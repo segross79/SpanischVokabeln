@@ -1,277 +1,525 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spanisch Vokabeltrainer (600 Wörter)</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --success: #16a34a;
-            --error: #dc2626;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanisch Vokabeltrainer (Random Modus)</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+    }
 
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        h1 {
-            font-size: 1.5rem;
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--primary);
-        }
+    .container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 28px;
+    }
 
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 0.875rem;
-            color: var(--text-light);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
-        }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
 
-        .card {
-            margin-bottom: 20px;
-        }
+    h1 { font-size: 1.4rem; color: var(--text); }
 
-        .category {
-            display: inline-block;
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-        .sentence {
-            font-size: 1.125rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
 
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
+    select, button {
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      outline: none;
+      transition: all 0.2s ease;
+    }
 
-        input[type="text"] {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+    select {
+      flex: 1;
+      background: #fff;
+      cursor: pointer;
+    }
 
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+    button:hover { background: var(--primary-hover); }
 
-        button:hover {
-            background-color: var(--primary-hover);
-        }
+    .btn-secondary {
+      background: #6b7280;
+    }
+    .btn-secondary:hover { background: #4b5563; }
 
-        .feedback {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 500;
-            display: none;
-        }
+    .btn-repeat {
+      background: #eab308;
+      color: #fff;
+    }
+    .btn-repeat:hover { background: #ca8a04; }
 
-        .feedback.success {
-            background-color: #dcfce7;
-            color: var(--success);
-            display: block;
-        }
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
 
-        .feedback.error {
-            background-color: #fee2e2;
-            color: var(--error);
-            display: block;
-        }
+    .toggle-group input {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
 
-        .hint {
-            margin-top: 10px;
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
+    .progress-bar-container {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: var(--border);
-            border-radius: 3px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
 
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-    </style>
+    .card {
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .prompt {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      gap: 6px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .input-group input {
+      font-size: 1.1rem;
+      padding: 8px 12px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      width: 180px;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+    }
+
+    .hint-box {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      min-height: 20px;
+      font-style: italic;
+    }
+
+    .btn-hint {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px dashed var(--border);
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .btn-hint:hover { background: #f3f4f6; color: var(--text); }
+
+    .feedback {
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .feedback.correct {
+      background: #dcfce7;
+      color: var(--success);
+      border: 1px solid #86efac;
+    }
+
+    .feedback.incorrect {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 15px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Spanisch Vokabeltrainer</h1>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+<div class="container">
+  <header>
+    <h1>Spanisch-Trainer</h1>
+    <span id="counter" style="font-weight: 600; color: var(--text-muted);">0 / 0</span>
+  </header>
 
-        <div class="stats">
-            <span id="counter">Frage 1 von 600</span>
-            <span id="score">Richtig: 0</span>
-        </div>
-
-        <div class="card">
-            <div id="category" class="category">Kategorie</div>
-            <div id="germanTranslation" style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 8px;">Deutsch: ...</div>
-            <div id="sentenceDisplay" class="sentence">Lade Vokabeln...</div>
-
-            <div class="input-group">
-                <input type="text" id="userInput" placeholder="Antwort eingeben..." autocomplete="off">
-                <button id="submitBtn" onclick="checkAnswer()">Prüfen</button>
-            </div>
-
-            <div id="hintDisplay" class="hint"></div>
-            <div id="feedback" class="feedback"></div>
-        </div>
+  <div class="controls">
+    <div class="row">
+      <select id="blockSelect" onchange="loadSelectedBlock()">
+        <!-- Dynamisch befüllt -->
+      </select>
+      <button class="btn-secondary" onclick="shuffleCurrentList()" title="Aktuelle Auswahl neu mischen">🎲 Mischen</button>
     </div>
 
-    <script>
-        // Die vollständige Datenbank mit allen 600 Vokabeln
-        const vocabData = [
-            // Beispielhafter Auszug / Platzhalter für die vollständige Liste (alle IDs 1 bis 600 sind hier integriert)
-            { id: 1, cat: "Grundlagen", de: "Hallo, wie geht es dir?", pre: "¡Hola! ¿Cómo ", post: "?", ans: "estás", hint: "befinden (Du-Form)" },
-            { id: 2, cat: "Grundlagen", de: "Mir geht es gut, danke.", pre: "Estoy ", post: ", gracias.", ans: "bien", hint: "gut" },
-            // ... (Hier befinden sich im vollständigen Array alle Einträge von ID 1 bis 600)
-            { id: 591, cat: "Abschluss", de: "Wir haben das Ziel fast erreicht.", pre: "Ya casi hemos llegado a la ", post: ".", ans: "meta", hint: "Ziel" },
-            { id: 592, cat: "Abschluss", de: "Das ist das Ende des Kurses.", pre: "Este es el final del ", post: ".", ans: "curso", hint: "Kurs" },
-            { id: 593, cat: "Abschluss", de: "Wir feiern unseren Erfolg.", pre: "Celebramos nuestro ", post: ".", ans: "éxito", hint: "Erfolg" },
-            { id: 594, cat: "Abschluss", de: "Ich habe viel gelernt.", pre: "He aprendido ", post: ".", ans: "mucho", hint: "viel" },
-            { id: 595, cat: "Abschluss", de: "Spanisch macht großen Spaß.", pre: "El español es muy ", post: ".", ans: "divertido", hint: "spaßig/unterhaltsam" },
-            { id: 596, cat: "Abschluss", de: "Wir sprechen jetzt besser.", pre: "Hablamos mejor ", post: ".", ans: "ahora", hint: "jetzt" },
-            { id: 597, cat: "Abschluss", de: "Der nächste Schritt ist eine Reise.", pre: "El siguiente paso es un ", post: ".", ans: "viaje", hint: "Reise" },
-            { id: 598, cat: "Abschluss", de: "Wir geben niemals auf.", pre: "Nunca nos ", post: ".", ans: "rendimos", hint: "aufgeben" },
-            { id: 599, cat: "Abschluss", de: "Bis zum nächsten Mal!", pre: "¡Hasta la próxima ", post: "!", ans: "vez", hint: "Mal" },
-            { id: 600, cat: "Abschluss", de: "Viel Erfolg beim Weiterlernen!", pre: "¡Mucho éxito en el siguiente ", post: "!", ans: "aprendizaje", hint: "Lernen" }
-        ];
+    <div class="row" style="justify-content: space-between;">
+      <label class="toggle-group">
+        <input type="checkbox" id="chkRandom" checked onchange="loadSelectedBlock()">
+        <span>Immer zufällig ausgeben (Random)</span>
+      </label>
 
-        let currentIndex = 0;
-        let correctCount = 0;
+      <button class="btn-repeat" id="btnRepeatWrong" onclick="startRepeatMode()" style="display:none;">
+        Fehler ( <span id="wrongCount">0</span> )
+      </button>
+    </div>
+  </div>
 
-        const categoryEl = document.getElementById("category");
-        const germanEl = document.getElementById("germanTranslation");
-        const sentenceDisplayEl = document.getElementById("sentenceDisplay");
-        const userInputEl = document.getElementById("userInput");
-        const feedbackEl = document.getElementById("feedback");
-        const counterEl = document.getElementById("counter");
-        const scoreEl = document.getElementById("score");
-        const hintEl = document.getElementById("hintDisplay");
-        const progressFillEl = document.getElementById("progressFill");
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
 
-        function loadQuestion() {
-            if (currentIndex >= vocabData.length) {
-                document.querySelector(".card").innerHTML = `
-                    <h2 style="text-align: center; color: var(--success);">Glückwunsch!</h2>
-                    <p style="text-align: center;">Du hast alle ${vocabData.length} Vokabeln durchgearbeitet.</p>
-                    <p style="text-align: center;">Richtig beantwortet: ${correctCount} von ${vocabData.length}</p>
-                    <button onclick="location.reload()" style="display: block; width: 100%; margin-top: 20px;">Nochmal starten</button>
-                `;
-                return;
-            }
+  <div class="card" id="quizCard">
+    <div class="category-badge" id="catBadge">Kategorie</div>
+    <div class="prompt" id="dePrompt">Deutsche Vokabel</div>
+    
+    <div class="input-group">
+      <span id="preText"></span>
+      <input type="text" id="userInput" placeholder="Antwort..." autocomplete="off" spellcheck="false">
+      <span id="postText"></span>
+    </div>
 
-            const current = vocabData[currentIndex];
-            categoryEl.textContent = current.cat;
-            germanEl.textContent = `Deutsch: ${current.de}`;
-            sentenceDisplayEl.innerHTML = `${current.pre}<span style="border-bottom: 2px dashed var(--primary); display: inline-block; width: 80px; text-align: center;">...</span>${current.post}`;
-            hintEl.textContent = `Hinweis: ${current.hint}`;
-            
-            userInputEl.value = "";
-            feedbackEl.className = "feedback";
-            feedbackEl.textContent = "";
-            
-            counterEl.textContent = `Frage ${currentIndex + 1} von ${vocabData.length}`;
-            scoreEl.textContent = `Richtig: ${correctCount}`;
-            progressFillEl.style.width = `${((currentIndex) / vocabData.length) * 100}%`;
-            
-            userInputEl.focus();
+    <button class="btn-hint" onclick="toggleHint()">💡 Hinweis anzeigen</button>
+    <div class="hint-box" id="hintBox" style="display:none;"></div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <button class="action-btn" id="btnSubmit" onclick="checkAnswer()">Überprüfen</button>
+
+  <div class="stats">
+    <span>Richtig: <strong id="scoreCorrect" style="color: var(--success);">0</strong></span>
+    <span>Falsch: <strong id="scoreWrong" style="color: var(--danger);">0</strong></span>
+  </div>
+</div>
+
+<script>
+  // HIER DIE 489 VOKABELN EINFÜGEN:
+  const vocabData = [
+    { id: 1, cat: "Pronomen", de: "ich", pre: "", post: "", ans: "yo", hint: "Personalpronomen" },
+    { id: 2, cat: "Pronomen", de: "du", pre: "", post: "", ans: "tú", hint: "Personalpronomen" },
+    { id: 3, cat: "Pronomen", de: "er", pre: "", post: "", ans: "él", hint: "Personalpronomen" },
+    { id: 4, cat: "Pronomen", de: "sie (Singular)", pre: "", post: "", ans: "ella", hint: "Personalpronomen" },
+    { id: 319, cat: "Restaurant", de: "Eine Vorspeise, bitte.", pre: "Un ", post: ", por favor.", ans: "entrante", hint: "Vorspeise" }
+    // Füge hier alle verbleibenden Vokabeln deines Datensatzes ein
+  ];
+
+  const BLOCK_SIZE = 30;
+  let currentList = [];
+  let currentIndex = 0;
+  let wrongAnswers = [];
+  let score = { correct: 0, wrong: 0 };
+  let isChecked = false;
+
+  // Fisher-Yates Shuffle Algorithmus für echtes Zufallsmischen
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  window.onload = () => {
+    buildBlockOptions();
+    loadSelectedBlock();
+
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (!isChecked) {
+          checkAnswer();
+        } else {
+          nextQuestion();
         }
+      }
+    });
+  };
 
-        function checkAnswer() {
-            const current = vocabData[currentIndex];
-            const userVal = userInputEl.value.trim().toLowerCase();
-            const correctVal = current.ans.toLowerCase();
+  function buildBlockOptions() {
+    const select = document.getElementById('blockSelect');
+    select.innerHTML = '';
+    
+    const totalBlocks = Math.ceil(vocabData.length / BLOCK_SIZE);
+    
+    for (let i = 0; i < totalBlocks; i++) {
+      const start = i * BLOCK_SIZE + 1;
+      const end = Math.min((i + 1) * BLOCK_SIZE, vocabData.length);
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `Block ${i + 1} (${start} - ${end})`;
+      select.appendChild(option);
+    }
 
-            if (userVal === correctVal) {
-                feedbackEl.textContent = "Richtig! ¡Muy bien!";
-                feedbackEl.className = "feedback success";
-                correctCount++;
-                currentIndex++;
-                setTimeout(loadQuestion, 1200);
-            } else {
-                feedbackEl.textContent = `Falsch. Richtige Antwort wäre: "${current.ans}"`;
-                feedbackEl.className = "feedback error";
-                currentIndex++;
-                setTimeout(loadQuestion, 2000);
-            }
+    const allOption = document.createElement('option');
+    allOption.value = "all";
+    allOption.textContent = `Alle Vokabeln (1 - ${vocabData.length})`;
+    select.appendChild(allOption);
+  }
+
+  function loadSelectedBlock() {
+    const val = document.getElementById('blockSelect').value;
+    const isRandom = document.getElementById('chkRandom').checked;
+
+    if (val === "all") {
+      currentList = [...vocabData];
+    } else {
+      const blockIndex = parseInt(val);
+      const start = blockIndex * BLOCK_SIZE;
+      const end = start + BLOCK_SIZE;
+      currentList = vocabData.slice(start, end);
+    }
+
+    if (isRandom) {
+      shuffleArray(currentList);
+    }
+
+    resetSession();
+  }
+
+  function shuffleCurrentList() {
+    shuffleArray(currentList);
+    resetSession();
+  }
+
+  function startRepeatMode() {
+    if (wrongAnswers.length === 0) return;
+    currentList = [...wrongAnswers];
+    if (document.getElementById('chkRandom').checked) {
+      shuffleArray(currentList);
+    }
+    wrongAnswers = [];
+    document.getElementById('btnRepeatWrong').style.display = 'none';
+    resetSession();
+  }
+
+  function resetSession() {
+    currentIndex = 0;
+    score = { correct: 0, wrong: 0 };
+    updateStats();
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (currentIndex >= currentList.length) {
+      finishBlock();
+      return;
+    }
+
+    isChecked = false;
+    const item = currentList[currentIndex];
+
+    document.getElementById('catBadge').textContent = item.cat || 'Allgemein';
+    document.getElementById('dePrompt').textContent = item.de;
+    document.getElementById('preText').textContent = item.pre || '';
+    document.getElementById('postText').textContent = item.post || '';
+    
+    const input = document.getElementById('userInput');
+    input.value = '';
+    input.disabled = false;
+    input.focus();
+
+    document.getElementById('hintBox').style.display = 'none';
+    document.getElementById('hintBox').textContent = item.hint || 'Kein Hinweis verfügbar.';
+
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'none';
+
+    const btn = document.getElementById('btnSubmit');
+    btn.textContent = 'Überprüfen';
+    btn.onclick = checkAnswer;
+
+    updateProgress();
+  }
+
+  function toggleHint() {
+    const hintBox = document.getElementById('hintBox');
+    hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function checkAnswer() {
+    if (isChecked) return;
+
+    const item = currentList[currentIndex];
+    const userVal = document.getElementById('userInput').value.trim().toLowerCase();
+    const targetVal = item.ans.trim().toLowerCase();
+
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'block';
+
+    if (userVal === targetVal) {
+      feedback.textContent = 'Richtig! ¡Muy bien!';
+      feedback.className = 'feedback correct';
+      score.correct++;
+    } else {
+      feedback.innerHTML = `Falsch! Richtig ist: <strong>${item.pre || ''}${item.ans}${item.post || ''}</strong>`;
+      feedback.className = 'feedback incorrect';
+      score.wrong++;
+      
+      if (!wrongAnswers.some(w => w.id === item.id)) {
+        wrongAnswers.push(item);
+      }
+    }
+
+    isChecked = true;
+    document.getElementById('userInput').disabled = true;
+    updateStats();
+
+    const btn = document.getElementById('btnSubmit');
+    btn.textContent = 'Weiter (Enter)';
+    btn.onclick = nextQuestion;
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    showQuestion();
+  }
+
+  function updateProgress() {
+    const total = currentList.length;
+    const current = currentIndex + 1;
+    document.getElementById('counter').textContent = `${Math.min(current, total)} / ${total}`;
+    
+    const pct = (currentIndex / total) * 100;
+    document.getElementById('progressBar').style.width = `${pct}%`;
+  }
+
+  function updateStats() {
+    document.getElementById('scoreCorrect').textContent = score.correct;
+    document.getElementById('scoreWrong').textContent = score.wrong;
+    
+    const repeatBtn = document.getElementById('btnRepeatWrong');
+    const wrongCountSpan = document.getElementById('wrongCount');
+    
+    if (wrongAnswers.length > 0) {
+      repeatBtn.style.display = 'inline-block';
+      wrongCountSpan.textContent = wrongAnswers.length;
+    }
+  }
+
+  function finishBlock() {
+    document.getElementById('progressBar').style.width = '100%';
+    document.getElementById('quizCard').innerHTML = `
+      <h2>Durchgang beendet! 🎉</h2>
+      <p style="margin-top: 10px; color: var(--text-muted);">
+        Ergebnis: <strong>${score.correct}</strong> richtig, <strong>${score.wrong}</strong> falsch.
+      </p>
+    `;
+    document.getElementById('feedback').style.display = 'none';
+    
+    const btn = document.getElementById('btnSubmit');
+    if (wrongAnswers.length > 0) {
+      btn.textContent = 'Fehler jetzt wiederholen';
+      btn.onclick = startRepeatMode;
+    } else {
+      btn.textContent = 'Nächsten Block laden';
+      btn.onclick = () => {
+        const select = document.getElementById('blockSelect');
+        if (select.selectedIndex < select.options.length - 1) {
+          select.selectedIndex++;
         }
-
-        userInputEl.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                checkAnswer();
-            }
-        });
-
-        // Starten
-        loadQuestion();
-    </script>
+        loadSelectedBlock();
+      };
+    }
+  }
+</script>
 </body>
 </html>
