@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spanisch Vokabeltrainer</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
       background-color: #0b111e; 
@@ -182,8 +180,8 @@
       <button class="btn-reset" onclick="resetProgress()">Zurücksetzen</button>
     </div>
     <div class="header-info">
-      <div>Modus: Zufall</div>
-      <div id="solved-count">(0 gelöst)</div>
+      <div id="round-info">Runde 1 / 20</div>
+      <div id="block-info">(0 / 30 gelöst)</div>
     </div>
   </div>
 
@@ -210,6 +208,7 @@
 
 <script>
 const vocabDb = [
+
 
 
  { id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
