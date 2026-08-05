@@ -1,51 +1,240 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spanisch Vokabeltrainer</title>
+    <title>Spanisch Grundwortschatz A1</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        h1 { color: #2c3e50; font-size: 24px; margin-bottom: 20px; }
-        .stats { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; }
-        .vocab { font-size: 28px; font-weight: bold; color: #2980b9; margin: 20px 0; }
-        input[type="text"] { width: 80%; padding: 10px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 5px; margin-bottom: 15px; outline: none; transition: border-color 0.3s; }
-        input[type="text"]:focus { border-color: #2980b9; }
-        button { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #219653; }
-        .feedback { margin-top: 15px; font-size: 16px; font-weight: bold; }
-        .correct { color: #27ae60; }
-        .incorrect { color: #c0392b; }
-        .rules { font-size: 12px; color: #95a5a6; margin-top: 25px; text-align: left; border-top: 1px solid #ecf0f1; padding-top: 10px; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --primary-hover: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success: #22c55e;
+            --error: #ef4444;
+            --retry: #f59e0b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.3);
+            padding: 1.5rem;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .badge {
+            background-color: #0f172a;
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge.retry-badge {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .info-box {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-box span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .sentence-area {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .german-sentence {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .spanish-sentence {
+            font-size: 1.15rem;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .blank-line {
+            display: inline-block;
+            border-bottom: 2px dashed var(--primary);
+            width: 100px;
+            margin: 0 5px;
+        }
+
+        .blank-line.error-line {
+            border-bottom: 2px dashed var(--error);
+        }
+
+        .input-container {
+            margin-top: 1.5rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            background-color: #0f172a;
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            text-align: center;
+            display: none;
+        }
+
+        .feedback.success {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: block;
+        }
+
+        .footer-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Spanisch Vokabeltrainer</h1>
-    <div class="stats" id="stats">Frage 1 von 30 (Runde 1)</div>
-    <div class="vocab" id="vocab-display">Lade Vokabeln...</div>
-    
-    <div id="quiz-area">
-        <input type="text" id="user-input" placeholder="Deutsche Übersetzung eingeben..." autocomplete="off">
-        <br>
-        <button id="submit-btn" onclick="checkAnswer()">Überprüfen</button>
+    <div class="header-row">
+        <div class="badge" id="badge-category">Wortschatz</div>
+        <div class="progress-label" id="progress-text">Frage 1 / 30</div>
     </div>
-    
-    <div class="feedback" id="feedback"></div>
 
-    <div class="rules">
-        <strong>Modus:</strong> Es werden immer 30 Vokabeln abgefragt. Nach den 30 Fragen muss man die Falscheingaben so oft eingeben, bis alles richtig war. Erst danach startet die nächste Runde mit den nächsten 30 Vokabeln, die bisher noch nicht dran waren. Wenn alles durch ist, beginnt es wieder von vorne. Alles immer random.
+    <div class="info-box" id="info-box">
+        Bedeutung: <span id="hint-text">...</span>
+    </div>
+
+    <div class="sentence-area">
+        <div class="german-sentence" id="german-sentence">Deutscher Satz</div>
+        <div class="spanish-sentence" id="spanish-container">
+            <span class="blank-line" id="dynamic-blank"></span>.
+        </div>
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="user-answer" placeholder="Spanische Vokabel eingeben..." autocomplete="off">
+        <button id="action-btn" onclick="handleAction()">Prüfen</button>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <div class="footer-stats">
+        <div>Score: <span id="score-text" style="color: var(--primary); font-weight: 600;">0</span></div>
+        <div>Streak: <span id="streak-text" style="color: var(--primary); font-weight: 600;">0</span></div>
     </div>
 </div>
 
 <script>
-    // 600 Vokabeln
-    const allVocabs = [
-Hier die Vokabeln von denen ich spreche. Füge das ein
-
-{ id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
+    
+const vocabDb = [
+ { id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
 { id: 2, cat: "Pronomen", de: "Du bist mein Freund.", pre: "", post: " eres mi amigo.", ans: "tú", hint: "du" },
 { id: 3, cat: "Pronomen", de: "Er ist groß.", pre: "", post: " es alto.", ans: "él", hint: "er" },
 { id: 4, cat: "Pronomen", de: "Sie ist klug.", pre: "", post: " es lista.", ans: "ella", hint: "sie (Singular)" },
@@ -393,7 +582,7 @@ Hier die Vokabeln von denen ich spreche. Füge das ein
 { id: 316, cat: "Restaurant", de: "Das schmeckt sehr gut.", pre: "Está muy ", post: ".", ans: "rico", hint: "lecker/gut schmecken" },
 { id: 317, cat: "Restaurant", de: "Ich hätte gern die Rechnung.", pre: "La ", post: ", por favor.", ans: "cuenta", hint: "Rechnung" },
 { id: 318, cat: "Restaurant", de: "Stimmt so.", pre: "Quédese con el ", post: ".", ans: "cambio", hint: "Wechselgeld/Trinkgeld" },
-{ id: 319, cat: "Restaurant", de: "Eine Vorspeise, bitte.", pre: "Un ", post: ", por favor.", anpre: "", ans: "entrante", hint: "Vorspeise" },
+{ id: 319, cat: "Restaurant", de: "Eine Vorspeise, bitte.", pre: "Un ", post: ", por favor.", ans: "entrante", hint: "Vorspeise" },
 { id: 320, cat: "Restaurant", de: "Zum Nachtisch nehme ich Obst.", pre: "De ", post: " tomo fruta.", ans: "postre", hint: "Nachspeise/Dessert" },
 
 { id: 321, cat: "Hotel", de: "Ich habe ein Zimmer reserviert.", pre: "Tengo una ", post: " reservada.", ans: "habitación", hint: "Zimmer" },
@@ -403,121 +592,445 @@ Hier die Vokabeln von denen ich spreche. Füge das ein
 { id: 325, cat: "Hotel", de: "Gibt es hier WLAN?", pre: "¿Hay ", post: " aquí?", ans: "wifi", hint: "WLAN" },
 { id: 326, cat: "Hotel", de: "Wie lautet das Passwort?", pre: "¿Cuál es la ", post: "?", ans: "contraseña", hint: "Passwort" },
 { id: 327, cat: "Hotel", de: "Mein Zimmer ist laut.", pre: "Mi habitación es ", post: ".", ans: "ruidosa", hint: "laut" },
-    ];
 
-    let remainingPool = [];
-    let currentRoundVocabs = [];
-    let failedVocabs = [];
+{ id: 328, cat: "Hotel", de: "Die Dusche funktioniert nicht.", pre: "La ducha no ", post: ".", ans: "funciona", hint: "funktionieren" },
+{ id: 329, cat: "Hotel", de: "Ich möchte auschecken.", pre: "Quiero ", post: ".", ans: "salir", hint: "auschecken/gehen" },
+{ id: 330, cat: "Hotel", de: "Vielen Dank für alles.", pre: "Muchas gracias por ", post: ".", ans: "todo", hint: "alles" },
+
+{ id: 331, cat: "Kommunikation", de: "Hallo, sprichst du Englisch?", pre: "Hola, ¿hablas ", post: "?", ans: "inglés", hint: "Englisch" },
+{ id: 332, cat: "Kommunikation", de: "Ich spreche ein bisschen Spanisch.", pre: "Hablo un ", post: " de español.", ans: "poco", hint: "ein wenig" },
+{ id: 333, cat: "Kommunikation", de: "Können Sie das bitte wiederholen?", pre: "¿Puede repetir eso, por ", post: "?", ans: "favor", hint: "bitte" },
+{ id: 334, cat: "Kommunikation", de: "Ich verstehe das nicht.", pre: "No ", post: " eso.", ans: "entiendo", hint: "verstehen" },
+{ id: 335, cat: "Kommunikation", de: "Wie sagt man das auf Spanisch?", pre: "¿Cómo se dice eso en ", post: "?", ans: "español", hint: "Spanisch" },
+{ id: 336, cat: "Kommunikation", de: "Entschuldigung, wo ist die Toilette?", pre: "Disculpe, ¿dónde está el ", post: "?", ans: "baño", hint: "Toilette" },
+{ id: 337, cat: "Kommunikation", de: "Es tut mir leid.", pre: "Lo ", post: ".", ans: "siento", hint: "es tut mir leid" },
+{ id: 338, cat: "Kommunikation", de: "Kein Problem.", pre: "No hay ", post: ".", ans: "problema", hint: "Problem" },
+{ id: 339, cat: "Kommunikation", de: "Vielen Dank!", pre: "¡Muchas ", post: "!", ans: "gracias", hint: "Vielen Dank" },
+{ id: 340, cat: "Kommunikation", de: "Gern geschehen.", pre: "De ", post: ".", ans: "nada", hint: "Gern geschehen" },
+
+{ id: 341, cat: "Technik", de: "Mein Handy ist leer.", pre: "Mi móvil está ", post: ".", ans: "descargado", hint: "leer/akku leer" },
+{ id: 342, cat: "Technik", de: "Ich muss mein Telefon aufladen.", pre: "Tengo que ", post: " el móvil.", ans: "cargar", hint: "laden" },
+{ id: 343, cat: "Technik", de: "Hast du ein Ladekabel?", pre: "¿Tienes un cable de ", post: "?", ans: "carga", hint: "Ladekabel" },
+{ id: 344, cat: "Technik", de: "Ruf mich an!", pre: "¡", post: "mame!", ans: "lla", hint: "anrufen" },
+{ id: 345, cat: "Technik", de: "Ich schicke dir eine Nachricht.", pre: "Te mando un ", post: ".", ans: "mensaje", hint: "Nachricht" },
+{ id: 346, cat: "Technik", de: "Das Internet ist sehr langsam.", pre: "Internet es muy ", post: ".", ans: "lento", hint: "langsam" },
+{ id: 347, cat: "Technik", de: "Mach den Fernseher an.", pre: "Enciende la ", post: ".", ans: "tele", hint: "Fernseher" },
+{ id: 348, cat: "Technik", de: "Die Batterie ist neu.", pre: "La ", post: " es nueva.", ans: "pila", hint: "Batterie" },
+{ id: 349, cat: "Technik", de: "Das Foto ist scharf.", pre: "La foto es ", post: ".", ans: "nítida", hint: "scharf" },
+{ id: 350, cat: "Technik", de: "Ich höre Podcasts.", pre: "Escucho ", post: ".", ans: "pódcasts", hint: "Podcasts" },
+
+{ id: 351, cat: "Wetter", de: "Wie ist das Wetter heute?", pre: "¿Qué tiempo ", post: " hoy?", ans: "hace", hint: "Wetter (machen)" },
+{ id: 352, cat: "Wetter", de: "Die Sonne scheint.", pre: "Hace ", post: ".", ans: "sol", hint: "sonnig" },
+{ id: 353, cat: "Wetter", de: "Es regnet stark.", pre: "Llueve ", post: ".", ans: "mucho", hint: "viel/stark" },
+{ id: 354, cat: "Wetter", de: "Es schneit in den Bergen.", pre: "Nieve en la ", post: ".", ans: "sierra", hint: "Gebirge/Schnee" },
+{ id: 355, cat: "Wetter", de: "Der Wind weht stark.", pre: "Hace mucho ", post: ".", ans: "viento", hint: "Wind" },
+{ id: 356, cat: "Wetter", de: "Es ist bewölkt.", pre: "Está ", post: ".", ans: "nublado", hint: "bewölkt" },
+{ id: 357, cat: "Wetter", de: "Wie viel Grad haben wir?", pre: "¿A cuántos ", post: " estamos?", ans: "grados", hint: "Grad" },
+{ id: 358, cat: "Wetter", de: "Es ist sehr kalt heute.", pre: "Hace mucho ", post: " hoy.", ans: "frío", hint: "kalt" },
+{ id: 359, cat: "Wetter", de: "Im Sommer ist es heiß.", pre: "En verano hace ", post: ".", ans: "calor", hint: "heiß" },
+{ id: 360, cat: "Wetter", de: "Der Frühling ist schön.", pre: "La ", post: " es bonita.", ans: "primavera", hint: "Frühling" },
+
+{ id: 361, cat: "Zeit", de: "Der Herbst bringt Regen.", pre: "El ", post: " trae lluvia.", ans: "otoño", hint: "Herbst" },
+{ id: 362, cat: "Zeit", de: "Es ist Mitternacht.", pre: "Es la ", post: ".", ans: "medianoche", hint: "Mitternacht" },
+{ id: 363, cat: "Zeit", de: "Es ist Mittag.", pre: "Es el ", post: ".", ans: "mediodía", hint: "Mittag" },
+{ id: 364, cat: "Zeit", de: "Wir haben Zeit.", pre: "Tenemos ", post: ".", ans: "tiempo", hint: "Zeit" },
+{ id: 365, cat: "Zeit", de: "Beeil dich!", pre: "¡", post: "te!", ans: "da prisa", hint: "beeilen" },
+{ id: 366, cat: "Zeit", de: "Es ist zu spät.", pre: "Es demasiado ", post: ".", ans: "tarde", hint: "spät" },
+{ id: 367, cat: "Zeit", de: "Du kommst zu früh.", pre: "Llegas muy ", post: ".", ans: "pronto", hint: "früh" },
+{ id: 368, cat: "Zeit", de: "Bis später!", pre: "¡Hasta ", post: "!", ans: "luego", hint: "bis später" },
+{ id: 369, cat: "Zeit", de: "Bis morgen!", pre: "¡Hasta ", post: "!", ans: "mañana", hint: "bis morgen" },
+{ id: 370, cat: "Zeit", de: "Vor einem Jahr.", pre: "Hace un ", post: ".", ans: "año", hint: "vor einem Jahr" },
+
+{ id: 371, cat: "Reise", de: "Ich mache eine Reise.", pre: "Hago un ", post: ".", ans: "viaje", hint: "Reise" },
+{ id: 372, cat: "Reise", de: "Wir packen die Koffer.", pre: "Hacemos las ", post: ".", ans: "maletas", hint: "Koffer" },
+{ id: 373, cat: "Reise", de: "Der Flug hat Verspätung.", pre: "El vuelo tiene ", post: ".", ans: "retraso", hint: "Verspätung" },
+{ id: 374, cat: "Reise", de: "Wo ist mein Gepäck?", pre: "¿Dónde está mi ", post: "?", ans: "equipaje", hint: "Gepäck" },
+{ id: 375, cat: "Reise", de: "Wir nehmen ein Taxi.", pre: "Tomamos un ", post: ".", ans: "taxi", hint: "Taxi" },
+{ id: 376, cat: "Reise", de: "Bitte halten Sie hier.", pre: "Pare aquí, por ", post: ".", ans: "favor", hint: "bitte anhalten" },
+{ id: 377, cat: "Reise", de: "Wie viel kostet die Fahrt?", pre: "¿Cuánto cuesta el ", post: "?", ans: "trayecto", hint: "Fahrt/Strecke" },
+{ id: 378, cat: "Reise", de: "Ich habe eine Stadtführung.", pre: "Tengo una visita ", post: ".", ans: "guiada", hint: "Stadtführung" },
+{ id: 379, cat: "Reise", de: "Wo ist die Touristeninformation?", pre: "¿Dónde está la oficina de ", post: "?", ans: "turismo", hint: "Touristeninformation" },
+{ id: 380, cat: "Reise", de: "Ich mache schöne Fotos.", pre: "Hago fotos ", post: ".", ans: "bonitas", hint: "schön" },
+
+{ id: 381, cat: "Schule", de: "Ich lerne Vokabeln.", pre: "Aprendo ", post: ".", ans: "vocabulario", hint: "Vokabular" },
+{ id: 382, cat: "Schule", de: "Der Lehrer erklärt die Regel.", pre: "El profesor explica la ", post: ".", ans: "regla", hint: "Regel" },
+{ id: 383, cat: "Schule", de: "Öffnen Sie das Buch auf Seite zehn.", pre: "Abra el libro por la página ", post: ".", ans: "diez", hint: "zehn" },
+{ id: 384, cat: "Schule", de: "Schreiben Sie die Übung auf.", pre: "Escriban el ", post: ".", ans: "ejercicio", hint: "Übung" },
+{ id: 385, cat: "Schule", de: "Haben Sie Fragen?", pre: "¿Tiene alguna ", post: "?", ans: "pregunta", hint: "Frage" },
+{ id: 386, cat: "Schule", de: "Die Hausaufgabe ist leicht.", pre: "Los deberes son ", post: ".", ans: "fáciles", hint: "leicht (Plural)" },
+{ id: 387, cat: "Schule", de: "Wir machen einen Test.", pre: "Hacemos un ", post: ".", ans: "examen", hint: "Test/Prüfung" },
+{ id: 388, cat: "Schule", de: "Ich habe bestanden.", pre: "He ", post: ".", ans: "aprobado", hint: "bestanden" },
+{ id: 389, cat: "Schule", de: "Ich spreche fließend.", pre: "Hablo con ", post: ".", ans: "fluidez", hint: "Flüssigkeit" },
+{ id: 390, cat: "Schule", de: "Die Sprache ist wunderschön.", pre: "El idioma es ", post: ".", ans: "precioso", hint: "wunderschön" },
+
+{ id: 391, cat: "Geld", de: "Ich gehe zum Geldautomaten.", pre: "Voy al cajero ", post: ".", ans: "automático", hint: "Geldautomat" },
+{ id: 392, cat: "Geld", de: "Ich hebe Geld ab.", pre: "Saco ", post: ".", ans: "dinero", hint: "Geld abheben" },
+{ id: 393, cat: "Geld", de: "Wie ist der Wechselkurs?", pre: "¿Cuál es el tipo de ", post: "?", ans: "cambio", hint: "Wechselkurs" },
+{ id: 394, cat: "Geld", de: "Ich möchte Euro wechseln.", pre: "Quiero cambiar ", post: ".", ans: "euros", hint: "Euro" },
+{ id: 395, cat: "Geld", de: "Akzeptieren Sie Kreditkarten?", pre: "¿Aceptan tarjetas de ", post: "?", ans: "crédito", hint: "Kreditkarte" },
+{ id: 396, cat: "Geld", de: "Geben Sie mir die PIN, bitte.", pre: "Dame el ", post: ", por favor.", ans: "pin", hint: "PIN" },
+{ id: 397, cat: "Geld", de: "Das Konto ist gedeckt.", pre: "La cuenta está ", post: ".", ans: "cubierta", hint: "gedeckt" },
+{ id: 398, cat: "Geld", de: "Ich spare Geld.", pre: "Ahorro ", post: ".", ans: "dinero", hint: "sparen" },
+{ id: 399, cat: "Geld", de: "Das kostet einen kleinen Preis.", pre: "Cuesta un precio ", post: ".", ans: "bajo", hint: "niedrig/günstig" },
+{ id: 400, cat: "Geld", de: "Ich bezahle die Rechnung.", pre: "Pago la ", post: ".", ans: "factura", hint: "Rechnung/Beleg" },
+{ id: 401, cat: "Persönlichkeit", de: "Er ist sehr freundlich.", pre: "Él es muy ", post: ".", ans: "amable", hint: "freundlich/nett" },
+{ id: 402, cat: "Persönlichkeit", de: "Sie ist eine ruhige Person.", pre: "Ella es una persona ", post: ".", ans: "tranquila", hint: "ruhig" },
+{ id: 403, cat: "Persönlichkeit", de: "Mein Chef ist streng.", pre: "Mi jefe es ", post: ".", ans: "estricto", hint: "streng" },
+{ id: 404, cat: "Persönlichkeit", de: "Das ist ein ehrlicher Mensch.", pre: "Es una persona ", post: ".", ans: "honesta", hint: "ehrlich" },
+{ id: 405, cat: "Persönlichkeit", de: "Er ist sehr humorvoll.", pre: "Él tiene mucho ", post: ".", ans: "humor", hint: "Humor" },
+{ id: 406, cat: "Persönlichkeit", de: "Sei nicht so ungeduldig!", pre: "¡No seas tan ", post: "!", ans: "impaciente", hint: "ungeduldig" },
+{ id: 407, cat: "Persönlichkeit", de: "Sie ist sehr schüchtern.", pre: "Ella es muy ", post: ".", ans: "tímida", hint: "schüchtern" },
+{ id: 408, cat: "Persönlichkeit", de: "Er ist ein optimistischer Typ.", pre: "Él es un tipo ", post: ".", ans: "optimista", hint: "optimistisch" },
+{ id: 409, cat: "Persönlichkeit", de: "Das Kind ist sehr neugierig.", pre: "El niño es muy ", post: ".", ans: "curioso", hint: "neugierig" },
+{ id: 410, cat: "Persönlichkeit", de: "Sie ist immer hilfsbereit.", pre: "Ella siempre es ", post: ".", ans: "servicial", hint: "hilfsbereit" },
+
+{ id: 411, cat: "Sport", de: "Ich spiele gern Fußball.", pre: "Me gusta jugar al ", post: ".", ans: "fútbol", hint: "Fußball" },
+{ id: 412, cat: "Sport", de: "Wir gehen im Sommer schwimmen.", pre: "Vamos a ", post: " en verano.", ans: "nadar", hint: "schwimmen" },
+{ id: 413, cat: "Sport", de: "Ich laufe jeden Morgen im Park.", pre: "Corro por el parque todas las ", post: ".", ans: "mañanas", hint: "Morgen" },
+{ id: 414, cat: "Sport", de: "Fährst du gern Rad?", pre: "¿Te gusta montar en ", post: "?", ans: "bicicleta", hint: "Fahrrad" },
+{ id: 415, cat: "Sport", de: "Wir machen Yoga zu Hause.", pre: "Hacemos ", post: " en casa.", ans: "yoga", hint: "Yoga" },
+{ id: 416, cat: "Sport", de: "Der Trainer erklärt die Übung.", pre: "El ", post: " explica el ejercicio.", ans: "entrenador", hint: "Trainer" },
+{ id: 417, cat: "Sport", de: "Ich gehe ins Fitnessstudio.", pre: "Voy al ", post: ".", ans: "gimnasio", hint: "Fitnessstudio" },
+{ id: 418, cat: "Sport", de: "Wer hat das Spiel gewonnen?", pre: "¿Quién ha ganado el ", post: "?", ans: "partido", hint: "Spiel/Match" },
+{ id: 419, cat: "Sport", de: "Das Stadion ist riesig.", pre: "El ", post: " es enorme.", ans: "estadio", hint: "Stadion" },
+{ id: 420, cat: "Sport", de: "Ich mache Krafttraining.", pre: "Hago entrenamiento de ", post: ".", ans: "fuerza", hint: "Kraft(training)" },
+
+{ id: 421, cat: "Gesundheit", de: "Ich habe Kopfschmerzen.", pre: "Tengo dolor de ", post: ".", ans: "cabeza", hint: "Kopfschmerzen" },
+{ id: 422, cat: "Gesundheit", de: "Mir tut der Bauch weh.", pre: "Me duele el ", post: ".", ans: "estómago", hint: "Bauch/Magen" },
+{ id: 423, cat: "Gesundheit", de: "Ich habe Fieber.", pre: "Tengo ", post: ".", ans: "fiebre", hint: "Fieber" },
+{ id: 424, cat: "Gesundheit", de: "Der Zahnarzt zieht einen Zahn.", pre: "El dentista saca un ", post: ".", ans: "diente", hint: "Zahn" },
+{ id: 425, cat: "Gesundheit", de: "Ich nehme eine Tablette.", pre: "Tomo una ", post: ".", ans: "pastilla", hint: "Tablette" },
+{ id: 426, cat: "Gesundheit", de: "Das ist gesund für den Körper.", pre: "Eso es sano para el ", post: ".", ans: "cuerpo", hint: "Körper" },
+{ id: 427, cat: "Gesundheit", de: "Ich bin allergisch gegen Nüsse.", pre: "Soy alérgico a los ", post: ".", ans: "frutos secos", hint: "Nüsse" },
+{ id: 428, cat: "Gesundheit", de: "Gute Besserung!", pre: "¡Que te ", post: "!", ans: "mejores", hint: "gute Besserung" },
+{ id: 429, cat: "Gesundheit", de: "Ich habe mich verletzt.", pre: "Me he ", post: ".", ans: "lesionado", hint: "verletzt" },
+{ id: 430, cat: "Gesundheit", de: "Rufen Sie einen Krankenwagen!", pre: "¡Llame a una ", post: "!", ans: "ambulancia", hint: "Ambulanz/Krankenwagen" },
+
+{ id: 431, cat: "Notfall", de: "Hilfe! Es brennt!", pre: "¡Auxilio! Hay un ", post: ".", ans: "fuego", hint: "Feuer" },
+{ id: 432, cat: "Notfall", de: "Wo ist die Polizei?", pre: "¿Dónde está la ", post: "?", ans: "policía", hint: "Polizei" },
+{ id: 433, cat: "Notfall", de: "Ich habe meinen Geldbeutel verloren.", pre: "He perdido mi ", post: ".", ans: "cartera", hint: "Geldbeutel" },
+{ id: 434, cat: "Notfall", de: "Man hat mich bestohlen.", pre: "Me han ", post: ".", ans: "robado", hint: "gestohlen" },
+{ id: 435, cat: "Notfall", de: "Ich brauche Hilfe.", pre: "Necesito ", post: ".", ans: "ayuda", hint: "Hilfe" },
+{ id: 436, cat: "Notfall", de: "Pass auf dich auf!", pre: "¡", post: "ado!", ans: "cuid", hint: "aufpassen" },
+{ id: 437, cat: "Notfall", de: "Es ist ein Notfall.", pre: "Es una ", post: ".", ans: "emergencia", hint: "Notfall" },
+{ id: 438, cat: "Notfall", de: "Wo ist der Notarzt?", pre: "¿Dónde está el médico de ", post: "?", ans: "urgencias", hint: "Notaufnahme/Notdienst" },
+{ id: 439, cat: "Notfall", de: "Ich habe mich verlaufen.", pre: "Me he ", post: ".", ans: "perdido", hint: "verlaufen" },
+{ id: 440, cat: "Notfall", de: "Keine Panik, alles wird gut.", pre: "No hay pánico, todo irá ", post: ".", ans: "bien", hint: "gut" },
+
+{ id: 441, cat: "Behörde", de: "Ich gehe zum Rathaus.", pre: "Voy al ", post: ".", ans: "ayuntamiento", hint: "Rathaus" },
+{ id: 442, cat: "Behörde", de: "Ich brauche ein Formular.", pre: "Necesito un ", post: ".", ans: "formulario", hint: "Formular" },
+{ id: 443, cat: "Behörde", de: "Unterschreiben Sie hier, bitte.", pre: "Firme ", post: ", por favor.", ans: "aquí", hint: "hier unterschreiben" },
+{ id: 444, cat: "Behörde", de: "Das ist meine Unterschrift.", pre: "Esta es mi ", post: ".", ans: "firma", hint: "Unterschrift" },
+{ id: 445, cat: "Behörde", de: "Ich brauche einen Termin.", pre: "Necesito una ", post: ".", ans: "cita", hint: "Termin" },
+{ id: 446, cat: "Behörde", de: "Warten Sie im Wartezimmer.", pre: "Espere en la sala de ", post: ".", ans: "espera", hint: "Wartezimmer" },
+{ id: 447, cat: "Behörde", de: "Das Dokument ist gültig.", pre: "El documento es ", post: ".", ans: "válido", hint: "gültig" },
+{ id: 448, cat: "Behörde", de: "Mein Ausweis ist abgelaufen.", pre: "Mi documento de identidad ha ", post: ".", ans: "caducado", hint: "abgelaufen" },
+{ id: 449, cat: "Behörde", de: "Ich zahle die Gebühr.", pre: "Pago la ", post: ".", ans: "tasa", hint: "Gebühr" },
+{ id: 450, cat: "Behörde", de: "Wo ist das Standesamt?", pre: "¿Dónde está el registro ", post: "?", ans: "civil", hint: "Standesamt" },
+
+{ id: 451, cat: "Umwelt", de: "Wir schützen die Natur.", pre: "Protegemos la ", post: ".", ans: "naturaleza", hint: "Natur" },
+{ id: 452, cat: "Umwelt", de: "Wir trennen den Müll.", pre: "Separamos la ", post: ".", ans: "basura", hint: "Müll" },
+{ id: 453, cat: "Umwelt", de: "Recyceln ist wichtig.", pre: "Reciclar es ", post: ".", ans: "importante", hint: "wichtig" },
+{ id: 454, cat: "Umwelt", de: "Saubere Energie ist die Zukunft.", pre: "La energía limpia es el ", post: ".", ans: "futuro", hint: "Zukunft" },
+{ id: 455, cat: "Umwelt", de: "Das Wasser ist rein.", pre: "El agua es ", post: ".", ans: "pura", hint: "rein" },
+{ id: 456, cat: "Umwelt", de: "Wir pflanzen einen Baum im Garten.", pre: "Plantamos un árbol en el ", post: ".", ans: "jardín", hint: "Garten" },
+{ id: 457, cat: "Umwelt", de: "Der Wald brennt im Sommer oft.", pre: "El bosque se quema a menudo en ", post: ".", ans: "verano", hint: "Sommer" },
+{ id: 458, cat: "Umwelt", de: "Plastik ist schlecht für die Tiere.", pre: "El plástico es malo para los ", post: ".", ans: "animales", hint: "Tiere" },
+{ id: 459, cat: "Umwelt", de: "Wir sparen Strom zu Hause.", pre: "Ahorramos ", post: " en casa.", ans: "electricidad", hint: "Strom" },
+{ id: 460, cat: "Umwelt", de: "Die Erde ist unser Planet.", pre: "La Tierra es nuestro ", post: ".", ans: "planeta", hint: "Planet" },
+
+{ id: 461, cat: "Kultur", de: "Wir gehen ins Theater.", pre: "Vamos al ", post: ".", ans: "teatro", hint: "Theater" },
+{ id: 462, cat: "Kultur", de: "Das Konzert war fantastisch.", pre: "El concierto fue ", post: ".", ans: "fantástico", hint: "fantastisch" },
+{ id: 463, cat: "Kultur", de: "Ich spiele Klavier.", pre: "Toco el ", post: ".", ans: "piano", hint: "Klavier" },
+{ id: 464, cat: "Kultur", de: "Sie tanzt sehr gut Flamenco.", pre: "Ella baila muy bien ", post: ".", ans: "flamenco", hint: "Flamenco" },
+{ id: 465, cat: "Kultur", de: "Das Museum zeigt alte Kunst.", pre: "El museo muestra arte ", post: ".", ans: "antiguo", hint: "alt" },
+{ id: 466, cat: "Kultur", de: "Wir lesen spanische Gedichte.", pre: "Leemos ", post: " españoles.", ans: "poemas", hint: "Gedichte" },
+{ id: 467, cat: "Kultur", de: "Der Eintritt kostet zehn Euro.", pre: "La entrada cuesta diez ", post: ".", ans: "euros", hint: "Euro" },
+{ id: 468, cat: "Kultur", de: "Die Ausstellung ist sehenswert.", pre: "La exposición merece la ", post: ".", ans: "pena", hint: "es lohnt sich" },
+{ id: 469, cat: "Kultur", de: "Ich liebe historische Architektur.", pre: "Me encanta la arquitectura ", post: ".", ans: "histórica", hint: "historisch" },
+{ id: 470, cat: "Kultur", de: "Das Buch hat einen tollen Einband.", pre: "El libro tiene una bonita ", post: ".", ans: "encuadernación", hint: "Einband" },
+
+{ id: 471, cat: "Medien", de: "Ich lese die Tageszeitung.", pre: "Leo el periódico del ", post: ".", ans: "día", hint: "Tageszeitung" },
+{ id: 472, cat: "Medien", de: "Die Nachrichten laufen im Fernsehen.", pre: "Las noticias pasan en la ", post: ".", ans: "televisión", hint: "Fernsehen" },
+{ id: 473, cat: "Medien", de: "Ich höre morgens Radio.", pre: "Escucho la ", post: " por la mañana.", ans: "radio", hint: "Radio" },
+{ id: 474, cat: "Medien", de: "Der Artikel ist sehr informativ.", pre: "El artículo es muy ", post: ".", ans: "informativo", hint: "informativ" },
+{ id: 475, cat: "Medien", de: "Wer ist der Autor dieses Buches?", pre: "¿Quién es el autor de este ", post: "?", ans: "libro", hint: "Buch" },
+{ id: 476, cat: "Medien", de: "Ich veröffentliche einen Blogbeitrag.", pre: "Publico una entrada en el ", post: ".", ans: "blog", hint: "Blog" },
+{ id: 477, cat: "Medien", de: "Das Interview war spannend.", pre: "La entrevista fue muy ", post: ".", ans: "emocionante", hint: "spannend/aufregend" },
+{ id: 478, cat: "Medien", de: "Die Zeitschrift erscheint monatlich.", pre: "La revista sale cada ", post: ".", ans: "mes", hint: "Monat" },
+{ id: 479, cat: "Medien", de: "Ich teile den Link mit dir.", pre: "Comparto el ", post: " contigo.", ans: "enlace", hint: "Link" },
+{ id: 480, cat: "Medien", de: "Der Kommentar hat viele Likes.", pre: "El comentario tiene muchos ", post: ".", ans: "me gusta", hint: "Likes" },
+
+{ id: 481, cat: "Gefühle", de: "Ich bin sehr stolz auf dich.", pre: "Estoy muy ", post: " de ti.", ans: "orgulloso", hint: "stolz" },
+{ id: 482, cat: "Gefühle", de: "Sie ist überrascht über das Geschenk.", pre: "Ella está ", post: " por el regalo.", ans: "sorprendida", hint: "überrascht" },
+{ id: 483, cat: "Gefühle", de: "Er hat schreckliche Angst vor Spinnen.", pre: "Tiene mucho ", post: " a las arañas.", ans: "miedo", hint: "Angst" },
+{ id: 484, cat: "Gefühle", de: "Ich fühle mich heute einsam.", pre: "Me siento ", post: " hoy.", ans: "solo", hint: "einsam/allein" },
+{ id: 485, cat: "Gefühle", de: "Mach dir keine Sorgen um mich.", pre: "No te ", post: " por mí.", ans: "preocupes", hint: "Sorgen machen" },
+{ id: 486, cat: "Gefühle", de: "Ich habe mich in diese Stadt verliebt.", pre: "Me he ", post: " de esta ciudad.", ans: "enamorado", hint: "verliebt" },
+{ id: 487, cat: "Gefühle", de: "Es tut mir leid, ich bin gestresst.", pre: "Lo siento, estoy ", post: ".", ans: "estresado", hint: "gestresst" },
+{ id: 488, cat: "Gefühle", de: "Wir sind voller Hoffnung.", pre: "Estamos llenos de ", post: ".", ans: "esperanza", hint: "Hoffnung" },
+{ id: 489, cat: "Gefühle", de: "Er ist enttäuscht vom Ergebnis.", pre: "Él está ", post: " con el resultado.", ans: "decepcionado", hint: "enttäuscht" },
+{ id: 490, cat: "Gefühle", de: "Genieße den Moment!", pre: "¡Disfruta del ", post: "!", ans: "momento", hint: "Moment" },
+
+{ id: 491, cat: "Alltag", de: "Ich putze die Wohnung am Samstag.", pre: "Limpio el piso el ", post: ".", ans: "sábado", hint: "Samstag" },
+{ id: 492, cat: "Alltag", de: "Ich hänge die Wäsche auf.", pre: "Tiendo la ", post: ".", ans: "ropa", hint: "Wäsche" },
+{ id: 493, cat: "Alltag", de: "Der Müll muss rausgebracht werden.", pre: "Hay que sacar la ", post: ".", ans: "basura", hint: "Müll" },
+{ id: 494, cat: "Alltag", de: "Ich bügle meine Hemden selbst.", pre: "Plancho mis camisas ", post: ".", ans: "yo mismo", hint: "selbst" },
+{ id: 495, cat: "Alltag", de: "Die Waschmaschine läuft.", pre: "La lavadora está en ", post: ".", ans: "marcha", hint: "in Betrieb" },
+{ id: 496, cat: "Alltag", de: "Ich kaufe frisches Brot beim Bäcker.", pre: "Compro pan fresco en la ", post: ".", ans: "panadería", hint: "Bäckerei" },
+{ id: 497, cat: "Alltag", de: "Wir bringen den Hund zum Tierarzt.", pre: "Llevamos el perro al veterinario.", post: "", ans: "perro", hint: "Hund" },
+{ id: 498, cat: "Alltag", de: "Ich gieße die Blumen jeden Abend.", pre: "Riego las flores todas las ", post: ".", ans: "noches", hint: "Abend" },
+{ id: 499, cat: "Alltag", de: "Der Staubsauger macht viel Lärm.", pre: "La aspiradora hace mucho ", post: ".", ans: "ruido", hint: "Lärm" },
+{ id: 500, cat: "Alltag", de: "Ich schließe die Haustür ab.", pre: "Cierro la puerta con ", post: ".", ans: "llave", hint: "Schlüssel" },
+
+{ id: 501, cat: "Beruf", de: "Ich arbeite in einem Büro.", pre: "Trabajo en una ", post: ".", ans: "oficina", hint: "Büro" },
+{ id: 502, cat: "Beruf", de: "Mein Kollege ist sehr hilfsbereit.", pre: "Mi ", post: " es muy servicial.", ans: "colega", hint: "Kollege" },
+{ id: 503, cat: "Beruf", de: "Wir haben heute eine wichtige Besprechung.", pre: "Tenemos una importante ", post: " hoy.", ans: "reunión", hint: "Besprechung/Meeting" },
+{ id: 504, cat: "Beruf", de: "Ich schreibe eine E-Mail an den Kunden.", pre: "Escribo un correo al ", post: ".", ans: "cliente", hint: "Kunde" },
+{ id: 505, cat: "Beruf", de: "Der Chef unterschreibt den Vertrag.", pre: "El jefe firma el ", post: ".", ans: "contrato", hint: "Vertrag" },
+{ id: 506, cat: "Beruf", de: "Ich suche einen neuen Job.", pre: "Busco un trabajo ", post: ".", ans: "nuevo", hint: "neu" },
+{ id: 507, cat: "Beruf", de: "Das Gehalt wird monatlich gezahlt.", pre: "El ", post: " se paga mensualmente.", ans: "sueldo", hint: "Gehalt" },
+{ id: 508, cat: "Beruf", de: "Ich habe morgen ein Vorstellungsgespräch.", pre: "Tengo una entrevista de ", post: " mañana.", ans: "trabajo", hint: "Vorstellungsgespräch" },
+{ id: 509, cat: "Beruf", de: "Mein Lebenslauf ist auf dem aktuellen Stand.", pre: "Mi ", post: " está actualizado.", ans: "currículum", hint: "Lebenslauf" },
+{ id: 510, cat: "Beruf", de: "Ich mache heute Überstunden.", pre: "Hago ", post: " hoy.", ans: "horas extras", hint: "Überstunden" },
+
+{ id: 511, cat: "Wohnung", de: "Ich wohne in einer schönen Wohnung.", pre: "Vivo en un piso ", post: ".", ans: "bonito", hint: "schön" },
+{ id: 512, cat: "Wohnung", de: "Die Miete ist ziemlich hoch.", pre: "El ", post: " es bastante alto.", ans: "alquiler", hint: "Miete" },
+{ id: 513, cat: "Wohnung", de: "Der Vermieter ist sehr nett.", pre: "El ", post: " es muy amable.", ans: "propietario", hint: "Vermieter/Eigentümer" },
+{ id: 514, cat: "Wohnung", de: "Wir ziehen nächsten Monat um.", pre: "Nos ", post: " el mes que viene.", ans: "mudamos", hint: "umziehen" },
+{ id: 515, cat: "Wohnung", de: "Das Wohnzimmer ist sehr hell.", pre: "El salón es muy ", post: ".", ans: "luminoso", hint: "hell" },
+{ id: 516, cat: "Wohnung", de: "Die Küche ist komplett ausgestattet.", pre: "La cocina está totalmente ", post: ".", ans: "equipada", hint: "ausgestattet" },
+{ id: 517, cat: "Wohnung", de: "Ich schlafe in einem bequemen Bett.", pre: "Duermo en una cama ", post: ".", ans: "cómoda", hint: "bequem" },
+{ id: 518, cat: "Wohnung", de: "Das Badezimmer hat eine große Dusche.", pre: "El baño tiene una ducha ", post: ".", ans: "grande", hint: "groß" },
+{ id: 519, cat: "Wohnung", de: "Wir sitzen abends auf dem Balkon.", pre: "Nos sentamos en el ", post: " por la noche.", ans: "balcón", hint: "Balkon" },
+{ id: 520, cat: "Wohnung", de: "Der Schlüssel passt nicht ins Schloss.", pre: "La llave no entra en la ", post: ".", ans: "cerradura", hint: "Schloss" },
+
+{ id: 521, cat: "Stadt", de: "Die Altstadt ist wunderschön.", pre: "El casco ", post: " es precioso.", ans: "antiguo", hint: "Altstadt" },
+{ id: 522, cat: "Stadt", de: "Es gibt hier viele Fußgängerzonen.", pre: "Hay muchas zonas ", post: " aquí.", ans: "peatonales", hint: "Fußgängerzone" },
+{ id: 523, cat: "Stadt", de: "Die Ampel schaltet auf Grün.", pre: "El semáforo se pone en ", post: ".", ans: "verde", hint: "grün" },
+{ id: 524, cat: "Stadt", de: "Der Verkehr in der Rushhour ist schrecklich.", pre: "El tráfico en la hora ", post: " es horrible.", ans: "punta", hint: "Hauptverkehrszeit" },
+{ id: 525, cat: "Stadt", de: "Ich nehme lieber die U-Bahn.", pre: "Prefiero tomar el ", post: ".", ans: "metro", hint: "U-Bahn" },
+{ id: 526, cat: "Stadt", de: "Die Brücke führt über den Fluss.", pre: "El puente cruza el ", post: ".", ans: "río", hint: "Fluss" },
+{ id: 527, cat: "Stadt", de: "Auf dem Platz treffen sich viele Menschen.", pre: "En la plaza se reúne mucha ", post: ".", ans: "gente", hint: "Leute" },
+{ id: 528, cat: "Stadt", de: "Das Rathaus steht im Stadtzentrum.", pre: "El ayuntamiento está en el ", post: " de la ciudad.", ans: "centro", hint: "Zentrum" },
+{ id: 529, cat: "Stadt", de: "Ich suche einen Parkplatz für das Auto.", pre: "Busco un ", post: " para el coche.", ans: "aparcamiento", hint: "Parkplatz" },
+{ id: 530, cat: "Stadt", de: "Die Straßenbeleuchtung geht an.", pre: "El alumbrado público se ", post: ".", ans: "enciende", hint: "einschalten/angehen" },
+
+{ id: 531, cat: "Reisen & Auto", de: "Ich tanke Benzin an der Tankstelle.", pre: "Pongo gasolina en la ", post: ".", ans: "gasolinera", hint: "Tankstelle" },
+{ id: 532, cat: "Reisen & Auto", de: "Der Reifen hat zu wenig Luft.", pre: "El neumático tiene poca ", post: ".", ans: "presión", hint: "Druck/Luft" },
+{ id: 533, cat: "Reisen & Auto", de: "Wir fahren auf der Autobahn.", pre: "Conducimos por la ", post: ".", ans: "autopista", hint: "Autobahn" },
+{ id: 534, cat: "Reisen & Auto", de: "Bitte schnallen Sie sich an.", pre: "Por favor, abróchense el ", post: ".", ans: "cinturón", hint: "Gurt" },
+{ id: 535, cat: "Reisen & Auto", de: "Die Polizei macht eine Geschwindigkeitskontrolle.", pre: "La policía hace un control de ", post: ".", ans: "velocidad", hint: "Geschwindigkeit" },
+{ id: 536, cat: "Reisen & Auto", de: "Ich habe eine Autopanne.", pre: "Tengo una avería en el ", post: ".", ans: "coche", hint: "Auto-Panne" },
+{ id: 537, cat: "Reisen & Auto", de: "Der Mietwagen steht bereit.", pre: "El coche de ", post: " está listo.", ans: "alquiler", hint: "Mietwagen" },
+{ id: 538, cat: "Reisen & Auto", de: "Wir nehmen die Fähre nach Mallorca.", pre: "Tomamos el ", post: " a Mallorca.", ans: "ferri", hint: "Fähre" },
+{ id: 539, cat: "Reisen & Auto", de: "Der Zug fährt auf Gleis vier ab.", pre: "El tren sale de la vía ", post: ".", ans: "cuatro", hint: "vier" },
+{ id: 540, cat: "Reisen & Auto", de: "Ich zeige mein Ticket dem Schaffner.", pre: "Muestro mi billete al ", post: ".", ans: "revisor", hint: "Schaffner/Kontrolleur" },
+
+{ id: 541, cat: "Natur & Tiere", de: "Der Löwe ist der König der Tiere.", pre: "El león es el rey de los ", post: ".", ans: "animales", hint: "Tiere" },
+{ id: 542, cat: "Natur & Tiere", de: "Vögel fliegen im Winter in den Süden.", pre: "Las aves vuelan al sur en ", post: ".", ans: "invierno", hint: "Winter" },
+{ id: 543, cat: "Natur & Tiere", de: "Der Fluss schlängelt sich durch das Tal.", pre: "El río serpentea por el ", post: ".", ans: "valle", hint: "Tal" },
+{ id: 544, cat: "Natur & Tiere", de: "Auf dem Berg liegt noch Schnee.", pre: "En la montaña todavía hay ", post: ".", ans: "nieve", hint: "Schnee" },
+{ id: 545, cat: "Natur & Tiere", de: "Der Ozean ist voller Geheimnisse.", pre: "El océano está lleno de ", post: ".", ans: "misterios", hint: "Geheimnisse" },
+{ id: 546, cat: "Natur & Tiere", de: "Die Blume riecht sehr gut.", pre: "La flor huele muy ", post: ".", ans: "bien", hint: "gut" },
+{ id: 547, cat: "Natur & Tiere", de: "Der Hund bewacht das Haus.", pre: "El perro ", post: " la casa.", ans: "vigila", hint: "bewachen" },
+{ id: 548, cat: "Natur & Tiere", de: "Die Katze schläft auf dem Sofa.", pre: "El gato duerme en el ", post: ".", ans: "sofá", hint: "Sofa" },
+{ id: 549, cat: "Natur & Tiere", de: "Wir füttern die Fische im Teich.", pre: "Damos de comer a los peces en el ", post: ".", ans: "estanque", hint: "Teich" },
+{ id: 550, cat: "Natur & Tiere", de: "Der Schmetterling ist bunt.", pre: "La mariposa es ", post: ".", ans: "de colores", hint: "bunt" },
+{ id: 551, cat: "Essen & Trinken", de: "Ich koche gerne für meine Freunde.", pre: "Me gusta cocinar para mis ", post: ".", ans: "amigos", hint: "Freunde" },
+{ id: 552, cat: "Essen & Trinken", de: "Das Frühstück gibt Energie für den Tag.", pre: "El desayuno da energía para el ", post: ".", ans: "día", hint: "Tag" },
+{ id: 553, cat: "Essen & Trinken", de: "Wir bestellen eine Pizza Salami.", pre: "Pedimos una pizza de ", post: ".", ans: "salami", hint: "Salami" },
+{ id: 554, cat: "Essen & Trinken", de: "Ich trinke den Tee mit Zitrone.", pre: "Bebo el té con ", post: ".", ans: "limón", hint: "Zitrone" },
+{ id: 555, cat: "Essen & Trinken", de: "Das Salz steht auf dem Tisch.", pre: "La sal está en la ", post: ".", ans: "mesa", hint: "Tisch" },
+{ id: 556, cat: "Essen & Trinken", de: "Bitte gib mir den Pfeffer.", pre: "Por favor, dame la ", post: ".", ans: "pimienta", hint: "Pfeffer" },
+{ id: 557, cat: "Essen & Trinken", de: "Das Hähnchen ist knusprig.", pre: "El pollo está ", post: ".", ans: "crujiente", hint: "knusprig" },
+{ id: 558, cat: "Essen & Trinken", de: "Ich schneide das Brot mit dem Messer.", pre: "Corto el pan con el ", post: ".", ans: "cuchillo", hint: "Messer" },
+{ id: 559, cat: "Essen & Trinken", de: "Wir essen die Suppe mit einem Löffel.", pre: "Comemos la sopa con una ", post: ".", ans: "cuchara", hint: "Löffel" },
+{ id: 560, cat: "Essen & Trinken", de: "Die Gabel liegt neben dem Teller.", pre: "El tenedor está al lado del ", post: ".", ans: "plato", hint: "Teller" },
+{ id: 561, cat: "Freizeit", de: "Ich höre am liebsten Rockmusik.", pre: "Prefiero escuchar música ", post: ".", ans: "rock", hint: "Rock" },
+{ id: 562, cat: "Freizeit", de: "Wir gehen heute Abend in den Club.", pre: "Vamos a la ", post: " esta noche.", ans: "discoteca", hint: "Club/Disko" },
+{ id: 563, cat: "Freizeit", de: "Ich lese gerne Krimis.", pre: "Me gusta leer novelas de ", post: ".", ans: "misterio", hint: "Krimi/Mistery" },
+{ id: 564, cat: "Freizeit", de: "Wir spielen Brettspiele mit der Familie.", pre: "Jugamos a juegos de mesa con la ", post: ".", ans: "familia", hint: "Familie" },
+{ id: 565, cat: "Freizeit", de: "Ich male ein Bild von der Landschaft.", pre: "Pinto un cuadro del ", post: ".", ans: "paisaje", hint: "Landschaft" },
+{ id: 566, cat: "Freizeit", de: "Wir machen ein Picknick im Park.", pre: "Hacemos un picnic en el ", post: ".", ans: "parque", hint: "Park" },
+{ id: 567, cat: "Freizeit", de: "Ich fotografiere den Sonnenuntergang.", pre: "Fotorrafeo la puesta de ", post: ".", ans: "sol", hint: "Sonne" },
+{ id: 568, cat: "Freizeit", de: "Wir gehen in den Zoo und sehen Affen.", pre: "Vamos al zoo y vemos ", post: ".", ans: "monos", hint: "Affen" },
+{ id: 569, cat: "Freizeit", de: "Ich entspanne mich auf der Couch.", pre: "Me relajo en el ", post: ".", ans: "sofá", hint: "Sofa" },
+{ id: 570, cat: "Freizeit", de: "Wir planen einen Ausflug fürs Wochenende.", pre: "Planeamos una excursión para el ", post: ".", ans: "fin de semana", hint: "Wochenende" },
+{ id: 571, cat: "Gesundheit", de: "Der Arzt verschreibt mir ein Medikament.", pre: "El médico me receta un ", post: ".", ans: "medicamento", hint: "Medikament" },
+{ id: 572, cat: "Gesundheit", de: "Ich messe mein Fieber mit dem Thermometer.", pre: "Mido mi fiebre con el ", post: ".", ans: "termómetro", hint: "Thermometer" },
+{ id: 573, cat: "Gesundheit", de: "Ich habe mir den Finger verbrannt.", pre: "Me he quemado el ", post: ".", ans: "dedo", hint: "Finger" },
+{ id: 574, cat: "Gesundheit", de: "Das Pflaster schützt die Wunde.", pre: "La tirita protege la ", post: ".", ans: "herida", hint: "Wunde" },
+{ id: 575, cat: "Gesundheit", de: "Ich bin oft müde im Frühling.", pre: "A menudo estoy cansado en ", post: ".", ans: "primavera", hint: "Frühling" },
+{ id: 576, cat: "Gesundheit", de: "Sport an der frischen Luft tut gut.", pre: "El deporte al aire libre hace ", post: ".", ans: "bien", hint: "gut" },
+{ id: 577, cat: "Gesundheit", de: "Ich trinke viel Wasser gegen den Durst.", pre: "Bebo mucha agua contra la ", post: ".", ans: "sed", hint: "Durst" },
+{ id: 578, cat: "Gesundheit", de: "Schlaf ist wichtig für die Gesundheit.", pre: "El sueño es importante para la ", post: ".", ans: "salud", hint: "Gesundheit" },
+{ id: 579, cat: "Gesundheit", de: "Ich habe einen gesunden Lebensstil.", pre: "Tengo un estilo de vida ", post: ".", ans: "sano", hint: "gesund" },
+{ id: 580, cat: "Gesundheit", de: "Der Zahn tut beim Essen weh.", post: " al comer.", pre: "El diente me ", ans: "duele", hint: "schmerzen" },
+{ id: 581, cat: "Geld & Bank", de: "Ich überweise das Geld online.", pre: "Transfiero el dinero ", post: ".", ans: "en línea", hint: "online" },
+{ id: 582, cat: "Geld & Bank", de: "Die Kreditkarte ist sicher.", pre: "La tarjeta de crédito es ", post: ".", ans: "segura", hint: "sicher" },
+{ id: 583, cat: "Geld & Bank", de: "Ich unterschreibe den Scheck.", pre: "Firmo el ", post: ".", ans: "cheque", hint: "Scheck" },
+{ id: 584, cat: "Geld & Bank", de: "Die Zinsen für das Konto sind niedrig.", pre: "Los intereses de la cuenta son ", post: ".", ans: "bajos", hint: "niedrig" },
+{ id: 585, cat: "Geld & Bank", de: "Ich habe einen Kredit aufgenommen.", pre: "He pedido un ", post: ".", ans: "préstamo", hint: "Kredit/Darlehen" },
+{ id: 586, cat: "Geld & Bank", de: "Das Budget für den Urlaub ist knapp.", pre: "El presupuesto para las vacaciones es ", post: ".", ans: "ajustado", hint: "knapp" },
+{ id: 587, cat: "Geld & Bank", de: "Ich vergleiche die Preise im Internet.", pre: "Comparo los precios en ", post: ".", ans: "Internet", hint: "Internet" },
+{ id: 588, cat: "Geld & Bank", de: "Ich spare auf ein neues Auto.", pre: "Ahorro para un coche ", post: ".", ans: "nuevo", hint: "neu" },
+{ id: 589, cat: "Geld & Bank", de: "Die Steuererklärung muss gemacht werden.", pre: "Hay que hacer la declaración de la ", post: ".", ans: "renta", hint: "Steuer" },
+{ id: 590, cat: "Geld & Bank", de: "Ich habe den Beleg aufbewahrt.", pre: "He guardado el ", post: ".", ans: "recibo", hint: "Beleg/Quittung" },
+{ id: 591, cat: "Technik & Büro", de: "Ich drucke das Dokument aus.", pre: "Imprimo el ", post: ".", ans: "documento", hint: "Dokument" },
+{ id: 592, cat: "Technik & Büro", de: "Der Drucker hat kein Papier mehr.", pre: "La impresora no tiene ", post: ".", ans: "papel", hint: "Papier" },
+{ id: 593, cat: "Technik & Büro", de: "Ich speichere die Datei auf dem USB-Stick.", pre: "Guardo el archivo en la memoria ", post: ".", ans: "USB", hint: "USB" },
+{ id: 594, cat: "Technik & Büro", de: "Das WLAN-Signal ist sehr stark.", pre: "La señal de wifi es muy ", post: ".", ans: "fuerte", hint: "stark" },
+{ id: 595, cat: "Technik & Büro", de: "Ich benutze eine Tastatur und eine Maus.", pre: "Uso un teclado y un ", post: ".", ans: "ratón", hint: "Maus" },
+{ id: 596, cat: "Technik & Büro", de: "Der Bildschirm zeigt ein klares Bild.", pre: "La pantalla muestra una imagen ", post: ".", ans: "clara", hint: "klar" },
+{ id: 597, cat: "Technik & Büro", de: "Ich scanne das Formular ein.", pre: "Escaneo el ", post: ".", ans: "formulario", hint: "Formular" },
+{ id: 598, cat: "Technik & Büro", de: "Wir halten eine Videokonferenz ab.", pre: "Hacemos una videoconferencia por ", post: ".", ans: "vídeo", hint: "Video" },
+{ id: 599, cat: "Technik & Büro", de: "Ich organisiere meine Termine im Kalender.", pre: "Organizo mis citas en el ", post: ".", ans: "calendario", hint: "Kalender" },
+{ id: 600, cat: "Technik & Büro", de: "Das Projekt ist erfolgreich beendet.", pre: "El proyecto ha terminado con ", post: ".", ans: "éxito", hint: "Erfolg" }
+];
+
+    // Block- und Runden-Management
+    const blockSize = 30;
+    let currentBlockIndex = 0;
+    let blockVocabs = [];
+    let wrongVocabsInRound = [];
+    let isRetryMode = false;
+
     let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
     let currentItem = null;
-    let roundNumber = 1;
-    let isCorrectionPhase = false;
 
-    function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        while (currentIndex !== 0) {
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    }
+    function initBlock() {
+        const start = currentBlockIndex * blockSize;
+        const end = start + blockSize;
+        blockVocabs = vocabDb.slice(start, end);
+        wrongVocabsInRound = [];
+        isRetryMode = false;
+        currentIndex = 0;
 
-    function initPool() {
-        remainingPool = [...allVocabs];
-        shuffle(remainingPool);
-        roundNumber = 1;
-        startNewRound();
-    }
-
-    function startNewRound() {
-        if (remainingPool.length === 0) {
-            initPool();
+        if (blockVocabs.length === 0) {
+            // Wenn alle Blöcke durch sind, von vorne beginnen oder beenden
+            currentBlockIndex = 0;
+            initBlock();
             return;
         }
-        const sliceSize = Math.min(30, remainingPool.length);
-        currentRoundVocabs = remainingPool.splice(0, sliceSize);
-        shuffle(currentRoundVocabs);
-        failedVocabs = [];
-        currentIndex = 0;
-        isCorrectionPhase = false;
-        nextQuestion();
+
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentIndex >= blockVocabs.length) {
+            // Rundenende erreicht! Prüfen, ob Fehler wiederholt werden müssen
+            if (wrongVocabsInRound.length > 0) {
+                isRetryMode = true;
+                blockVocabs = [...wrongVocabsInRound];
+                wrongVocabsInRound = [];
+                currentIndex = 0;
+                
+                // Badge auf Wiederholung setzen
+                const badge = document.getElementById('badge-category');
+                badge.innerText = "Wiederholung (Fehler)";
+                badge.className = "badge retry-badge";
+                
+                loadQuestion();
+                return;
+            } else {
+                // Nächster 30er-Block
+                currentBlockIndex++;
+                if (currentBlockIndex * blockSize >= vocabDb.length) {
+                    alert("Glückwunsch! Du hast alle Vokabelblöcke erfolgreich abgeschlossen!");
+                    currentBlockIndex = 0;
+                }
+                initBlock();
+                return;
+            }
+        }
+
+        currentItem = blockVocabs[currentIndex];
+
+        if (!isRetryMode) {
+            const badge = document.getElementById('badge-category');
+            badge.innerText = currentItem.cat;
+            badge.className = "badge";
+        }
+
+        document.getElementById('progress-text').innerText = `Frage ${currentIndex + 1} / ${blockVocabs.length} (Block ${currentBlockIndex + 1})`;
+        document.getElementById('hint-text').innerText = currentItem.hint;
+        document.getElementById('german-sentence').innerText = currentItem.de;
+
+        // Satzbau mit Lücke
+        const container = document.getElementById('spanish-container');
+        container.innerHTML = `${currentItem.pre}<span class="blank-line" id="dynamic-blank"></span>${currentItem.post}`;
+
+        document.getElementById('user-answer').value = '';
+        document.getElementById('user-answer').disabled = false;
+        document.getElementById('user-answer').focus();
+
+        const feedback = document.getElementById('feedback');
+        feedback.className = "feedback";
+        feedback.style.display = "none";
+
+        const btn = document.getElementById('action-btn');
+        btn.innerText = "Prüfen";
+        btn.onclick = handleAction;
+    }
+
+    function handleAction() {
+        const inputField = document.getElementById('user-answer');
+        const userAnswer = inputField.value.trim().toLowerCase();
+        const correctAnswer = currentItem.ans.toLowerCase();
+
+        const feedback = document.getElementById('feedback');
+        const blankLine = document.getElementById('dynamic-blank');
+        const btn = document.getElementById('action-btn');
+
+        if (userAnswer === "") return;
+
+        inputField.disabled = true;
+
+        if (userAnswer === correctAnswer) {
+            score += 10;
+            streak += 1;
+            feedback.innerText = "Richtig! ¡Muy bien!";
+            feedback.className = "feedback success";
+            blankLine.innerText = currentItem.ans;
+        } else {
+            streak = 0;
+            feedback.innerText = `Falsch! Richtig wäre: "${currentItem.ans}"`;
+            feedback.className = "feedback error";
+            blankLine.innerText = currentItem.ans;
+            blankLine.classList.add('error-line');
+
+            // Bei Fehlversuch in die Wiederholungsliste aufnehmen (falls nicht schon drin)
+            if (!wrongVocabsInRound.some(v => v.id === currentItem.id)) {
+                wrongVocabsInRound.push(currentItem);
+            }
+        }
+
+        document.getElementById('score-text').innerText = score;
+        document.getElementById('streak-text').innerText = streak;
+
+        btn.innerText = "Weiter";
+        btn.onclick = nextQuestion;
     }
 
     function nextQuestion() {
-        if (!isCorrectionPhase) {
-            if (currentIndex < currentRoundVocabs.length) {
-                currentItem = currentRoundVocabs[currentIndex];
-                document.getElementById("stats").innerText = `Frage ${currentIndex + 1} von ${currentRoundVocabs.length} (Runde ${roundNumber})`;
-            } else {
-                if (failedVocabs.length > 0) {
-                    isCorrectionPhase = true;
-                    shuffle(failedVocabs);
-                    currentIndex = 0;
-                    document.getElementById("stats").innerText = `Korrekturphase (${failedVocabs.length} Fehler) - Runde ${roundNumber}`;
-                    currentItem = failedVocabs[currentIndex];
-                } else {
-                    roundNumber++;
-                    startNewRound();
-                    return;
-                }
-            }
-        } else {
-            if (currentIndex < failedVocabs.length) {
-                currentItem = failedVocabs[currentIndex];
-                document.getElementById("stats").innerText = `Korrekturphase (${currentIndex + 1} von ${failedVocabs.length}) - Runde ${roundNumber}`;
-            } else {
-                shuffle(failedVocabs);
-                let stillFailed = [];
-                for (let v of failedVocabs) {
-                    stillFailed.push(v);
-                }
-                failedVocabs = [...stillFailed];
-                if (failedVocabs.length > 0) {
-                    currentIndex = 0;
-                    currentItem = failedVocabs[currentIndex];
-                    document.getElementById("stats").innerText = `Korrekturphase (Nächster Durchlauf) - Runde ${roundNumber}`;
-                } else {
-                    roundNumber++;
-                    startNewRound();
-                    return;
-                }
-            }
-        }
-
-        document.getElementById("vocab-display").innerText = currentItem.es;
-        document.getElementById("user-input").value = "";
-        document.getElementById("feedback").innerText = "";
+        currentIndex++;
+        loadQuestion();
     }
 
-    function checkAnswer() {
-        const userInputValue = document.getElementById("user-input").value.trim().toLowerCase();
-        const correctAnswer = currentItem.de.toLowerCase();
-        const feedbackEl = document.getElementById("feedback");
-
-        if (userInputValue === correctAnswer) {
-            feedbackEl.innerText = "Richtig!";
-            feedbackEl.className = "feedback correct";
-            currentIndex++;
-            setTimeout(nextQuestion, 1000);
-        } else {
-            feedbackEl.innerText = `Falsch! Richtig wäre: ${currentItem.de}`;
-            feedbackEl.className = "feedback incorrect";
-            if (!failedVocabs.includes(currentItem)) {
-                failedVocabs.push(currentItem);
-            }
-            currentIndex++;
-            setTimeout(nextQuestion, 2000);
-        }
-    }
-
-    document.getElementById("user-input").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            checkAnswer();
+    // Event Listener für Enter-Taste
+    document.getElementById('user-answer').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            handleAction();
         }
     });
 
-    initPool();
+    // Start beim Laden
+    window.onload = function() {
+        initBlock();
+    };
 </script>
 
 </body>
