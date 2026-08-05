@@ -5,113 +5,147 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spanisch Vokabeltrainer</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body { 
-      font-family: system-ui, -apple-system, sans-serif; 
-      background: #f4f6f8; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+      background-color: #0b111e; 
+      color: #f3f4f6; 
       margin: 0; 
-      padding: 20px; 
+      padding: 16px; 
       display: flex; 
       justify-content: center; 
       align-items: center; 
       min-height: 100vh; 
     }
     .card { 
-      background: white; 
+      background: #162032; 
       padding: 24px; 
-      border-radius: 12px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+      border-radius: 20px; 
       width: 100%; 
-      max-width: 500px; 
+      max-width: 440px; 
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      position: relative;
+      border: 1px solid #1e2d42;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
     }
     .header { 
       display: flex; 
       justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 16px; 
-      font-weight: bold; 
+      align-items: flex-start; 
+      margin-bottom: 20px; 
+    }
+    .header-left {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
     .badge { 
-      background: #e0e7ff; 
-      color: #3730a3; 
-      padding: 4px 12px; 
-      border-radius: 99px; 
+      background: #0f172a; 
+      color: #38bdf8; 
+      border: 1px solid #1e293b;
+      padding: 6px 14px; 
+      border-radius: 20px; 
       font-size: 0.85rem; 
+      font-weight: 600;
     }
-    .word-de { 
-      font-size: 1.4rem; 
-      font-weight: bold; 
-      margin-bottom: 8px; 
-      color: #1f2937; 
+    .btn-reset {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .btn-reset:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .header-info {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+    .meaning-box {
+      background: #0d1527;
+      border: 1px solid #1e2d42;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 1rem;
+      color: #94a3b8;
+    }
+    .meaning-box span {
+      color: #38bdf8;
+      font-weight: bold;
     }
     .sentence-de { 
-      font-size: 1rem; 
-      color: #4b5563; 
-      margin-bottom: 12px; 
+      font-size: 1.25rem; 
+      font-weight: 700; 
+      color: #ffffff; 
+      text-align: center;
+      margin-bottom: 8px; 
     }
     .sentence-es { 
       font-size: 1.1rem; 
-      font-weight: 500; 
-      margin-bottom: 20px; 
+      color: #94a3b8; 
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 24px; 
     }
     .blank-dots { 
-      border-bottom: 2px dashed #4b5563; 
-      padding: 0 8px; 
+      color: #ef4444; 
       font-weight: bold; 
-      color: #2563eb; 
+      font-style: normal;
+      border-bottom: 2px dashed #ef4444;
+      padding: 0 4px;
     }
     input[type="text"] { 
       width: 100%; 
-      padding: 12px; 
-      font-size: 1rem; 
-      border: 2px solid #d1d5db; 
-      border-radius: 8px; 
-      box-sizing: border-box; 
-      margin-bottom: 12px; 
+      background: #0d1527;
+      border: 2px solid #38bdf8; 
+      border-radius: 12px; 
+      padding: 14px 16px; 
+      font-size: 1.05rem; 
+      color: #ffffff;
       outline: none; 
-      transition: all 0.2s; 
+      margin-bottom: 16px; 
+      transition: border-color 0.2s;
     }
     input.input-correct { 
       border-color: #10b981; 
-      background-color: #ecfdf5; 
-      color: #065f46;
+      background: rgba(16, 185, 129, 0.1);
     }
     input.input-wrong { 
       border-color: #ef4444; 
-      background-color: #fef2f2; 
-      color: #991b1b;
+      background: rgba(239, 68, 68, 0.1);
     }
-    .btn-group { 
-      display: flex; 
-      gap: 8px; 
-    }
-    button { 
-      flex: 1; 
-      padding: 12px; 
-      font-size: 1rem; 
-      font-weight: 600; 
+    .btn-action { 
+      width: 100%; 
+      padding: 14px; 
+      font-size: 1.05rem; 
+      font-weight: 700; 
       border: none; 
-      border-radius: 8px; 
+      border-radius: 12px; 
       cursor: pointer; 
+      background: #38bdf8; 
+      color: #0b111e; 
       transition: background 0.2s; 
     }
-    .btn-check { 
-      background: #2563eb; 
-      color: white; 
-    }
-    .btn-check:hover:not(:disabled) { 
-      background: #1d4ed8; 
-    }
-    .btn-next { 
-      background: #10b981; 
-      color: white; 
-    }
-    .btn-next:hover:not(:disabled) { 
-      background: #059669; 
-    }
-    button:disabled { 
-      background: #e5e7eb; 
-      color: #9ca3af; 
-      cursor: not-allowed; 
+    .btn-action:hover { 
+      background: #7dd3fc; 
     }
     .feedback { 
       margin-top: 14px; 
@@ -122,32 +156,61 @@
     }
     .feedback.correct { color: #10b981; }
     .feedback.wrong { color: #ef4444; }
+
+    .divider {
+      border-top: 1px solid #1e2d42;
+      margin: 20px 0 16px 0;
+    }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+    .footer span {
+      color: #38bdf8;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
 <div class="card">
   <div class="header">
-    <span id="category-badge" class="badge">Kategorie</span>
-    <div>Punkte: <span id="score-val">0</span> | Streak: <span id="streak-val">0</span></div>
+    <div class="header-left">
+      <span id="category-badge" class="badge">Kategorie</span>
+      <button class="btn-reset" onclick="resetProgress()">Zurücksetzen</button>
+    </div>
+    <div class="header-info">
+      <div>Modus: Zufall</div>
+      <div id="solved-count">(0 gelöst)</div>
+    </div>
   </div>
 
-  <div id="word-de" class="word-de"></div>
+  <div class="meaning-box">
+    Bedeutung: <span id="word-de">...</span>
+  </div>
+
   <div id="sentence-de" class="sentence-de"></div>
   <div id="sentence-es" class="sentence-es"></div>
 
-  <input type="text" id="user-input" placeholder="Antwort auf Spanisch eingeben..." autocomplete="off">
+  <input type="text" id="user-input" placeholder="Antwort eingeben..." autocomplete="off">
 
-  <div class="btn-group">
-    <button id="btn-check" class="btn-check" onclick="handleCheck()">Prüfen</button>
-    <button id="btn-next" class="btn-next" onclick="handleNext()" disabled>Weiter</button>
-  </div>
+  <button id="btn-action" class="btn-action" onclick="handleAction()">Prüfen</button>
 
   <div id="feedback" class="feedback"></div>
+
+  <div class="divider"></div>
+
+  <div class="footer">
+    <div>Score: <span id="score-val">0</span></div>
+    <div>Streak: <span id="streak-val">0</span></div>
+  </div>
 </div>
 
 <script>
 const vocabDb = [
+
 
  { id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
 { id: 2, cat: "Pronomen", de: "Du bist mein Freund.", pre: "", post: " eres mi amigo.", ans: "tú", hint: "du" },
@@ -811,98 +874,112 @@ const vocabDb = [
 ];
 
 // ==========================================
-// STEUERUNGSLOGIK (Zufall & Manuelles Weiter)
+// STEUERUNGSLOGIK (Zufall + Manuelles Weiter)
 // ==========================================
 
 let currentCard = null;
 let score = 0;
 let streak = 0;
-let isChecked = false; // Verhindert mehrfaches Prüfen derselben Frage
+let totalSolved = 0;
+let isChecked = false; // Status: false = Warten auf Prüfung, true = Warten auf "Weiter"
 
-// 1. Lädt eine zufällige Frage aus der Datenbank
+// 1. Nächste Zufallsfrage laden
 function loadNextQuestion() {
   isChecked = false;
   
-  // Zufallsindex über das gesamte Array ziehen
+  // Zufällige Karte aus den 600 Vokabeln wählen
   const randomIndex = Math.floor(Math.random() * vocabDb.length);
   currentCard = vocabDb[randomIndex];
 
-  // UI zurücksetzen
-  document.getElementById('category-badge').innerText = currentCard.cat || 'Zufall';
+  // UI befüllen
+  document.getElementById('category-badge').innerText = currentCard.cat || 'Spanisch';
   document.getElementById('word-de').innerText = currentCard.hint || currentCard.ans;
   document.getElementById('sentence-de').innerText = currentCard.de;
   document.getElementById('sentence-es').innerHTML = `${currentCard.pre}<span class="blank-dots">............</span>${currentCard.post}`;
   
+  // Eingabefeld zurücksetzen
   const input = document.getElementById('user-input');
   input.value = '';
   input.disabled = false;
   input.className = '';
   input.focus();
 
-  // Buttons & Feedback zurücksetzen
-  document.getElementById('btn-check').disabled = false;
-  document.getElementById('btn-next').disabled = true;
+  // Button & Feedback zurücksetzen
+  const btn = document.getElementById('btn-action');
+  btn.innerText = 'Prüfen';
   document.getElementById('feedback').innerText = '';
   document.getElementById('feedback').className = 'feedback';
 }
 
-// 2. Antwort überprüfen
-function handleCheck() {
-  if (isChecked || !currentCard) return;
+// 2. Button-Klick abfangen (Wechselt automatisch zwischen "Prüfen" und "Weiter")
+function handleAction() {
+  if (!isChecked) {
+    checkAnswer();
+  } else {
+    loadNextQuestion();
+  }
+}
+
+// 3. Antwort überprüfen
+function checkAnswer() {
+  if (!currentCard) return;
 
   const input = document.getElementById('user-input');
   const feedbackEl = document.getElementById('feedback');
+  const btn = document.getElementById('btn-action');
+  
   const userAns = input.value.trim().toLowerCase();
   const correctAns = currentCard.ans.toLowerCase();
 
   isChecked = true;
-  input.disabled = true; // Sperrt das Eingabefeld nach der Auswertung
+  input.disabled = true;
 
   if (userAns === correctAns) {
-    // Richtig
     score += 10;
     streak += 1;
+    totalSolved += 1;
     input.classList.add('input-correct');
-    feedbackEl.innerText = 'Richtig! Richtig gut gemacht! 🎉';
+    feedbackEl.innerText = 'Richtig! Ausgezeichnet!';
     feedbackEl.className = 'feedback correct';
   } else {
-    // Falsch
     streak = 0;
     input.classList.add('input-wrong');
-    feedbackEl.innerText = `Falsch! Richtige Antwort: "${currentCard.ans}"`;
+    feedbackEl.innerText = `Falsch! Richtig ist: "${currentCard.ans}"`;
     feedbackEl.className = 'feedback wrong';
   }
 
-  // Punkte anzeigen
+  // Stats aktualisieren
   document.getElementById('score-val').innerText = score;
   document.getElementById('streak-val').innerText = streak;
+  document.getElementById('solved-count').innerText = `(${totalSolved} gelöst)`;
 
-  // Buttons umschalten: Prüfen sperren, Weiter freischalten & fokussieren
-  document.getElementById('btn-check').disabled = true;
-  const btnNext = document.getElementById('btn-next');
-  btnNext.disabled = false;
-  btnNext.focus();
+  // Button auf "Weiter" umstellen
+  btn.innerText = 'Weiter';
+  btn.focus();
 }
 
-// 3. Weiter-Button geklickt
-function handleNext() {
+// 4. Reset-Funktion
+function resetProgress() {
+  score = 0;
+  streak = 0;
+  totalSolved = 0;
+  document.getElementById('score-val').innerText = score;
+  document.getElementById('streak-val').innerText = streak;
+  document.getElementById('solved-count').innerText = `(0 gelöst)`;
   loadNextQuestion();
 }
 
-// Keyboard-Steuerung (Enter-Taste)
+// Enter-Taste unterstützen (Einmal Enter = Prüfen, nochmal Enter = Weiter)
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
-    if (!isChecked) {
-      handleCheck();
-    } else {
-      handleNext();
-    }
+    handleAction();
   }
 });
 
-// Erste Frage beim Aufruf starten
+// Spiel beim Aufruf direkt starten
 loadNextQuestion();
 </script>
 </body>
 </html>
+
 
