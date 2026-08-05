@@ -14,6 +14,8 @@
         input[type="text"]:focus { border-color: #2980b9; }
         button { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
         button:hover { background-color: #219653; }
+        .btn-reset { background-color: #e74c3c; margin-top: 15px; font-size: 12px; padding: 5px 10px; }
+        .btn-reset:hover { background-color: #c0392b; }
         .feedback { margin-top: 15px; font-size: 16px; font-weight: bold; }
         .correct { color: #27ae60; }
         .incorrect { color: #c0392b; }
@@ -35,13 +37,15 @@
     
     <div class="feedback" id="feedback"></div>
 
+    <button class="btn-reset" onclick="resetProgress()">Fortschritt zurücksetzen</button>
+
     <div class="rules">
         <strong>Modus:</strong> Es werden immer 30 Vokabeln abgefragt. Nach den 30 Fragen muss man die Falscheingaben so oft eingeben, bis alles richtig war. Erst danach startet die nächste Runde mit den nächsten 30 Vokabeln, die bisher noch nicht dran waren. Wenn alles durch ist, beginnt es wieder von vorne. Alles immer random.
     </div>
 </div>
 
 <script>
-    // 600 Vokabeln (Beispielhaft gekürzt/vollständig im Array hinterlegbar)
+    // 600 Vokabeln
     const allVocabs = [
         {es: "el agua", de: "das Wasser"}, {es: "el hombre", de: "der Mann"}, {es: "la mujer", de: "die Frau"},
         {es: "el niño", de: "das Kind"}, {es: "la casa", de: "das Haus"}, {es: "el coche", de: "das Auto"},
@@ -83,6 +87,46 @@
         return array;
     }
 
+    function saveProgress() {
+        const state = {
+            remainingPool,
+            currentRoundVocabs,
+            failedVocabs,
+            currentIndex,
+            roundNumber,
+            isCorrectionPhase,
+            currentItem
+        };
+        localStorage.setItem("spanisch_vocab_state", JSON.stringify(state));
+    }
+
+    function loadProgress() {
+        const saved = localStorage.getItem("spanisch_vocab_state");
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                remainingPool = state.remainingPool || [];
+                currentRoundVocabs = state.currentRoundVocabs || [];
+                failedVocabs = state.failedVocabs || [];
+                currentIndex = state.currentIndex || 0;
+                roundNumber = state.roundNumber || 1;
+                isCorrectionPhase = state.isCorrectionPhase || false;
+                currentItem = state.currentItem || null;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    function resetProgress() {
+        if (confirm("Möchtest du deinen Fortschritt wirklich zurücksetzen?")) {
+            localStorage.removeItem("spanisch_vocab_state");
+            initPool();
+        }
+    }
+
     function initPool() {
         remainingPool = [...allVocabs];
         shuffle(remainingPool);
@@ -119,6 +163,7 @@
                 } else {
                     roundNumber++;
                     startNewRound();
+                    saveProgress();
                     return;
                 }
             }
@@ -140,14 +185,18 @@
                 } else {
                     roundNumber++;
                     startNewRound();
+                    saveProgress();
                     return;
                 }
             }
         }
 
-        document.getElementById("vocab-display").innerText = currentItem.es;
+        if (currentItem) {
+            document.getElementById("vocab-display").innerText = currentItem.es;
+        }
         document.getElementById("user-input").value = "";
         document.getElementById("feedback").innerText = "";
+        saveProgress();
     }
 
     function checkAnswer() {
@@ -159,20 +208,16 @@
             feedbackEl.innerText = "Richtig!";
             feedbackEl.className = "feedback correct";
             currentIndex++;
+            saveProgress();
             setTimeout(nextQuestion, 1000);
         } else {
             feedbackEl.innerText = `Falsch! Richtig wäre: ${currentItem.de}`;
             feedbackEl.className = "feedback incorrect";
-            if (isCorrectionPhase) {
-                if (!failedVocabs.includes(currentItem)) {
-                    failedVocabs.push(currentItem);
-                }
-            } else {
-                if (!failedVocabs.includes(currentItem)) {
-                    failedVocabs.push(currentItem);
-                }
+            if (!failedVocabs.some(v => v.es === currentItem.es)) {
+                failedVocabs.push(currentItem);
             }
             currentIndex++;
+            saveProgress();
             setTimeout(nextQuestion, 2000);
         }
     }
@@ -183,7 +228,18 @@
         }
     });
 
-    initPool();
+    // Start-Logik mit Lade-Überprüfung
+    if (!loadProgress() || !currentItem) {
+        initPool();
+    } else {
+        // UI mit geladenem Zustand aktualisieren
+        if (isCorrectionPhase) {
+            document.getElementById("stats").innerText = `Korrekturphase (${currentIndex + 1} von ${failedVocabs.length}) - Runde ${roundNumber}`;
+        } else {
+            document.getElementById("stats").innerText = `Frage ${currentIndex + 1} von ${currentRoundVocabs.length} (Runde ${roundNumber})`;
+        }
+        document.getElementById("vocab-display").innerText = currentItem ? currentItem.es : "Lade...";
+    }
 </script>
 
 </body>
