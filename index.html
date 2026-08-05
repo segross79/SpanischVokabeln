@@ -830,166 +830,188 @@ const vocabDb = [
 { id: 541, cat: "Natur & Tiere", de: "Der Löwe ist der König der Tiere.", pre: "El león es el rey de los ", post: ".", ans: "animales", hint: "Tiere" },
 { id: 542, cat: "Natur & Tiere", de: "Vögel fliegen im Winter in den Süden.", pre: "Las aves vuelan al sur en ", post: ".", ans: "invierno", hint: "Winter" },
 { id: 543, cat: "Natur & Tiere", de: "Der Fluss schlängelt sich durch das Tal.", pre: "El río serpentea por el ", post: ".", ans: "valle", hint: "Tal" },
-{ id: 544, cat: "Natur & Tiere", de: "Auf dem Berg liegt noch Schnee.", pre: "En la montaña todavía hay ", post: ".", ans: "nieve", hint: "Schnee" },
+{ id: 544, cat: "Natur & Tiere", de: "Auf dem Berg liegt noch Schnee.", pre: "In der montaña todavía hay ", post: ".", ans: "nieve", hint: "Schnee" },
 { id: 545, cat: "Natur & Tiere", de: "Der Ozean ist voller Geheimnisse.", pre: "El océano está lleno de ", post: ".", ans: "misterios", hint: "Geheimnisse" },
 { id: 546, cat: "Natur & Tiere", de: "Die Blume riecht sehr gut.", pre: "La flor huele muy ", post: ".", ans: "bien", hint: "gut" },
-{ id: 547, cat: "Natur & Tiere", de: "Im Wald wachsen viele Pilze.", pre: "En el bosque crecen muchas ", post: ".", ans: "setas", hint: "Pilze" },
-{ id: 548, cat: "Natur & Tiere", de: "Die Sonne geht im Osten auf.", pre: "El sol sale por el ", post: ".", ans: "este", hint: "Osten" },
-{ id: 549, cat: "Natur & Tiere", de: "Der Mond leuchtet in der Nacht.", pre: "La luna brilla por la ", post: ".", ans: "noche", hint: "Nacht" },
-{ id: 550, cat: "Natur & Tiere", de: "Ein Sturm zieht auf.", pre: "Se acerca una ", post: ".", ans: "tormenta", hint: "Sturm/Gewitter" },
+{ id: 547, cat: "Natur & Tiere", de: "Im Wald wachsen viele Pilze.", pre: "En el bosque crecen muchas ", post: ".", ans: "setas", hint: "Pilze" }
+];
 
-{ id: 551, cat: "Kochen & Essen", de: "Ich schneide das Gemüse mit einem scharfen Messer.", pre: "Corto la verdura con un cuchillo ", post: ".", ans: "afilado", hint: "scharf" },
-{ id: 552, cat: "Kochen & Essen", de: "Das Wasser kocht im Topf.", pre: "El agua hierve en la ", post: ".", ans: "olla", hint: "Topf" },
-{ id: 553, cat: "Kochen & Essen", de: "Ich brate den Fisch in der Pfanne.", pre: " Frío el pescado en la ", post: ".", ans: "sartén", hint: "Pfanne" },
-{ id: 554, cat: "Kochen & Essen", de: "Vergiss nicht, Salz hinzuzufügen.", pre: "No olvides añadir ", post: ".", ans: "sal", hint: "Salz" },
-{ id: 555, cat: "Kochen & Essen", de: "Der Kuchen schmeckt sehr süß.", pre: "El pastel sabe muy ", post: ".", ans: "dulce", hint: "süß" },
-{ id: 556, cat: "Kochen & Essen", de: "Die Zitrone ist ziemlich sauer.", pre: "El limón es bastante ", post: ".", ans: "ácido", hint: "sauer" },
-{ id: 557, cat: "Kochen & Essen", de: "Ich trinke meinen Kaffee am liebsten schwarz.", pre: "Prefiero tomar mi café ", post: ".", ans: "solo", hint: "schwarz/pur" },
-{ id: 558, cat: "Kochen & Essen", de: "Wir decken den Tisch für das Abendessen.", pre: " Ponemos la mesa para la ", post: ".", ans: "cena", hint: "Abendessen" },
-{ id: 559, cat: "Kochen & Essen", de: "Kannst du mir bitte das Öl geben?", pre: "¿Me puedes pasar el ", post: ", por favor?", ans: "aceite", hint: "Öl" },
-{ id: 560, cat: "Kochen & Essen", de: "Das Fleisch ist wunderbar zart.", pre: "La carne está muy ", post: ".", ans: "tierna", hint: "zart" },
+let sessionVocab = [];
+let retryVocab = [];
+let currentIndex = 0;
+let score = 0;
+let streak = 0;
+let currentBlock = 1;
+let isRetryRound = false;
 
-{ id: 561, cat: "Technik & Internet", de: "Ich speichere die Datei auf dem Computer.", pre: "Guardo el archivo en el ", post: ".", ans: "ordenador", hint: "Computer" },
-{ id: 562, cat: "Technik & Internet", de: "Mein Drucker hat kein Papier mehr.", pre: "A mi impresora le falta ", post: ".", ans: "papel", hint: "Papier" },
-{ id: 563, cat: "Technik & Internet", de: "Ich habe mein Passwort vergessen.", pre: "He olvidado mi ", post: ".", ans: "contraseña", hint: "Passwort" },
-{ id: 564, cat: "Technik & Internet", de: "Die Website lädt extrem schnell.", pre: "La página web carga muy ", post: ".", ans: "rápido", hint: "schnell" },
-{ id: 565, cat: "Technik & Internet", de: "Ich lade ein Update herunter.", pre: "Descargo una ", post: ".", ans: "actualización", hint: "Aktualisierung/Update" },
-{ id: 566, cat: "Technik & Internet", de: "Schalte bitte den Bildschirm aus.", pre: "Apaga la ", post: ", por favor.", ans: "pantalla", hint: "Bildschirm" },
-{ id: 567, cat: "Technik & Internet", de: "Ich schreibe eine Nachricht auf der Tastatur.", pre: "Escribo un texto en el ", post: ".", ans: "teclado", hint: "Tastatur" },
-{ id: 568, cat: "Technik & Internet", de: "Die Maus funktioniert kabellos.", pre: "El ratón funciona sin ", post: ".", ans: "cables", hint: "Kabel" },
-{ id: 569, cat: "Technik & Internet", de: "Ich habe eine Sicherheitskopie gemacht.", pre: "He hecho una copia de ", post: ".", ans: "seguridad", hint: "Sicherheit" },
-{ id: 570, cat: "Technik & Internet", de: "Das Betriebssystem ist auf dem neuesten Stand.", pre: "El sistema operativo está ", post: ".", ans: "actualizado", hint: "aktuell" },
-
-{ id: 571, cat: "Geld & Bank", de: "Ich zahle am liebsten mit Karte.", pre: "Prefiero pagar con ", post: ".", ans: "tarjeta", hint: "Karte" },
-{ id: 572, cat: "Geld & Bank", de: "Die Überweisung dauert einen Tag.", pre: "La transferencia tarda un ", post: ".", ans: "día", hint: "Tag" },
-{ id: 573, cat: "Geld & Bank", de: "Ich muss meine monatlichen Rechnungen bezahlen.", pre: "Tengo que pagar mis facturas ", post: ".", ans: "mensuales", hint: "monatlich" },
-{ id: 574, cat: "Geld & Bank", de: "Wie hoch sind die Zinsen?", pre: "¿Cuánto son los ", post: "?", ans: "intereses", hint: "Zinsen" },
-{ id: 575, cat: "Geld & Bank", de: "Ich habe ein Sparkonto eröffnet.", pre: "He abierto una cuenta de ", post: ".", ans: "ahorros", hint: "Ersparnisse/Sparen" },
-{ id: 576, cat: "Geld & Bank", de: "Der Automat hat meine Karte eingezogen.", pre: "El cajero se ha tragado mi ", post: ".", ans: "tarjeta", hint: "Karte" },
-{ id: 577, cat: "Geld & Bank", de: "Ich brauche einen Kredit für das Haus.", pre: "Necesito un préstamo para la ", post: ".", ans: "casa", hint: "Haus" },
-{ id: 578, cat: "Geld & Bank", de: "Die Unterschrift muss beglaubigt werden.", pre: "La firma debe ser ", post: ".", ans: "legalizada", hint: "legalisiert/beglaubigt" },
-{ id: 579, cat: "Geld & Bank", de: "Das Geschäft war sehr profitabel.", pre: "El negocio ha sido muy ", post: ".", ans: "rentable", hint: "profitabel/rentabel" },
-{ id: 580, cat: "Geld & Bank", de: "Ich spende Geld für einen guten Zweck.", pre: "Dono dinero para una buena ", post: ".", ans: "causa", hint: "Zweck/Ursache" },
-
-{ id: 581, cat: "Gesundheit & Arzt", de: "Der Arzt untersucht den Patienten.", pre: "El médico ausculta al ", post: ".", ans: "paciente", hint: "Patient" },
-{ id: 582, cat: "Gesundheit & Arzt", de: "Ich habe mir den Arm gebrochen.", pre: "Me he roto el ", post: ".", ans: "brazo", hint: "Arm" },
-{ id: 583, cat: "Gesundheit & Arzt", de: "Die Wunde muss desinfiziert werden.", pre: "La herida debe ser ", post: ".", ans: "desinfectada", hint: "desinfiziert" },
-{ id: 584, cat: "Gesundheit & Arzt", de: "Ich nehme Vitamine für das Immunsystem.", pre: "Tomo vitaminas para las ", post: " defensas.", ans: "propias", hint: "eigene/Abwehrkräfte" },
-{ id: 585, cat: "Gesundheit & Arzt", de: "Der Blutdruck ist völlig normal.", pre: "La presión arterial es totalmente ", post: ".", ans: "normal", hint: "normal" },
-{ id: 586, cat: "Gesundheit & Arzt", de: "Ich habe starke Halsschmerzen.", pre: "Tengo un fuerte dolor de ", post: ".", ans: "garganta", hint: "Hals" },
-{ id: 587, cat: "Gesundheit & Arzt", de: "Die Krankenschwester bringt die Medikamente.", pre: "La enfermera trae la ", post: ".", ans: "medicación", hint: "Medikation" },
-{ id: 588, cat: "Gesundheit & Arzt", de: "Ich muss eine Woche im Bett bleiben.", pre: "Tengo que guardar cama una ", post: ".", ans: "semana", hint: "Woche" },
-{ id: 589, cat: "Gesundheit & Arzt", de: "Der Verband muss gewechselt werden.", pre: "Hay que cambiar el ", post: ".", ans: "venda", hint: "Verband" },
-{ id: 590, cat: "Gesundheit & Arzt", de: "Gesundheit ist das Wichtigste im Leben.", pre: "La salud es lo más importante en la ", post: ".", ans: "vida", hint: "Leben" },
-
-{ id: 591, cat: "Abschluss", de: "Wir haben das Ziel fast erreicht.", pre: "Ya casi hemos llegado a la ", post: ".", ans: "meta", hint: "Ziel" },
-{ id: 592, cat: "Abschluss", de: "Dieser Kurs war ein voller Erfolg.", pre: "Este curso ha sido todo un ", post: ".", ans: "éxito", hint: "Erfolg" },
-{ id: 593, cat: "Abschluss", de: "Ich habe viel Neues gelernt.", pre: "He aprendido muchas cosas ", post: ".", ans: "nuevas", hint: "neu" },
-{ id: 594, cat: "Abschluss", de: "Spanisch sprechen macht großen Spaß.", pre: "Hablar español es muy ", post: ".", ans: "divertido", hint: "spaßig/lustig" },
-{ id: 595, cat: "Abschluss", de: "Das ist das Ende dieser Lektion.", pre: "Este es el final de esta ", post: ".", ans: "lección", hint: "Lektion" },
-{ id: 596, cat: "Abschluss", de: "Machen wir weiter so!", pre: "¡Sigamos ", post: "!", ans: "así", hint: "so weitermachen" },
-{ id: 597, cat: "Abschluss", de: "Du machst hervorragende Fortschritte.", pre: "Haces progresos ", post: ".", ans: "excelentes", hint: "hervorragend" },
-{ id: 598, cat: "Abschluss", de: "Glaub an dich selbst.", pre: " Cree en ti ", post: ".", ans: "mismo", hint: "selbst" },
-{ id: 599, cat: "Abschluss", de: "Die Mühe hat sich gelohnt.", pre: "El esfuerzo ha merecido la ", post: ".", ans: "pena", hint: "lohnen" },
-{ id: 600, cat: "Abschluss", de: "Herzlichen Glückwunsch zur Vollendung!", pre: "¡Felicitaciones por la ", post: "!", ans: "finalización", hint: "Vollendung/Abschluss" }
-
-    ];
-
-    // Statusvariablen & localStorage Initialisierung
-    let score = parseInt(localStorage.getItem('vocab_score')) || 0;
-    let streak = parseInt(localStorage.getItem('vocab_streak')) || 0;
-    let currentIndex = parseInt(localStorage.getItem('vocab_currentIndex')) || 0;
-    let isRetry = false;
-    let currentItem = null;
-
-    function saveProgress() {
-        localStorage.setItem('vocab_score', score);
-        localStorage.setItem('vocab_streak', streak);
-        localStorage.setItem('vocab_currentIndex', currentIndex);
+// Shuffle array helper
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
+    return array;
+}
 
-    function updateUI() {
-        document.getElementById('score-text').innerText = score;
-        document.getElementById('streak-text').innerText = streak;
-        document.getElementById('progress-text').innerText = `Frage ${currentIndex + 1} / ${vocabDb.length}`;
-    }
+function initSession() {
+    // Shuffle entire database once
+    let shuffledDb = shuffle([...vocabDb]);
+    // Take first 30 items for the initial block
+    sessionVocab = shuffledDb.slice(0, 30);
+    retryVocab = [];
+    currentIndex = 0;
+    score = 0;
+    streak = 0;
+    isRetryRound = false;
+    loadQuestion();
+}
 
-    function loadQuestion() {
-        if (currentIndex >= vocabDb.length) {
-            currentIndex = 0; // Zyklus von vorne beginnen oder Endbildschirm anzeigen
-        }
+function loadQuestion() {
+    const feedback = document.getElementById('feedback');
+    feedback.className = 'feedback';
+    feedback.style.display = 'none';
+    document.getElementById('user-answer').value = '';
+    document.getElementById('user-answer').disabled = false;
+    document.getElementById('action-btn').innerText = "Prüfen";
+    document.getElementById('action-btn').setAttribute("onclick", "handleAction()");
 
-        currentItem = vocabDb[currentIndex];
-        
-        document.getElementById('badge-category').innerText = currentItem.cat;
-        if (isRetry) {
-            document.getElementById('badge-category').className = "badge retry-badge";
-            document.getElementById('badge-category').innerText = "Wiederholung";
-        } else {
-            document.getElementById('badge-category').className = "badge";
-        }
+    let currentList = isRetryRound ? retryVocab : sessionVocab;
 
-        document.getElementById('hint-text').innerText = currentItem.hint;
-        document.getElementById('german-sentence').innerText = currentItem.de;
-
-        const container = document.getElementById('spanish-container');
-        container.innerHTML = `${currentItem.pre}<span class="blank-line" id="dynamic-blank"></span>${currentItem.post}`;
-
-        document.getElementById('user-answer').value = '';
-        document.getElementById('feedback').style.display = 'none';
-        document.getElementById('action-btn').innerText = "Prüfen";
-        
-        updateUI();
-    }
-
-    function handleAction() {
-        const userInputValue = document.getElementById('user-answer').value.trim().toLowerCase();
-        const feedbackEl = document.getElementById('feedback');
-        const blankLine = document.getElementById('dynamic-blank');
-
-        if (!isRetry && document.getElementById('action-btn').innerText === "Prüfen") {
-            // Prüfung der Antwort
-            if (userInputValue === currentItem.ans.toLowerCase()) {
-                feedbackEl.className = "feedback success";
-                feedbackEl.innerText = "Richtig! Gut gemacht.";
-                blankLine.classList.remove('error-line');
-                blankLine.innerText = currentItem.ans;
-                
-                score += 10;
-                streak += 1;
-                document.getElementById('action-btn').innerText = "Weiter";
-                
-                if (!isRetry) {
-                    currentIndex++;
-                }
-                isRetry = false;
-                saveProgress();
+    if (currentIndex >= currentList.length) {
+        if (isRetryRound) {
+            // End of retry round, advance to next 30-block or restart if done
+            let remainingDb = vocabDb.filter(item => !sessionVocab.some(s => s.id === item.id));
+            if (remainingDb.length > 0) {
+                sessionVocab = shuffle(remainingDb).slice(0, 30);
+                retryVocab = [];
+                currentIndex = 0;
+                isRetryRound = false;
+                currentBlock++;
+                loadQuestion();
             } else {
-                feedbackEl.className = "feedback error";
-                feedbackEl.innerText = `Falsch. Richtige Antwort: "${currentItem.ans}"`;
-                blankLine.classList.add('error-line');
-                blankLine.innerText = currentItem.ans;
-                
-                streak = 0;
-                isRetry = true; // Fehlerwiederholung aktivieren
-                document.getElementById('action-btn').innerText = "Weiter";
-                saveProgress();
+                showCompletion();
             }
         } else {
-            // Nächste Frage laden
-            loadQuestion();
+            if (retryVocab.length > 0) {
+                // Start retry round for failed items
+                isRetryRound = true;
+                currentIndex = 0;
+                retryVocab = shuffle(retryVocab);
+                alert("Runde beendet! Jetzt werden die falschen Vokabeln wiederholt.");
+                loadQuestion();
+            } else {
+                // No mistakes, move to next 30-block
+                let remainingDb = vocabDb.filter(item => !sessionVocab.some(s => s.id === item.id));
+                if (remainingDb.length > 0) {
+                    sessionVocab = shuffle(remainingDb).slice(0, 30);
+                    retryVocab = [];
+                    currentIndex = 0;
+                    isRetryRound = false;
+                    currentBlock++;
+                    loadQuestion();
+                } else {
+                    showCompletion();
+                }
+            }
         }
+        return;
     }
 
-    // Enter-Tasten Unterstützung
-    document.getElementById('user-answer').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            handleAction();
-        }
-    });
+    let item = currentList[currentIndex];
 
-    // Initialer Start beim Laden der Seite
+    // Update UI Badges & Labels
+    let badge = document.getElementById('badge-category');
+    if (isRetryRound) {
+        badge.className = "badge retry-badge";
+        badge.innerText = "Wiederholung (" + item.cat + ")";
+    } else {
+        badge.className = "badge";
+        badge.innerText = item.cat;
+    }
+
+    document.getElementById('progress-text').innerText = (isRetryRound ? "Wiederholung " : "Frage ") + (currentIndex + 1) + " / " + currentList.length;
+    document.getElementById('hint-text').innerText = item.hint;
+    document.getElementById('german-sentence').innerText = item.de;
+
+    // Build sentence preview with blank
+    let container = document.getElementById('spanish-container');
+    container.innerHTML = item.pre + '<span class="blank-line" id="dynamic-blank"></span>' + item.post;
+
+    document.getElementById('score-text').innerText = score;
+    document.getElementById('streak-text').innerText = streak;
+    document.getElementById('user-answer').focus();
+}
+
+function handleAction() {
+    let currentList = isRetryRound ? retryVocab : sessionVocab;
+    let item = currentList[currentIndex];
+    let userAns = document.getElementById('user-answer').value.trim().toLowerCase();
+    let correctAns = item.ans.trim().toLowerCase();
+
+    let feedback = document.getElementById('feedback');
+    let blank = document.getElementById('dynamic-blank');
+    let actionBtn = document.getElementById('action-btn');
+
+    if (userAns === correctAns) {
+        feedback.className = 'feedback success';
+        feedback.innerText = "Richtig! Gut gemacht.";
+        feedback.style.display = 'block';
+        blank.innerText = item.ans;
+        blank.style.borderBottom = "2px solid var(--success)";
+        blank.style.color = "var(--success)";
+        blank.style.fontWeight = "bold";
+
+        score += 10;
+        streak += 1;
+
+        actionBtn.innerText = "Weiter";
+        actionBtn.setAttribute("onclick", "nextQuestion()");
+        document.getElementById('user-answer').disabled = true;
+    } else {
+        feedback.className = 'feedback error';
+        feedback.innerText = "Falsch! Richtige Antwort: " + item.ans;
+        feedback.style.display = 'block';
+        blank.innerText = item.ans;
+        blank.style.borderBottom = "2px solid var(--error)";
+        blank.style.color = "var(--error)";
+        blank.style.fontWeight = "bold";
+
+        streak = 0;
+
+        // Add to retry list if not already there in this session block
+        if (!isRetryRound && !retryVocab.some(r => r.id === item.id)) {
+            retryVocab.push(item);
+        }
+
+        actionBtn.innerText = "Weiter";
+        actionBtn.setAttribute("onclick", "nextQuestion()");
+        document.getElementById('user-answer').disabled = true;
+    }
+
+    document.getElementById('score-text').innerText = score;
+    document.getElementById('streak-text').innerText = streak;
+}
+
+function nextQuestion() {
+    currentIndex++;
     loadQuestion();
+}
+
+function showCompletion() {
+    document.querySelector('.container').innerHTML = `
+        <div style="text-align: center; padding: 2rem 0;">
+            <h2 style="color: var(--success); margin-bottom: 1rem;">Großartig!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Du hast alle Vokabeln erfolgreich durchgearbeitet.</p>
+            <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 2rem;">Dein Endscore: <span style="color: var(--primary);">${score}</span></p>
+            <button onclick="initSession()">Nochmal von vorne</button>
+        </div>
+    `;
+}
+
+// Initialize on load
+initSession();
 </script>
 
 </body>
