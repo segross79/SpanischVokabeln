@@ -1,525 +1,524 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spanisch Vokabeltrainer (Random Modus)</title>
-  <style>
-    :root {
-      --bg-color: #f4f6f9;
-      --card-bg: #ffffff;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --text: #1f2937;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      background: var(--card-bg);
-      width: 100%;
-      max-width: 600px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      padding: 28px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    h1 { font-size: 1.4rem; color: var(--text); }
-
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    select, button {
-      padding: 10px 14px;
-      font-size: 0.95rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    select {
-      flex: 1;
-      background: #fff;
-      cursor: pointer;
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    button:hover { background: var(--primary-hover); }
-
-    .btn-secondary {
-      background: #6b7280;
-    }
-    .btn-secondary:hover { background: #4b5563; }
-
-    .btn-repeat {
-      background: #eab308;
-      color: #fff;
-    }
-    .btn-repeat:hover { background: #ca8a04; }
-
-    .toggle-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    .toggle-group input {
-      cursor: pointer;
-      width: 16px;
-      height: 16px;
-    }
-
-    .progress-bar-container {
-      height: 8px;
-      background: #e5e7eb;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background: var(--primary);
-      transition: width 0.3s ease;
-    }
-
-    .card {
-      background: #fafafa;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .category-badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      background: #e0e7ff;
-      color: #3730a3;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .prompt {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: var(--text);
-    }
-
-    .input-group {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      gap: 6px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
-    .input-group input {
-      font-size: 1.1rem;
-      padding: 8px 12px;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      text-align: center;
-      width: 180px;
-      outline: none;
-    }
-
-    .input-group input:focus {
-      border-color: var(--primary);
-    }
-
-    .hint-box {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 10px;
-      min-height: 20px;
-      font-style: italic;
-    }
-
-    .btn-hint {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px dashed var(--border);
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      margin-top: 5px;
-    }
-
-    .btn-hint:hover { background: #f3f4f6; color: var(--text); }
-
-    .feedback {
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .feedback.correct {
-      background: #dcfce7;
-      color: var(--success);
-      border: 1px solid #86efac;
-    }
-
-    .feedback.incorrect {
-      background: #fee2e2;
-      color: var(--danger);
-      border: 1px solid #fca5a5;
-    }
-
-    .action-btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-    }
-
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 15px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanisch Vokabeltrainer</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        h1 { color: #2c3e50; font-size: 24px; margin-bottom: 20px; }
+        .stats { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; }
+        .vocab { font-size: 28px; font-weight: bold; color: #2980b9; margin: 20px 0; }
+        input[type="text"] { width: 80%; padding: 10px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 5px; margin-bottom: 15px; outline: none; transition: border-color 0.3s; }
+        input[type="text"]:focus { border-color: #2980b9; }
+        button { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #219653; }
+        .feedback { margin-top: 15px; font-size: 16px; font-weight: bold; }
+        .correct { color: #27ae60; }
+        .incorrect { color: #c0392b; }
+        .rules { font-size: 12px; color: #95a5a6; margin-top: 25px; text-align: left; border-top: 1px solid #ecf0f1; padding-top: 10px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <header>
-    <h1>Spanisch-Trainer</h1>
-    <span id="counter" style="font-weight: 600; color: var(--text-muted);">0 / 0</span>
-  </header>
-
-  <div class="controls">
-    <div class="row">
-      <select id="blockSelect" onchange="loadSelectedBlock()">
-        <!-- Dynamisch befüllt -->
-      </select>
-      <button class="btn-secondary" onclick="shuffleCurrentList()" title="Aktuelle Auswahl neu mischen">🎲 Mischen</button>
-    </div>
-
-    <div class="row" style="justify-content: space-between;">
-      <label class="toggle-group">
-        <input type="checkbox" id="chkRandom" checked onchange="loadSelectedBlock()">
-        <span>Immer zufällig ausgeben (Random)</span>
-      </label>
-
-      <button class="btn-repeat" id="btnRepeatWrong" onclick="startRepeatMode()" style="display:none;">
-        Fehler ( <span id="wrongCount">0</span> )
-      </button>
-    </div>
-  </div>
-
-  <div class="progress-bar-container">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-
-  <div class="card" id="quizCard">
-    <div class="category-badge" id="catBadge">Kategorie</div>
-    <div class="prompt" id="dePrompt">Deutsche Vokabel</div>
+    <h1>Spanisch Vokabeltrainer</h1>
+    <div class="stats" id="stats">Frage 1 von 30 (Runde 1)</div>
+    <div class="vocab" id="vocab-display">Lade Vokabeln...</div>
     
-    <div class="input-group">
-      <span id="preText"></span>
-      <input type="text" id="userInput" placeholder="Antwort..." autocomplete="off" spellcheck="false">
-      <span id="postText"></span>
+    <div id="quiz-area">
+        <input type="text" id="user-input" placeholder="Deutsche Übersetzung eingeben..." autocomplete="off">
+        <br>
+        <button id="submit-btn" onclick="checkAnswer()">Überprüfen</button>
     </div>
+    
+    <div class="feedback" id="feedback"></div>
 
-    <button class="btn-hint" onclick="toggleHint()">💡 Hinweis anzeigen</button>
-    <div class="hint-box" id="hintBox" style="display:none;"></div>
-  </div>
-
-  <div class="feedback" id="feedback"></div>
-
-  <button class="action-btn" id="btnSubmit" onclick="checkAnswer()">Überprüfen</button>
-
-  <div class="stats">
-    <span>Richtig: <strong id="scoreCorrect" style="color: var(--success);">0</strong></span>
-    <span>Falsch: <strong id="scoreWrong" style="color: var(--danger);">0</strong></span>
-  </div>
+    <div class="rules">
+        <strong>Modus:</strong> Es werden immer 30 Vokabeln abgefragt. Nach den 30 Fragen muss man die Falscheingaben so oft eingeben, bis alles richtig war. Erst danach startet die nächste Runde mit den nächsten 30 Vokabeln, die bisher noch nicht dran waren. Wenn alles durch ist, beginnt es wieder von vorne. Alles immer random.
+    </div>
 </div>
 
 <script>
-  // HIER DIE 489 VOKABELN EINFÜGEN:
-  const vocabData = [
-    { id: 1, cat: "Pronomen", de: "ich", pre: "", post: "", ans: "yo", hint: "Personalpronomen" },
-    { id: 2, cat: "Pronomen", de: "du", pre: "", post: "", ans: "tú", hint: "Personalpronomen" },
-    { id: 3, cat: "Pronomen", de: "er", pre: "", post: "", ans: "él", hint: "Personalpronomen" },
-    { id: 4, cat: "Pronomen", de: "sie (Singular)", pre: "", post: "", ans: "ella", hint: "Personalpronomen" },
-    { id: 319, cat: "Restaurant", de: "Eine Vorspeise, bitte.", pre: "Un ", post: ", por favor.", ans: "entrante", hint: "Vorspeise" }
-    // Füge hier alle verbleibenden Vokabeln deines Datensatzes ein
-  ];
+    // 600 Vokabeln
+    const allVocabs = [
+Hier die Vokabeln von denen ich spreche. Füge das ein
 
-  const BLOCK_SIZE = 30;
-  let currentList = [];
-  let currentIndex = 0;
-  let wrongAnswers = [];
-  let score = { correct: 0, wrong: 0 };
-  let isChecked = false;
+{ id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
+{ id: 2, cat: "Pronomen", de: "Du bist mein Freund.", pre: "", post: " eres mi amigo.", ans: "tú", hint: "du" },
+{ id: 3, cat: "Pronomen", de: "Er ist groß.", pre: "", post: " es alto.", ans: "él", hint: "er" },
+{ id: 4, cat: "Pronomen", de: "Sie ist klug.", pre: "", post: " es lista.", ans: "ella", hint: "sie (Singular)" },
+{ id: 5, cat: "Pronomen", de: "Wir gehen ins Kino.", pre: "", post: " vamos al cine.", ans: "nosotros", hint: "wir" },
+{ id: 6, cat: "Pronomen", de: "Ihr seid aus Spanien.", pre: "", post: " sois de España.", ans: "vosotros", hint: "ihr" },
+{ id: 7, cat: "Pronomen", de: "Sie arbeiten viel.", pre: "", post: " trabajan mucho.", ans: "ellos", hint: "sie (Plural, männlich)" },
+{ id: 8, cat: "Pronomen", de: "Sie lesen ein Buch.", pre: "", post: " leen un libro.", ans: "ellas", hint: "sie (Plural, weiblich)" },
+{ id: 9, cat: "Pronomen", de: "Sie (höflich) sind sehr nett.", pre: "", post: " es muy amable.", ans: "usted", hint: "Sie (höflich, Singular)" },
+{ id: 10, cat: "Pronomen", de: "Sie (höflich, Plural) können eintreten.", pre: "", post: " pueden pasar.", ans: "ustedes", hint: "Sie (höflich, Plural)" },
 
-  // Fisher-Yates Shuffle Algorithmus für echtes Zufallsmischen
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+{ id: 11, cat: "Familie", de: "Meine Mutter heißt Maria.", pre: "Mi ", post: " se llama María.", ans: "madre", hint: "Mutter" },
+{ id: 12, cat: "Familie", de: "Sein Vater ist Arzt.", pre: "Su ", post: " es médico.", ans: "padre", hint: "Vater" },
+{ id: 13, cat: "Familie", de: "Ich habe einen Bruder.", pre: "Tengo un ", post: ".", ans: "hermano", hint: "Bruder" },
+{ id: 14, cat: "Familie", de: "Ihre Schwester ist jung.", pre: "Su ", post: " es joven.", ans: "hermana", hint: "Schwester" },
+{ id: 15, cat: "Familie", de: "Der Sohn spielt draußen.", pre: "El ", post: " juega fuera.", ans: "hijo", hint: "Sohn" },
+{ id: 16, cat: "Familie", de: "Die Tochter liest.", pre: "La ", post: " lee.", ans: "hija", hint: "Tochter" },
+{ id: 17, cat: "Familie", de: "Mein Großvater ist alt.", pre: "Mi ", post: " es mayor.", ans: "abuelo", hint: "Großvater" },
+{ id: 18, cat: "Familie", de: "Die Großmutter kocht.", pre: "La ", post: " cocina.", ans: "abuela", hint: "Großmutter" },
+{ id: 19, cat: "Familie", de: "Mein Onkel lebt in Madrid.", pre: "Mi ", post: " vive en Madrid.", ans: "tío", hint: "Onkel" },
+{ id: 20, cat: "Familie", de: "Meine Tante arbeitet hier.", pre: "Mi ", post: " trabaja aquí.", ans: "tía", hint: "Tante" },
+
+{ id: 21, cat: "Farbe", de: "Das Auto ist rot.", pre: "El coche es ", post: ".", ans: "rojo", hint: "rot" },
+{ id: 22, cat: "Farbe", de: "Der Himmel ist blau.", pre: "El cielo es ", post: ".", ans: "azul", hint: "blau" },
+{ id: 23, cat: "Farbe", de: "Der Apfel ist grün.", pre: "La manzana es ", post: ".", ans: "verde", hint: "grün" },
+{ id: 24, cat: "Farbe", de: "Die Sonne ist gelb.", pre: "El sol es ", post: ".", ans: "amarillo", hint: "gelb" },
+{ id: 25, cat: "Farbe", de: "Der Hund ist schwarz.", pre: "El perro es ", post: ".", ans: "negro", hint: "schwarz" },
+{ id: 26, cat: "Farbe", de: "Das Papier ist weiß.", pre: "El papel es ", post: ".", ans: "blanco", hint: "weiß" },
+{ id: 27, cat: "Farbe", de: "Die Katze ist grau.", pre: "El gato es ", post: ".", ans: "gris", hint: "grau" },
+{ id: 28, cat: "Farbe", de: "Der Bär ist braun.", pre: "El oso es ", post: ".", ans: "marrón", hint: "braun" },
+{ id: 29, cat: "Farbe", de: "Die Orange ist orange.", pre: "La naranja es ", post: ".", ans: "naranja", hint: "orange" },
+{ id: 30, cat: "Farbe", de: "Die Blume ist rosa.", pre: "La flor es ", post: ".", ans: "rosa", hint: "rosa" },
+
+{ id: 31, cat: "Tag", de: "Heute ist Montag.", pre: "Hoy es ", post: ".", ans: "lunes", hint: "Montag" },
+{ id: 32, cat: "Tag", de: "Morgen ist Dienstag.", pre: "Mañana es ", post: ".", ans: "martes", hint: "Dienstag" },
+{ id: 33, cat: "Tag", de: "Wir sehen uns am Mittwoch.", pre: "Nos vemos el ", post: ".", ans: "miércoles", hint: "Mittwoch" },
+{ id: 34, cat: "Tag", de: "Donnerstag habe ich Zeit.", pre: "El ", post: " tengo tiempo.", ans: "jueves", hint: "Donnerstag" },
+{ id: 35, cat: "Tag", de: "Freitag ist ein guter Tag.", pre: "El ", post: " es un buen día.", ans: "viernes", hint: "Freitag" },
+{ id: 36, cat: "Tag", de: "Am Samstag ruhe ich mich aus.", pre: "El ", post: " descanso.", ans: "sábado", hint: "Samstag" },
+{ id: 37, cat: "Tag", de: "Der Sonntag ist ruhig.", pre: "El ", post: " es tranquilo.", ans: "domingo", hint: "Sonntag" },
+
+{ id: 38, cat: "Zeit", de: "Heute ist ein schöner Tag.", pre: "", post: " es un día bonito.", ans: "hoy", hint: "heute" },
+{ id: 39, cat: "Zeit", de: "Ich mache es morgen.", pre: "Lo hago ", post: ".", ans: "mañana", hint: "morgen" },
+{ id: 40, cat: "Zeit", de: "Gestern war ich zu Hause.", pre: "", post: " estuve en casa.", ans: "ayer", hint: "gestern" },
+
+{ id: 41, cat: "Zahl", de: "Ich habe ein Buch.", pre: "Tengo ", post: " libro.", ans: "un", hint: "ein" },
+{ id: 42, cat: "Zahl", de: "Es gibt zwei Autos.", pre: "Hay ", post: " coches.", ans: "dos", hint: "zwei" },
+{ id: 43, cat: "Zahl", de: "Wir sind drei Personen.", pre: "Somos ", post: " personas.", ans: "tres", hint: "drei" },
+{ id: 44, cat: "Zahl", de: "Vier Tische, bitte.", pre: "", post: " mesas, por favor.", ans: "cuatro", hint: "vier" },
+{ id: 45, cat: "Zahl", de: "Ich brauche fünf Minuten.", pre: "Necesito ", post: " minutos.", ans: "cinco", hint: "fünf" },
+{ id: 46, cat: "Zahl", de: "Er hat sechs Hunde.", pre: "Tiene ", post: " perros.", ans: "seis", hint: "sechs" },
+{ id: 47, cat: "Zahl", de: "Sieben Tage die Woche.", pre: "", post: " días a la semana.", ans: "siete", hint: "sieben" },
+{ id: 48, cat: "Zahl", de: "Es ist acht Uhr.", pre: "Son las ", post: ".", ans: "ocho", hint: "acht" },
+{ id: 49, cat: "Zahl", de: "Neun Stunden schlafen.", pre: "Dormir ", post: " horas.", ans: "nueve", hint: "neun" },
+{ id: 50, cat: "Zahl", de: "Zehn Euro, bitte.", pre: "", post: " euros, por favor.", ans: "diez", hint: "zehn" },
+
+{ id: 51, cat: "Verb", de: "Ich bin Arzt.", pre: "", post: " médico.", ans: "soy", hint: "sein (Beruf/Eigenschaft - yo)" },
+{ id: 52, cat: "Verb", de: "Ich bin hier.", pre: "", post: " aquí.", ans: "estoy", hint: "sich befinden (yo)" },
+{ id: 53, cat: "Verb", de: "Ich habe Hunger.", pre: "", post: " hambre.", ans: "tengo", hint: "haben (yo)" },
+{ id: 54, cat: "Verb", de: "Ich mache Sport.", pre: "", post: " deporte.", ans: "hago", hint: "machen (yo)" },
+{ id: 55, cat: "Verb", de: "Ich gehe nach Hause.", pre: "", post: " a casa.", ans: "voy", hint: "gehen (yo)" },
+{ id: 56, cat: "Verb", de: "Er kommt aus Berlin.", pre: "Él ", post: " de Berlín.", ans: "viene", hint: "kommen (él)" },
+{ id: 57, cat: "Verb", de: "Wir essen Pizza.", pre: "Nosotros ", post: " pizza.", ans: "comemos", hint: "essen (nosotros)" },
+{ id: 58, cat: "Verb", de: "Sie trinken Wasser.", pre: "Ellos ", post: " agua.", ans: "beben", hint: "trinken (ellos)" },
+{ id: 59, cat: "Verb", de: "Du sprichst gut.", pre: "Tú ", post: " bien.", ans: "hablas", hint: "sprechen (tú)" },
+{ id: 60, cat: "Verb", de: "Ihr lebt in Spanien.", pre: "Vosotros ", post: " en España.", ans: "vivís", hint: "leben (vosotros)" },
+
+{ id: 61, cat: "Essen", de: "Ich trinke Wasser.", pre: "Bebo ", post: ".", ans: "agua", hint: "Wasser" },
+{ id: 62, cat: "Essen", de: "Wir essen Brot.", pre: "Comemos ", post: ".", ans: "pan", hint: "Brot" },
+{ id: 63, cat: "Essen", de: "Das Fleisch ist gut.", pre: "La ", post: " está buena.", ans: "carne", hint: "Fleisch" },
+{ id: 64, cat: "Essen", de: "Der Fisch ist frisch.", pre: "El ", post: " es fresco.", ans: "pescado", hint: "Fisch" },
+{ id: 65, cat: "Essen", de: "Ich mag Obst.", pre: "Me gusta la ", post: ".", ans: "fruta", hint: "Obst/Frucht" },
+{ id: 66, cat: "Essen", de: "Gemüse ist gesund.", pre: "La ", post: " es sana.", ans: "verdura", hint: "Gemüse" },
+{ id: 67, cat: "Essen", de: "Ich kaufe Käse.", pre: "Compro ", post: ".", ans: "queso", hint: "Käse" },
+{ id: 68, cat: "Essen", de: "Ein Kaffee mit Milch.", pre: "Un café con ", post: ".", ans: "leche", hint: "Milch" },
+{ id: 69, cat: "Essen", de: "Ein Glas Rotwein.", pre: "Una copa de ", post: " tinto.", ans: "vino", hint: "Wein" },
+{ id: 70, cat: "Essen", de: "Zwei Bier, bitte.", pre: "Dos ", post: ", por favor.", ans: "cervezas", hint: "Bier (Plural)" },
+
+{ id: 71, cat: "Ort", de: "Ich gehe ins Haus.", pre: "Voy a la ", post: ".", ans: "casa", hint: "Haus" },
+{ id: 72, cat: "Ort", de: "Das Hotel ist groß.", pre: "El ", post: " es grande.", ans: "hotel", hint: "Hotel" },
+{ id: 73, cat: "Ort", de: "Wir suchen ein Restaurant.", pre: "Buscamos un ", post: ".", ans: "restaurante", hint: "Restaurant" },
+{ id: 74, cat: "Ort", de: "Die Straße ist lang.", pre: "La ", post: " es larga.", ans: "calle", hint: "Straße" },
+{ id: 75, cat: "Ort", de: "Der Platz ist schön.", pre: "La ", post: " es bonita.", ans: "plaza", hint: "Platz" },
+{ id: 76, cat: "Ort", de: "Die Stadt ist laut.", pre: "La ", post: " es ruidosa.", ans: "ciudad", hint: "Stadt" },
+{ id: 77, cat: "Ort", de: "Spanien ist ein Land.", pre: "España es un ", post: ".", ans: "país", hint: "Land" },
+{ id: 78, cat: "Ort", de: "Die Schule ist hier.", pre: "La ", post: " está aquí.", ans: "escuela", hint: "Schule" },
+{ id: 79, cat: "Ort", de: "Das Krankenhaus ist dort.", pre: "El ", post: " está allí.", ans: "hospital", hint: "Krankenhaus" },
+{ id: 80, cat: "Ort", de: "Der Bahnhof ist nah.", pre: "La ", post: " está cerca.", ans: "estación", hint: "Bahnhof" },
+
+{ id: 81, cat: "Zeit", de: "Ich habe eine Stunde.", pre: "Tengo una ", post: ".", ans: "hora", hint: "Stunde" },
+{ id: 82, cat: "Zeit", de: "Warte eine Minute.", pre: "Espera un ", post: ".", ans: "minuto", hint: "Minute" },
+{ id: 83, cat: "Zeit", de: "Guten Tag!", pre: "¡Buen ", post: "!", ans: "día", hint: "Tag" },
+{ id: 84, cat: "Zeit", de: "Nächste Woche.", pre: "La próxima ", post: ".", ans: "semana", hint: "Woche" },
+{ id: 85, cat: "Zeit", de: "Jeden Monat.", pre: "Cada ", post: ".", ans: "mes", hint: "Monat" },
+{ id: 86, cat: "Zeit", de: "Nächstes Jahr.", pre: "El próximo ", post: ".", ans: "año", hint: "Jahr" },
+{ id: 87, cat: "Zeit", de: "Am Morgen.", pre: "Por la ", post: ".", ans: "mañana", hint: "Morgen (Tageszeit)" },
+{ id: 88, cat: "Zeit", de: "Am Nachmittag.", pre: "Por la ", post: ".", ans: "tarde", hint: "Nachmittag" },
+{ id: 89, cat: "Zeit", de: "In der Nacht.", pre: "Por la ", post: ".", ans: "noche", hint: "Nacht" },
+{ id: 90, cat: "Zeit", de: "Bis bald.", pre: "Hasta ", post: ".", ans: "pronto", hint: "bald" },
+
+{ id: 91, cat: "Adjektiv", de: "Ein guter Freund.", pre: "Un ", post: " amigo.", ans: "buen", hint: "guter (vor Nomen)" },
+{ id: 92, cat: "Adjektiv", de: "Eine schlechte Idee.", pre: "Una ", post: " idea.", ans: "mala", hint: "schlechte" },
+{ id: 93, cat: "Adjektiv", de: "Ein großer Hund.", pre: "Un perro ", post: ".", ans: "grande", hint: "groß" },
+{ id: 94, cat: "Adjektiv", de: "Ein kleiner Tisch.", pre: "Una mesa ", post: ".", ans: "pequeña", hint: "klein (weiblich)" },
+{ id: 95, cat: "Adjektiv", de: "Ein neues Auto.", pre: "Un coche ", post: ".", ans: "nuevo", hint: "neu" },
+{ id: 96, cat: "Adjektiv", de: "Ein altes Haus.", pre: "Una casa ", post: ".", ans: "vieja", hint: "alt (weiblich)" },
+{ id: 97, cat: "Adjektiv", de: "Ein großer Mann.", pre: "Un hombre ", post: ".", ans: "alto", hint: "groß (Körpergröße)" },
+{ id: 98, cat: "Adjektiv", de: "Ein kleiner Stuhl.", pre: "Una silla ", post: ".", ans: "baja", hint: "niedrig/klein (weiblich)" },
+{ id: 99, cat: "Adjektiv", de: "Ein schöner Ort.", pre: "Un lugar ", post: ".", ans: "bonito", hint: "schön" },
+{ id: 100, cat: "Adjektiv", de: "Es ist hässlich.", pre: "Es ", post: ".", ans: "feo", hint: "hässlich" },
+{ id: 101, cat: "Kleidung", de: "Ich kaufe ein Hemd.", pre: "Compro una ", post: ".", ans: "camisa", hint: "Hemd" },
+{ id: 102, cat: "Kleidung", de: "Die Hose ist blau.", pre: "El ", post: " es azul.", ans: "pantalón", hint: "Hose" },
+{ id: 103, cat: "Kleidung", de: "Meine Schuhe sind neu.", pre: "Mis ", post: " son nuevos.", ans: "zapatos", hint: "Schuhe" },
+{ id: 104, cat: "Kleidung", de: "Er trägt eine Jacke.", pre: "Lleva una ", post: ".", ans: "chaqueta", hint: "Jacke" },
+{ id: 105, cat: "Kleidung", de: "Das Kleid ist schön.", pre: "El ", post: " es bonito.", ans: "vestido", hint: "Kleid" },
+{ id: 106, cat: "Kleidung", de: "Ein weißes T-Shirt.", pre: "Una ", post: " blanca.", ans: "camiseta", hint: "T-Shirt" },
+{ id: 107, cat: "Kleidung", de: "Sie trägt einen Rock.", pre: "Ella lleva una ", post: ".", ans: "falda", hint: "Rock" },
+{ id: 108, cat: "Kleidung", de: "Der Hut ist schwarz.", pre: "El ", post: " es negro.", ans: "sombrero", hint: "Hut" },
+{ id: 109, cat: "Kleidung", de: "Ich brauche Socken.", pre: "Necesito ", post: ".", ans: "calcetines", hint: "Socken" },
+{ id: 110, cat: "Kleidung", de: "Es ist kalt, ich brauche einen Mantel.", pre: "Hace frío, necesito un ", post: ".", ans: "abrigo", hint: "Mantel" },
+
+{ id: 111, cat: "Körper", de: "Mein Kopf tut weh.", pre: "Me duele la ", post: ".", ans: "cabeza", hint: "Kopf" },
+{ id: 112, cat: "Körper", de: "Er hat blaue Augen.", pre: "Tiene los ", post: " azules.", ans: "ojos", hint: "Augen" },
+{ id: 113, cat: "Körper", de: "Die rechte Hand.", pre: "La ", post: " derecha.", ans: "mano", hint: "Hand" },
+{ id: 114, cat: "Körper", de: "Der linke Fuß.", pre: "El ", post: " izquierdo.", ans: "pie", hint: "Fuß" },
+{ id: 115, cat: "Körper", de: "Sie hat lange Haare.", pre: "Tiene el ", post: " largo.", ans: "pelo", hint: "Haar(e)" },
+{ id: 116, cat: "Körper", de: "Mein Arm tut weh.", pre: "Me duele el ", post: ".", ans: "brazo", hint: "Arm" },
+{ id: 117, cat: "Körper", de: "Ich habe müde Beine.", pre: "Tengo las ", post: " cansadas.", ans: "piernas", hint: "Beine" },
+{ id: 118, cat: "Körper", de: "Öffne den Mund.", pre: "Abre la ", post: ".", ans: "boca", hint: "Mund" },
+{ id: 119, cat: "Körper", de: "Ich habe zwei Ohren.", pre: "Tengo dos ", post: ".", ans: "orejas", hint: "Ohren" },
+{ id: 120, cat: "Körper", de: "Eine kleine Nase.", pre: "Una ", post: " pequeña.", ans: "nariz", hint: "Nase" },
+
+{ id: 121, cat: "Haus", de: "Schließe die Tür.", pre: "Cierra la ", post: ".", ans: "puerta", hint: "Tür" },
+{ id: 122, cat: "Haus", de: "Das Fenster ist offen.", pre: "La ", post: " está abierta.", ans: "ventana", hint: "Fenster" },
+{ id: 123, cat: "Haus", de: "Das Essen steht auf dem Tisch.", pre: "La comida está en la ", post: ".", ans: "mesa", hint: "Tisch" },
+{ id: 124, cat: "Haus", de: "Ich brauche einen Stuhl.", pre: "Necesito una ", post: ".", ans: "silla", hint: "Stuhl" },
+{ id: 125, cat: "Haus", de: "Das Bett ist bequem.", pre: "La ", post: " es cómoda.", ans: "cama", hint: "Bett" },
+{ id: 126, cat: "Haus", de: "Die Küche ist klein.", pre: "La ", post: " es pequeña.", ans: "cocina", hint: "Küche" },
+{ id: 127, cat: "Haus", de: "Wo ist das Badezimmer?", pre: "¿Dónde está el ", post: "?", ans: "baño", hint: "Badezimmer" },
+{ id: 128, cat: "Haus", de: "Wir sitzen im Wohnzimmer.", pre: "Estamos en el ", post: ".", ans: "salón", hint: "Wohnzimmer" },
+{ id: 129, cat: "Haus", de: "Das Sofa ist neu.", pre: "El ", post: " es nuevo.", ans: "sofá", hint: "Sofa" },
+{ id: 130, cat: "Haus", de: "Mach die Lampe an.", pre: "Enciende la ", post: ".", ans: "lámpara", hint: "Lampe" },
+
+{ id: 131, cat: "Natur", de: "Die Sonne scheint.", pre: "Hace ", post: ".", ans: "sol", hint: "Sonne" },
+{ id: 132, cat: "Natur", de: "Der Mond ist hell.", pre: "La ", post: " brilla.", ans: "luna", hint: "Mond" },
+{ id: 133, cat: "Natur", de: "Das ist ein großer Baum.", pre: "Es un ", post: " grande.", ans: "árbol", hint: "Baum" },
+{ id: 134, cat: "Natur", de: "Eine rote Blume.", pre: "Una ", post: " roja.", ans: "flor", hint: "Blume" },
+{ id: 135, cat: "Natur", de: "Der Fluss ist lang.", pre: "El ", post: " es largo.", ans: "río", hint: "Fluss" },
+{ id: 136, cat: "Natur", de: "Wir gehen in die Berge.", pre: "Vamos a la ", post: ".", ans: "montaña", hint: "Berg" },
+{ id: 137, cat: "Natur", de: "Ich liebe den Strand.", pre: "Me encanta la ", post: ".", ans: "playa", hint: "Strand" },
+{ id: 138, cat: "Natur", de: "Das Meer ist ruhig.", pre: "El ", post: " está tranquilo.", ans: "mar", hint: "Meer" },
+{ id: 139, cat: "Natur", de: "Wir laufen durch den Wald.", pre: "Caminamos por el ", post: ".", ans: "bosque", hint: "Wald" },
+{ id: 140, cat: "Natur", de: "Im Winter gibt es Schnee.", pre: "En invierno hay ", post: ".", ans: "nieve", hint: "Schnee" },
+
+{ id: 141, cat: "Verb", de: "Ich arbeite viel.", pre: "Yo ", post: " mucho.", ans: "trabajo", hint: "arbeiten (ich)" },
+{ id: 142, cat: "Verb", de: "Er studiert Spanisch.", pre: "Él ", post: " español.", ans: "estudia", hint: "lernen/studieren (er)" },
+{ id: 143, cat: "Verb", de: "Wir schreiben einen Brief.", pre: "Nosotros ", post: " una carta.", ans: "escribimos", hint: "schreiben (wir)" },
+{ id: 144, cat: "Verb", de: "Sie liest ein Buch.", pre: "Ella ", post: " un libro.", ans: "lee", hint: "lesen (sie)" },
+{ id: 145, cat: "Verb", de: "Ich höre Musik.", pre: "", post: " música.", ans: "escucho", hint: "hören (ich)" },
+{ id: 146, cat: "Verb", de: "Ich sehe ein Auto.", pre: "", post: " un coche.", ans: "veo", hint: "sehen (ich)" },
+{ id: 147, cat: "Verb", de: "Ich brauche Zeit.", pre: "", post: " tiempo.", ans: "necesito", hint: "brauchen (ich)" },
+{ id: 148, cat: "Verb", de: "Ich will Wasser.", pre: "", post: " agua.", ans: "quiero", hint: "wollen/möchten (ich)" },
+{ id: 149, cat: "Verb", de: "Ich kann helfen.", pre: "", post: " ayudar.", ans: "puedo", hint: "können (ich)" },
+{ id: 150, cat: "Verb", de: "Ich weiß es nicht.", pre: "No lo ", post: ".", ans: "sé", hint: "wissen (ich)" },
+
+{ id: 151, cat: "Verb", de: "Ich kenne Madrid.", pre: "", post: " Madrid.", ans: "conozco", hint: "kennen (ich)" },
+{ id: 152, cat: "Verb", de: "Ich sage die Wahrheit.", pre: "", post: " la verdad.", ans: "digo", hint: "sagen (ich)" },
+{ id: 153, cat: "Verb", de: "Ich gebe dir das Buch.", pre: "Te ", post: " el libro.", ans: "doy", hint: "geben (ich)" },
+{ id: 154, cat: "Verb", de: "Ich nehme einen Kaffee.", pre: "", post: " un café.", ans: "tomo", hint: "nehmen (ich)" },
+{ id: 155, cat: "Verb", de: "Ich suche den Bahnhof.", pre: "", post: " la estación.", ans: "busco", hint: "suchen (ich)" },
+{ id: 156, cat: "Verb", de: "Ich finde den Schlüssel nicht.", pre: "No ", post: " la llave.", ans: "encuentro", hint: "finden (ich)" },
+{ id: 157, cat: "Verb", de: "Ich spiele Fußball.", pre: "", post: " al fútbol.", ans: "juego", hint: "spielen (ich)" },
+{ id: 158, cat: "Verb", de: "Ich schlafe viel.", pre: "", post: " mucho.", ans: "duermo", hint: "schlafen (ich)" },
+{ id: 159, cat: "Verb", de: "Ich denke an dich.", pre: "", post: " en ti.", ans: "pienso", hint: "denken (ich)" },
+{ id: 160, cat: "Verb", de: "Darf ich etwas fragen?", pre: "¿Puedo ", post: " algo?", ans: "preguntar", hint: "fragen" },
+
+{ id: 161, cat: "Frage", de: "Was ist das?", pre: "¿", post: " es esto?", ans: "qué", hint: "was" },
+{ id: 162, cat: "Frage", de: "Wer ist das?", pre: "¿", post: " es?", ans: "quién", hint: "wer" },
+{ id: 163, cat: "Frage", de: "Wie heißt du?", pre: "¿", post: " te llamas?", ans: "cómo", hint: "wie" },
+{ id: 164, cat: "Frage", de: "Wo ist das Hotel?", pre: "¿", post: " está el hotel?", ans: "dónde", hint: "wo" },
+{ id: 165, cat: "Frage", de: "Wann kommst du?", pre: "¿", post: " vienes?", ans: "cuándo", hint: "wann" },
+{ id: 166, cat: "Frage", de: "Warum weinst du?", pre: "¿", post: " lloras?", ans: "por qué", hint: "warum" },
+{ id: 167, cat: "Frage", de: "Wie viel kostet es?", pre: "¿", post: " cuesta?", ans: "cuánto", hint: "wie viel" },
+{ id: 168, cat: "Frage", de: "Wohin gehst du?", pre: "¿", post: " vas?", ans: "adónde", hint: "wohin" },
+{ id: 169, cat: "Frage", de: "Woher kommst du?", pre: "¿", post: " eres?", ans: "de dónde", hint: "woher" },
+{ id: 170, cat: "Frage", de: "Welches Auto ist deins?", pre: "¿", post: " es tu coche?", ans: "cuál", hint: "welcher/welche/welches" },
+
+{ id: 171, cat: "Adverb", de: "Ich bin hier.", pre: "Estoy ", post: ".", ans: "aquí", hint: "hier" },
+{ id: 172, cat: "Adverb", de: "Das Hotel ist dort.", pre: "El hotel está ", post: ".", ans: "allí", hint: "dort" },
+{ id: 173, cat: "Adverb", de: "Das ist sehr gut.", pre: "Eso es ", post: " bueno.", ans: "muy", hint: "sehr" },
+{ id: 174, cat: "Adverb", de: "Ich habe viel Arbeit.", pre: "Tengo ", post: " trabajo.", ans: "mucho", hint: "viel" },
+{ id: 175, cat: "Adverb", de: "Ich spreche wenig Spanisch.", pre: "Hablo ", post: " español.", ans: "poco", hint: "wenig" },
+{ id: 176, cat: "Adverb", de: "Er kommt immer zu spät.", pre: "Él ", post: " llega tarde.", ans: "siempre", hint: "immer" },
+{ id: 177, cat: "Adverb", de: "Ich trinke nie Kaffee.", pre: "No bebo ", post: " café.", ans: "nunca", hint: "nie" },
+{ id: 178, cat: "Adverb", de: "Mir geht es gut.", pre: "Estoy ", post: ".", ans: "bien", hint: "gut (Adverb)" },
+{ id: 179, cat: "Adverb", de: "Es geht ihm schlecht.", pre: "Está ", post: ".", ans: "mal", hint: "schlecht (Adverb)" },
+{ id: 180, cat: "Adverb", de: "Ich komme auch.", pre: "Yo ", post: " voy.", ans: "también", hint: "auch" },
+
+{ id: 181, cat: "Ort/Richtung", de: "Kommst du mit mir?", pre: "¿Vienes ", post: "migo?", ans: "con", hint: "mit" },
+{ id: 182, cat: "Ort/Richtung", de: "Kaffee ohne Zucker.", pre: "Café ", post: " azúcar.", ans: "sin", hint: "ohne" },
+{ id: 183, cat: "Ort/Richtung", de: "Ein Geschenk für dich.", pre: "Un regalo ", post: " ti.", ans: "para", hint: "für" },
+{ id: 184, cat: "Ort/Richtung", de: "Ich komme aus Deutschland.", pre: "Soy ", post: " Alemania.", ans: "de", hint: "von/aus" },
+{ id: 185, cat: "Ort/Richtung", de: "Wir gehen zum Strand.", pre: "Vamos ", post: " la playa.", ans: "a", hint: "zu/nach" },
+{ id: 186, cat: "Ort/Richtung", de: "Ich bin im Haus.", pre: "Estoy ", post: " la casa.", ans: "en", hint: "in/auf" },
+{ id: 187, cat: "Ort/Richtung", de: "Das Buch liegt auf dem Tisch.", pre: "El libro está ", post: " la mesa.", ans: "sobre", hint: "über/auf" },
+{ id: 188, cat: "Ort/Richtung", de: "Der Bahnhof ist rechts.", pre: "La estación está a la ", post: ".", ans: "derecha", hint: "rechts" },
+{ id: 189, cat: "Ort/Richtung", de: "Das Museum ist links.", pre: "El museo está a la ", post: ".", ans: "izquierda", hint: "links" },
+{ id: 190, cat: "Ort/Richtung", de: "Gehen Sie geradeaus.", pre: "Vaya todo ", post: ".", ans: "recto", hint: "geradeaus" },
+
+{ id: 191, cat: "Transport", de: "Ich fahre mit dem Auto.", pre: "Voy en ", post: ".", ans: "coche", hint: "Auto" },
+{ id: 192, cat: "Transport", de: "Der Zug kommt an.", pre: "El ", post: " llega.", ans: "tren", hint: "Zug" },
+{ id: 193, cat: "Transport", de: "Wo ist der Bus?", pre: "¿Dónde está el ", post: "?", ans: "autobús", hint: "Bus" },
+{ id: 194, cat: "Transport", de: "Das Flugzeug startet.", pre: "El ", post: " despega.", ans: "avión", hint: "Flugzeug" },
+{ id: 195, cat: "Transport", de: "Ich fahre Fahrrad.", pre: "Monto en ", post: ".", ans: "bicicleta", hint: "Fahrrad" },
+{ id: 196, cat: "Transport", de: "Wir fahren zum Flughafen.", pre: "Vamos al ", post: ".", ans: "aeropuerto", hint: "Flughafen" },
+{ id: 197, cat: "Transport", de: "Ich brauche ein Ticket.", pre: "Necesito un ", post: ".", ans: "billete", hint: "Ticket/Fahrkarte" },
+{ id: 198, cat: "Transport", de: "Hast du Geld?", pre: "¿Tienes ", post: "?", ans: "dinero", hint: "Geld" },
+{ id: 199, cat: "Transport", de: "Ich zahle mit Karte.", pre: "Pago con ", post: ".", ans: "tarjeta", hint: "Karte" },
+{ id: 200, cat: "Stadt", de: "Wo ist die Bank?", pre: "¿Dónde está el ", post: "?", ans: "banco", hint: "Bank" },
+
+{ id: 201, cat: "Stadt", de: "Ich gehe in die Post.", pre: "Voy a la ", post: ".", ans: "oficina de correos", hint: "Postamt" },
+{ id: 202, cat: "Stadt", de: "Wo ist die Apotheke?", pre: "¿Dónde está la ", post: "?", ans: "farmacia", hint: "Apotheke" },
+{ id: 203, cat: "Stadt", de: "Ich kaufe im Supermarkt ein.", pre: "Compro en el ", post: ".", ans: "supermercado", hint: "Supermarkt" },
+{ id: 204, cat: "Stadt", de: "Das Museum ist interessant.", pre: "El ", post: " es interesante.", ans: "museo", hint: "Museum" },
+{ id: 205, cat: "Stadt", de: "Der Park ist grün.", pre: "El ", post: " es verde.", ans: "parque", hint: "Park" },
+{ id: 206, cat: "Gefühl", de: "Ich bin glücklich.", pre: "Estoy ", post: ".", ans: "feliz", hint: "glücklich" },
+{ id: 207, cat: "Gefühl", de: "Warum bist du traurig?", pre: "¿Por qué estás ", post: "?", ans: "triste", hint: "traurig" },
+{ id: 208, cat: "Gefühl", de: "Ich bin müde heute Abend.", pre: "Estoy ", post: " esta noche.", ans: "cansado", hint: "müde" },
+{ id: 209, cat: "Gefühl", de: "Er ist sehr wütend.", pre: "Él está muy ", post: ".", ans: "enfadado", hint: "wütend/sauer" },
+{ id: 210, cat: "Gefühl", de: "Wir sind hungrig.", pre: "Tenemos ", post: ".", ans: "hambre", hint: "Hunger (haben)" },
+
+{ id: 211, cat: "Gefühl", de: "Hast du Durst?", pre: "¿Tienes ", post: "?", ans: "sed", hint: "Durst (haben)" },
+{ id: 212, cat: "Gefühl", de: "Mir ist kalt.", pre: "Tengo ", post: ".", ans: "frío", hint: "kalt (sein/haben)" },
+{ id: 213, cat: "Gefühl", de: "Mir ist heiß.", pre: "Tengo ", post: ".", ans: "calor", hint: "heiß (sein/haben)" },
+{ id: 214, cat: "Gefühl", de: "Ich habe Angst vor Hunden.", pre: "Tengo ", post: " a los perros.", ans: "miedo", hint: "Angst" },
+{ id: 215, cat: "Gefühl", de: "Das ist sehr interessant.", pre: "Eso es muy ", post: ".", ans: "interesante", hint: "interessant" },
+{ id: 216, cat: "Gesundheit", de: "Ich bin krank.", pre: "Estoy ", post: ".", ans: "enfermo", hint: "krank" },
+{ id: 217, cat: "Gesundheit", de: "Ich fühle mich gut.", pre: "Me siento ", post: ".", ans: "bien", hint: "gut (befinden)" },
+{ id: 218, cat: "Gesundheit", de: "Der Arzt hilft mir.", pre: "El ", post: " me ayuda.", ans: "médico", hint: "Arzt" },
+{ id: 219, cat: "Gesundheit", de: "Ich brauche Medizin.", pre: "Necesito ", post: ".", ans: "medicina", hint: "Medizin" },
+{ id: 220, cat: "Gesundheit", de: "Ich habe Schmerzen.", pre: "Tengo ", post: ".", ans: "dolor", hint: "Schmerz" },
+
+{ id: 221, cat: "Arbeit", de: "Ich arbeite im Büro.", pre: "Trabajo en la ", post: ".", ans: "oficina", hint: "Büro" },
+{ id: 222, cat: "Arbeit", de: "Der Chef ist nett.", pre: "El ", post: " es simpático.", ans: "jefe", hint: "Chef" },
+{ id: 223, cat: "Arbeit", de: "Ich habe einen Kollegin.", pre: "Tengo una ", post: ".", ans: "compañera", hint: "Kollegin" },
+{ id: 224, cat: "Arbeit", de: "Ich schreibe eine E-Mail.", pre: "Escribo un ", post: ".", ans: "correo electrónico", hint: "E-Mail" },
+{ id: 225, cat: "Arbeit", de: "Das Telefon klingelt.", pre: "El ", post: " suena.", ans: "teléfono", hint: "Telefon" },
+{ id: 226, cat: "Arbeit", de: "Ich habe ein Meeting.", pre: "Tengo una ", post: ".", ans: "reunión", hint: "Besprechung/Meeting" },
+{ id: 227, cat: "Arbeit", de: "Der Computer ist kaputt.", pre: "El ", post: " está roto.", ans: "ordenador", hint: "Computer" },
+{ id: 228, cat: "Arbeit", de: "Ich habe viel zu tun.", pre: "Tengo mucho que ", post: ".", ans: "hacer", hint: "tun/machen" },
+{ id: 229, cat: "Arbeit", de: "Der Urlaub beginnt morgen.", pre: "Las ", post: " empiezan mañana.", ans: "vacaciones", hint: "Urlaub" },
+{ id: 230, cat: "Arbeit", de: "Ich habe frei.", pre: "Estoy de ", post: ".", ans: "permiso", hint: "frei/freigestellt" },
+
+{ id: 231, cat: "Hobby", de: "Ich höre gern Musik.", pre: "Me gusta escuchar ", post: ".", ans: "música", hint: "Musik" },
+{ id: 232, cat: "Hobby", de: "Ich lese ein gutes Buch.", pre: "Leo un buen ", post: ".", ans: "libro", hint: "Buch" },
+{ id: 233, cat: "Hobby", de: "Wir schauen einen Film.", pre: "Vemos una ", post: ".", ans: "película", hint: "Film" },
+{ id: 234, cat: "Hobby", de: "Ich spiele Gitarre.", pre: "Toco la ", post: ".", ans: "guitarra", hint: "Gitarre" },
+{ id: 235, cat: "Hobby", de: "Wir kochen zusammen.", pre: "Cocinamos ", post: ".", ans: "juntos", hint: "zusammen" },
+{ id: 236, cat: "Hobby", de: "Ich mache Fotos.", pre: "Hago ", post: ".", ans: "fotos", hint: "Fotos" },
+{ id: 237, cat: "Hobby", de: "Er malt ein Bild.", pre: "Él pinta un ", post: ".", ans: "cuadro", hint: "Bild/Gemälde" },
+{ id: 238, cat: "Hobby", de: "Ich gehe spazieren.", pre: "Voy a dar un ", post: ".", ans: "paseo", hint: "Spaziergang" },
+{ id: 239, cat: "Hobby", de: "Wir reisen gern.", pre: "Nos gusta ", post: ".", ans: "viajar", hint: "reisen" },
+{ id: 240, cat: "Hobby", de: "Ich treffe Freunde.", pre: "Quedo con ", post: ".", ans: "amigos", hint: "Freunde" },
+
+{ id: 241, cat: "Adjektiv", de: "Das ist einfach.", pre: "Eso es ", post: ".", ans: "fácil", hint: "einfach/leicht" },
+{ id: 242, cat: "Adjektiv", de: "Spanisch ist schwer.", pre: "El español es ", post: ".", ans: "difícil", hint: "schwierig/schwer" },
+{ id: 243, cat: "Adjektiv", de: "Das ist wichtig.", pre: "Eso es ", post: ".", ans: "importante", hint: "wichtig" },
+{ id: 244, cat: "Adjektiv", de: "Das ist möglich.", pre: "Eso es ", post: ".", ans: "posible", hint: "möglich" },
+{ id: 245, cat: "Adjektiv", de: "Das ist unmöglich.", pre: "Eso es ", post: ".", ans: "imposible", hint: "unmöglich" },
+{ id: 246, cat: "Adjektiv", de: "Er ist sehr klug.", pre: "Él es muy ", post: ".", ans: "inteligente", hint: "klug/intelligent" },
+{ id: 247, cat: "Adjektiv", de: "Das ist ein armer Mann.", pre: "Es un hombre ", post: ".", ans: "pobre", hint: "arm" },
+{ id: 248, cat: "Adjektiv", de: "Er hat viel Geld, er ist reich.", pre: "Tiene mucho dinero, es ", post: ".", ans: "rico", hint: "reich / lecker" },
+{ id: 249, cat: "Adjektiv", de: "Das ist sauber.", pre: "Eso está ", post: ".", ans: "limpio", hint: "sauber" },
+{ id: 250, cat: "Adjektiv", de: "Das Zimmer ist schmutzig.", pre: "La habitación está ", post: ".", ans: "sucio", hint: "schmutzig" },
+
+{ id: 251, cat: "Adjektiv", de: "Die Tür ist offen.", pre: "La puerta está ", post: ".", ans: "abierto", hint: "offen" },
+{ id: 252, cat: "Adjektiv", de: "Der Laden ist geschlossen.", pre: "La tienda está ", post: ".", ans: "cerrado", hint: "geschlossen" },
+{ id: 253, cat: "Adjektiv", de: "Das ist leer.", pre: "Eso está ", post: ".", ans: "vacío", hint: "leer" },
+{ id: 254, cat: "Adjektiv", de: "Das Glas ist voll.", pre: "El vaso está ", post: ".", ans: "lleno", hint: "voll" },
+{ id: 255, cat: "Adjektiv", de: "Der Tisch ist frei.", pre: "La mesa está ", post: ".", ans: "libre", hint: "frei" },
+{ id: 256, cat: "Adjektiv", de: "Der Platz ist besetzt.", pre: "El asiento está ", post: ".", ans: "ocupado", hint: "besetzt" },
+{ id: 257, cat: "Adjektiv", de: "Das ist billig.", pre: "Eso es muy ", post: ".", ans: "barato", hint: "billig/günstig" },
+{ id: 258, cat: "Adjektiv", de: "Das ist sehr teuer.", pre: "Eso es muy ", post: ".", ans: "caro", hint: "teuer" },
+{ id: 259, cat: "Adjektiv", de: "Er ist jung.", pre: "Él es ", post: ".", ans: "joven", hint: "jung" },
+{ id: 260, cat: "Adjektiv", de: "Meine Großmutter ist alt.", pre: "Mi abuela es ", post: ".", ans: "mayor", hint: "alt / älter" },
+
+{ id: 261, cat: "Konjunktion", de: "Ich spreche Deutsch und Spanisch.", pre: "Hablo alemán ", post: " español.", ans: "y", hint: "und" },
+{ id: 262, cat: "Konjunktion", de: "Kaffee oder Tee?", pre: "¿Café ", post: " té?", ans: "o", hint: "oder" },
+{ id: 263, cat: "Konjunktion", de: "Ich möchte kommen, aber ich kann nicht.", pre: "Quiero venir, ", post: " no puedo.", ans: "pero", hint: "aber" },
+{ id: 264, cat: "Konjunktion", de: "Weil ich keine Zeit habe.", pre: "Porque no tengo ", post: ".", ans: "tiempo", hint: "weil" },
+{ id: 265, cat: "Konjunktion", de: "Wenn du kommst, gehen wir essen.", pre: "Si vienes, ", post: " a comer.", ans: "vamos", hint: "wenn/falls" },
+{ id: 266, cat: "Konjunktion", de: "Ich bin so glücklich wie du.", pre: "Estoy tan feliz ", post: " tú.", ans: "como", hint: "wie" },
+{ id: 267, cat: "Pronomen", de: "Das ist mein Buch.", pre: "Este es ", post: " libro.", ans: "mi", hint: "mein" },
+{ id: 268, cat: "Pronomen", de: "Das ist dein Haus.", pre: "Esta es ", post: " casa.", ans: "tu", hint: "dein" },
+{ id: 269, cat: "Pronomen", de: "Sein Auto ist schnell.", pre: "Su coche es ", post: ".", ans: "rápido", hint: "sein/ihr" },
+{ id: 270, cat: "Pronomen", de: "Unser Hund ist lieb.", pre: "Nuestro perro es ", post: ".", ans: "cariñoso", hint: "unser" },
+
+{ id: 271, cat: "Pronomen", de: "Das ist alles für heute.", pre: "Eso es ", post: " por hoy.", ans: "todo", hint: "alles" },
+{ id: 272, cat: "Pronomen", de: "Jemand klopft an die Tür.", pre: "Alguien ", post: " a la puerta.", ans: "llama", hint: "jemand" },
+{ id: 273, cat: "Pronomen", de: "Niemand ist hier.", pre: "Nadie ", post: " aquí.", ans: "está", hint: "niemand" },
+{ id: 274, cat: "Pronomen", de: "Ich weiß etwas.", pre: "Sé ", post: ".", ans: "algo", hint: "etwas" },
+{ id: 275, cat: "Pronomen", de: "Ich weiß nichts.", pre: "No sé ", post: ".", ans: "nada", hint: "nichts" },
+{ id: 276, cat: "Pronomen", de: "Das ist mein Stuhl, dieser ist dein.", pre: "Esta es mi silla, ", post: " es tuya.", ans: "ésta", hint: "diese/r" },
+{ id: 277, cat: "Pronomen", de: "Jeder Mensch will leben.", pre: "Cada ", post: " persona quiere vivir.", ans: "cada", hint: "jeder/jede/jedes" },
+{ id: 278, cat: "Verb", de: "Ich muss gehen.", pre: "Tengo que ", post: ".", ans: "ir", hint: "müssen / gehen" },
+{ id: 279, cat: "Verb", de: "Du sollst nicht lügen.", pre: "No debes ", post: ".", ans: "mentir", hint: "sollen / lügen" },
+{ id: 280, cat: "Verb", de: "Ich mag Kaffee.", pre: "Me ", post: " el café.", ans: "gusta", hint: "mögen (gefällt mir)" },
+
+{ id: 281, cat: "Verb", de: "Ich liebe dich.", pre: "Te ", post: ".", ans: "quiero", hint: "lieben/mögen" },
+{ id: 282, cat: "Verb", de: "Wir feiern ein Fest.", pre: "Celebramos una ", post: ".", ans: "fiesta", hint: "Feier/Fest" },
+{ id: 283, cat: "Verb", de: "Ich beginne zu lernen.", pre: "Empiezo a ", post: ".", ans: "estudiar", hint: "beginnen/anfangen" },
+{ id: 284, cat: "Verb", de: "Der Kurs endet heute.", pre: "El curso ", post: " hoy.", ans: "termina", hint: "enden/beenden" },
+{ id: 285, cat: "Verb", de: "Ich vergesse oft Namen.", pre: "Olvido a menudo los ", post: ".", ans: "nombres", hint: "vergessen" },
+{ id: 286, cat: "Verb", de: "Ich erinnere mich daran.", pre: "Me ", post: " de eso.", ans: "acuerdo", hint: "sich erinnern" },
+{ id: 287, cat: "Verb", de: "Ich antworte auf die Frage.", pre: "Respondo a la ", post: ".", ans: "pregunta", hint: "antworten" },
+{ id: 288, cat: "Verb", de: "Er erklärt die Grammatik.", pre: "Él ", post: " la gramática.", ans: "explica", hint: "erklären" },
+{ id: 289, cat: "Verb", de: "Ich wiederhole das Wort.", pre: "Repito la ", post: ".", ans: "palabra", hint: "wiederholen" },
+{ id: 290, cat: "Verb", de: "Verstehst du mich?", pre: "¿Me ", post: "?", ans: "entiendes", hint: "verstehen" },
+
+{ id: 291, cat: "Wohnung", de: "Ich miete eine Wohnung.", pre: "Alquilo un ", post: ".", ans: "piso", hint: "Wohnung" },
+{ id: 292, cat: "Wohnung", de: "Der Schlüssel passt.", pre: "La ", post: " encaja.", ans: "llave", hint: "Schlüssel" },
+{ id: 293, cat: "Wohnung", de: "Wir wohnen im ersten Stock.", pre: "Vivimos en el primer ", post: ".", ans: "piso", hint: "Stockwerk / Etage" },
+{ id: 294, cat: "Wohnung", de: "Der Aufzug ist kaputt.", pre: "El ", post: " está roto.", ans: "ascensor", hint: "Aufzug/Fahrstuhl" },
+{ id: 295, cat: "Wohnung", de: "Die Treppe ist steil.", pre: "La ", post: " es empinada.", ans: "escalera", hint: "Treppe" },
+{ id: 296, cat: "Wohnung", de: "Der Garten hat Blumen.", pre: "El ", post: " tiene flores.", ans: "jardín", hint: "Garten" },
+{ id: 297, cat: "Wohnung", de: "Der Balkon ist sonnig.", pre: "El ", post: " es soleado.", ans: "balcón", hint: "Balkon" },
+{ id: 298, cat: "Wohnung", de: "Wir haben eine Garage.", pre: "Tenemos un ", post: ".", ans: "garaje", hint: "Garage" },
+{ id: 299, cat: "Wohnung", de: "Die Miete ist hoch.", pre: "El ", post: " es alto.", ans: "alquiler", hint: "Miete" },
+{ id: 300, cat: "Wohnung", de: "Ich suche einen Mitbewohner.", pre: "Busco un ", post: ".", ans: "compañero de piso", hint: "Mitbewohner" },
+{ id: 301, cat: "Einkaufen", de: "Ich gehe in das Geschäft.", pre: "Voy a la ", post: ".", ans: "tienda", hint: "Geschäft/Laden" },
+{ id: 302, cat: "Einkaufen", de: "Der Verkäufer hilft mir.", pre: "El ", post: " me ayuda.", ans: "vendedor", hint: "Verkäufer" },
+{ id: 303, cat: "Einkaufen", de: "Kann ich Ihnen helfen?", pre: "¿Puedo ", post: "le?", ans: "ayudar", hint: "helfen" },
+{ id: 304, cat: "Einkaufen", de: "Ich schaue mich nur um.", pre: "Solo estoy ", post: ".", ans: "mirando", hint: "schauen/umsehen" },
+{ id: 305, cat: "Einkaufen", de: "Wo ist die Umkleidekabine?", pre: "¿Dónde está el ", post: "?", ans: "probador", hint: "Umkleidekabine" },
+{ id: 306, cat: "Einkaufen", de: "Ich nehme dieses Kleid.", pre: "Me ", post: " este vestido.", ans: "llevo", hint: "mitnehmen/kaufen" },
+{ id: 307, cat: "Einkaufen", de: "Ich möchte das umtauschen.", pre: "Quiero cambiar ", post: ".", ans: "esto", hint: "umtauschen" },
+{ id: 308, cat: "Einkaufen", de: "Geben Sie mir bitte die Quittung.", pre: "Dame el ", post: ", por favor.", ans: "tique", hint: "Kassenbon/Quittung" },
+{ id: 309, cat: "Einkaufen", de: "Haben Sie eine Tüte?", pre: "¿Tiene una ", post: "?", ans: "bolsa", hint: "Tüte/Tasche" },
+{ id: 310, cat: "Einkaufen", de: "Der Markt ist sonntags geschlossen.", pre: "El mercado está cerrado los ", post: ".", ans: "domingos", hint: "sonntags" },
+
+{ id: 311, cat: "Restaurant", de: "Einen Tisch für zwei Personen, bitte.", pre: "Una mesa para dos ", post: ", por favor.", ans: "personas", hint: "Personen" },
+{ id: 312, cat: "Restaurant", de: "Die Speisekarte, bitte.", pre: "La ", post: ", por favor.", ans: "carta", hint: "Speisekarte" },
+{ id: 313, cat: "Restaurant", de: "Was empfehlen Sie?", pre: "¿Qué me ", post: "?", ans: "recomienda", hint: "empfehlen" },
+{ id: 314, cat: "Restaurant", de: "Ich bin Vegetarier.", pre: "Soy ", post: ".", ans: "vegetariano", hint: "vegetarisch" },
+{ id: 315, cat: "Restaurant", de: "Guten Appetit!", pre: "¡Buen ", post: "!", ans: "provecho", hint: "Guten Appetit" },
+{ id: 316, cat: "Restaurant", de: "Das schmeckt sehr gut.", pre: "Está muy ", post: ".", ans: "rico", hint: "lecker/gut schmecken" },
+{ id: 317, cat: "Restaurant", de: "Ich hätte gern die Rechnung.", pre: "La ", post: ", por favor.", ans: "cuenta", hint: "Rechnung" },
+{ id: 318, cat: "Restaurant", de: "Stimmt so.", pre: "Quédese con el ", post: ".", ans: "cambio", hint: "Wechselgeld/Trinkgeld" },
+{ id: 319, cat: "Restaurant", de: "Eine Vorspeise, bitte.", pre: "Un ", post: ", por favor.", anpre: "", ans: "entrante", hint: "Vorspeise" },
+{ id: 320, cat: "Restaurant", de: "Zum Nachtisch nehme ich Obst.", pre: "De ", post: " tomo fruta.", ans: "postre", hint: "Nachspeise/Dessert" },
+
+{ id: 321, cat: "Hotel", de: "Ich habe ein Zimmer reserviert.", pre: "Tengo una ", post: " reservada.", ans: "habitación", hint: "Zimmer" },
+{ id: 322, cat: "Hotel", de: "Mein Name ist Schmidt.", pre: "Me ", post: " Schmidt.", ans: "llamo", hint: "heißen" },
+{ id: 323, cat: "Hotel", de: "Hier ist mein Reisepass.", pre: "Aquí tiene mi ", post: ".", ans: "pasaporte", hint: "Reisepass" },
+{ id: 324, cat: "Hotel", de: "Um wie viel Uhr gibt es Frühstück?", pre: "¿A qué hora es el ", post: "?", ans: "desayuno", hint: "Frühstück" },
+{ id: 325, cat: "Hotel", de: "Gibt es hier WLAN?", pre: "¿Hay ", post: " aquí?", ans: "wifi", hint: "WLAN" },
+{ id: 326, cat: "Hotel", de: "Wie lautet das Passwort?", pre: "¿Cuál es la ", post: "?", ans: "contraseña", hint: "Passwort" },
+{ id: 327, cat: "Hotel", de: "Mein Zimmer ist laut.", pre: "Mi habitación es ", post: ".", ans: "ruidosa", hint: "laut" },
+    ];
+
+    let remainingPool = [];
+    let currentRoundVocabs = [];
+    let failedVocabs = [];
+    let currentIndex = 0;
+    let currentItem = null;
+    let roundNumber = 1;
+    let isCorrectionPhase = false;
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
     }
-    return array;
-  }
 
-  window.onload = () => {
-    buildBlockOptions();
-    loadSelectedBlock();
+    function initPool() {
+        remainingPool = [...allVocabs];
+        shuffle(remainingPool);
+        roundNumber = 1;
+        startNewRound();
+    }
 
-    document.getElementById('userInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        if (!isChecked) {
-          checkAnswer();
+    function startNewRound() {
+        if (remainingPool.length === 0) {
+            initPool();
+            return;
+        }
+        const sliceSize = Math.min(30, remainingPool.length);
+        currentRoundVocabs = remainingPool.splice(0, sliceSize);
+        shuffle(currentRoundVocabs);
+        failedVocabs = [];
+        currentIndex = 0;
+        isCorrectionPhase = false;
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        if (!isCorrectionPhase) {
+            if (currentIndex < currentRoundVocabs.length) {
+                currentItem = currentRoundVocabs[currentIndex];
+                document.getElementById("stats").innerText = `Frage ${currentIndex + 1} von ${currentRoundVocabs.length} (Runde ${roundNumber})`;
+            } else {
+                if (failedVocabs.length > 0) {
+                    isCorrectionPhase = true;
+                    shuffle(failedVocabs);
+                    currentIndex = 0;
+                    document.getElementById("stats").innerText = `Korrekturphase (${failedVocabs.length} Fehler) - Runde ${roundNumber}`;
+                    currentItem = failedVocabs[currentIndex];
+                } else {
+                    roundNumber++;
+                    startNewRound();
+                    return;
+                }
+            }
         } else {
-          nextQuestion();
+            if (currentIndex < failedVocabs.length) {
+                currentItem = failedVocabs[currentIndex];
+                document.getElementById("stats").innerText = `Korrekturphase (${currentIndex + 1} von ${failedVocabs.length}) - Runde ${roundNumber}`;
+            } else {
+                shuffle(failedVocabs);
+                let stillFailed = [];
+                for (let v of failedVocabs) {
+                    stillFailed.push(v);
+                }
+                failedVocabs = [...stillFailed];
+                if (failedVocabs.length > 0) {
+                    currentIndex = 0;
+                    currentItem = failedVocabs[currentIndex];
+                    document.getElementById("stats").innerText = `Korrekturphase (Nächster Durchlauf) - Runde ${roundNumber}`;
+                } else {
+                    roundNumber++;
+                    startNewRound();
+                    return;
+                }
+            }
         }
-      }
+
+        document.getElementById("vocab-display").innerText = currentItem.es;
+        document.getElementById("user-input").value = "";
+        document.getElementById("feedback").innerText = "";
+    }
+
+    function checkAnswer() {
+        const userInputValue = document.getElementById("user-input").value.trim().toLowerCase();
+        const correctAnswer = currentItem.de.toLowerCase();
+        const feedbackEl = document.getElementById("feedback");
+
+        if (userInputValue === correctAnswer) {
+            feedbackEl.innerText = "Richtig!";
+            feedbackEl.className = "feedback correct";
+            currentIndex++;
+            setTimeout(nextQuestion, 1000);
+        } else {
+            feedbackEl.innerText = `Falsch! Richtig wäre: ${currentItem.de}`;
+            feedbackEl.className = "feedback incorrect";
+            if (!failedVocabs.includes(currentItem)) {
+                failedVocabs.push(currentItem);
+            }
+            currentIndex++;
+            setTimeout(nextQuestion, 2000);
+        }
+    }
+
+    document.getElementById("user-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkAnswer();
+        }
     });
-  };
 
-  function buildBlockOptions() {
-    const select = document.getElementById('blockSelect');
-    select.innerHTML = '';
-    
-    const totalBlocks = Math.ceil(vocabData.length / BLOCK_SIZE);
-    
-    for (let i = 0; i < totalBlocks; i++) {
-      const start = i * BLOCK_SIZE + 1;
-      const end = Math.min((i + 1) * BLOCK_SIZE, vocabData.length);
-      const option = document.createElement('option');
-      option.value = i;
-      option.textContent = `Block ${i + 1} (${start} - ${end})`;
-      select.appendChild(option);
-    }
-
-    const allOption = document.createElement('option');
-    allOption.value = "all";
-    allOption.textContent = `Alle Vokabeln (1 - ${vocabData.length})`;
-    select.appendChild(allOption);
-  }
-
-  function loadSelectedBlock() {
-    const val = document.getElementById('blockSelect').value;
-    const isRandom = document.getElementById('chkRandom').checked;
-
-    if (val === "all") {
-      currentList = [...vocabData];
-    } else {
-      const blockIndex = parseInt(val);
-      const start = blockIndex * BLOCK_SIZE;
-      const end = start + BLOCK_SIZE;
-      currentList = vocabData.slice(start, end);
-    }
-
-    if (isRandom) {
-      shuffleArray(currentList);
-    }
-
-    resetSession();
-  }
-
-  function shuffleCurrentList() {
-    shuffleArray(currentList);
-    resetSession();
-  }
-
-  function startRepeatMode() {
-    if (wrongAnswers.length === 0) return;
-    currentList = [...wrongAnswers];
-    if (document.getElementById('chkRandom').checked) {
-      shuffleArray(currentList);
-    }
-    wrongAnswers = [];
-    document.getElementById('btnRepeatWrong').style.display = 'none';
-    resetSession();
-  }
-
-  function resetSession() {
-    currentIndex = 0;
-    score = { correct: 0, wrong: 0 };
-    updateStats();
-    showQuestion();
-  }
-
-  function showQuestion() {
-    if (currentIndex >= currentList.length) {
-      finishBlock();
-      return;
-    }
-
-    isChecked = false;
-    const item = currentList[currentIndex];
-
-    document.getElementById('catBadge').textContent = item.cat || 'Allgemein';
-    document.getElementById('dePrompt').textContent = item.de;
-    document.getElementById('preText').textContent = item.pre || '';
-    document.getElementById('postText').textContent = item.post || '';
-    
-    const input = document.getElementById('userInput');
-    input.value = '';
-    input.disabled = false;
-    input.focus();
-
-    document.getElementById('hintBox').style.display = 'none';
-    document.getElementById('hintBox').textContent = item.hint || 'Kein Hinweis verfügbar.';
-
-    const feedback = document.getElementById('feedback');
-    feedback.style.display = 'none';
-
-    const btn = document.getElementById('btnSubmit');
-    btn.textContent = 'Überprüfen';
-    btn.onclick = checkAnswer;
-
-    updateProgress();
-  }
-
-  function toggleHint() {
-    const hintBox = document.getElementById('hintBox');
-    hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
-  }
-
-  function checkAnswer() {
-    if (isChecked) return;
-
-    const item = currentList[currentIndex];
-    const userVal = document.getElementById('userInput').value.trim().toLowerCase();
-    const targetVal = item.ans.trim().toLowerCase();
-
-    const feedback = document.getElementById('feedback');
-    feedback.style.display = 'block';
-
-    if (userVal === targetVal) {
-      feedback.textContent = 'Richtig! ¡Muy bien!';
-      feedback.className = 'feedback correct';
-      score.correct++;
-    } else {
-      feedback.innerHTML = `Falsch! Richtig ist: <strong>${item.pre || ''}${item.ans}${item.post || ''}</strong>`;
-      feedback.className = 'feedback incorrect';
-      score.wrong++;
-      
-      if (!wrongAnswers.some(w => w.id === item.id)) {
-        wrongAnswers.push(item);
-      }
-    }
-
-    isChecked = true;
-    document.getElementById('userInput').disabled = true;
-    updateStats();
-
-    const btn = document.getElementById('btnSubmit');
-    btn.textContent = 'Weiter (Enter)';
-    btn.onclick = nextQuestion;
-  }
-
-  function nextQuestion() {
-    currentIndex++;
-    showQuestion();
-  }
-
-  function updateProgress() {
-    const total = currentList.length;
-    const current = currentIndex + 1;
-    document.getElementById('counter').textContent = `${Math.min(current, total)} / ${total}`;
-    
-    const pct = (currentIndex / total) * 100;
-    document.getElementById('progressBar').style.width = `${pct}%`;
-  }
-
-  function updateStats() {
-    document.getElementById('scoreCorrect').textContent = score.correct;
-    document.getElementById('scoreWrong').textContent = score.wrong;
-    
-    const repeatBtn = document.getElementById('btnRepeatWrong');
-    const wrongCountSpan = document.getElementById('wrongCount');
-    
-    if (wrongAnswers.length > 0) {
-      repeatBtn.style.display = 'inline-block';
-      wrongCountSpan.textContent = wrongAnswers.length;
-    }
-  }
-
-  function finishBlock() {
-    document.getElementById('progressBar').style.width = '100%';
-    document.getElementById('quizCard').innerHTML = `
-      <h2>Durchgang beendet! 🎉</h2>
-      <p style="margin-top: 10px; color: var(--text-muted);">
-        Ergebnis: <strong>${score.correct}</strong> richtig, <strong>${score.wrong}</strong> falsch.
-      </p>
-    `;
-    document.getElementById('feedback').style.display = 'none';
-    
-    const btn = document.getElementById('btnSubmit');
-    if (wrongAnswers.length > 0) {
-      btn.textContent = 'Fehler jetzt wiederholen';
-      btn.onclick = startRepeatMode;
-    } else {
-      btn.textContent = 'Nächsten Block laden';
-      btn.onclick = () => {
-        const select = document.getElementById('blockSelect');
-        if (select.selectedIndex < select.options.length - 1) {
-          select.selectedIndex++;
-        }
-        loadSelectedBlock();
-      };
-    }
-  }
+    initPool();
 </script>
+
 </body>
 </html>
