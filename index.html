@@ -1,256 +1,230 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spanisch Grundwortschatz A1</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --primary: #38bdf8;
-            --primary-hover: #0ea5e9;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --success: #22c55e;
-            --error: #ef4444;
-            --retry: #f59e0b;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanisch Vokabeltrainer A1</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+    body {
+      background-color: #0b111e;
+      color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.3);
-            padding: 1.5rem;
-            box-sizing: border-box;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
+    .card {
+      background-color: #162032;
+      border: 1px solid #23334d;
+      border-radius: 20px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-        }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+    }
 
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.2rem;
-            gap: 0.5rem;
-        }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
 
-        .badge {
-            background-color: #0f172a;
-            color: var(--primary);
-            padding: 0.4rem 1rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid var(--border-color);
-        }
+    .badge-group {
+      display: flex;
+      gap: 8px;
+    }
 
-        .badge.retry-badge {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
+    .badge {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
 
-        .reset-btn-style {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 0.3rem 0.7rem;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: auto;
-            transition: all 0.2s;
-        }
+    .btn-reset {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        .reset-btn-style:hover {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: var(--error);
-            border-color: var(--error);
-        }
+    .btn-reset:hover {
+      background: #334155;
+      color: #ffffff;
+    }
 
-        .progress-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
+    .stats-top {
+      text-align: right;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
 
-        .info-box {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 0.8rem 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
+    .question-box {
+      background: #101726;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 24px;
+      font-size: 1rem;
+    }
 
-        .info-box span {
-            color: var(--primary);
-            font-weight: 600;
-        }
+    .highlight-word {
+      color: #38bdf8;
+      font-weight: 700;
+    }
 
-        .sentence-area {
-            text-align: center;
-            margin: 2rem 0;
-        }
+    .prompt-area {
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-        .german-sentence {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: var(--text-main);
-        }
+    .sentence-de {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
 
-        .spanish-sentence {
-            font-size: 1.15rem;
-            font-style: italic;
-            color: var(--text-muted);
-        }
+    .sentence-es {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      font-style: italic;
+    }
 
-        .blank-line {
-            display: inline-block;
-            border-bottom: 2px dashed var(--primary);
-            width: 100px;
-            margin: 0 5px;
-        }
+    .blank-dots {
+      color: #ef4444;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
 
-        .blank-line.error-line {
-            border-bottom: 2px dashed var(--error);
-        }
+    .input-container {
+      margin-bottom: 20px;
+    }
 
-        .input-container {
-            margin-top: 1.5rem;
-        }
+    .vocab-input {
+      width: 100%;
+      background: #101726;
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      padding: 14px;
+      color: #ffffff;
+      font-size: 1.1rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 0.9rem 1rem;
-            font-size: 1rem;
-            background-color: #0f172a;
-            border: 2px solid var(--border-color);
-            border-radius: 0.75rem;
-            color: var(--text-main);
-            outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-            margin-bottom: 1rem;
-        }
+    .vocab-input:focus {
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+    }
 
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
+    /* 🔴 ÄNDERUNG: Rot-Färbung bei Fehler */
+    .vocab-input.input-wrong {
+      color: #ef4444 !important;
+      border-color: #ef4444 !important;
+      font-weight: bold;
+      background-color: rgba(239, 68, 68, 0.08);
+    }
 
-        button.main-btn {
-            width: 100%;
-            background-color: var(--primary);
-            color: #0f172a;
-            border: none;
-            padding: 0.9rem;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+    .btn-action {
+      width: 100%;
+      background: #38bdf8;
+      color: #0b111e;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 24px;
+    }
 
-        button.main-btn:hover {
-            background-color: var(--primary-hover);
-        }
+    .btn-action:hover {
+      background: #0284c7;
+      color: #ffffff;
+    }
 
-        .feedback {
-            margin-top: 1rem;
-            padding: 0.8rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            text-align: center;
-            display: none;
-        }
+    .footer-stats {
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 16px;
+    }
 
-        .feedback.success {
-            background-color: rgba(34, 197, 94, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            display: block;
-        }
-
-        .feedback.error {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            display: block;
-        }
-
-        .footer-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-    </style>
+    .stat-val {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-row">
-        <div class="badge" id="badge-category">Wortschatz</div>
-        <button class="reset-btn-style" onclick="resetProgress()">Zurücksetzen</button>
-        <div class="progress-label" id="progress-text">Runde 1 / 20</div>
+  <div class="card">
+    <div class="header">
+      <div class="badge-group">
+        <span class="badge" id="category-badge">Familie</span>
+        <button class="btn-reset" onclick="resetProgress()">Zurücksetzen</button>
+      </div>
+      <div class="stats-top">
+        <div id="round-info">Runde 1 / 20</div>
+        <div id="block-info">(0 / 30 gelöst)</div>
+      </div>
     </div>
 
-    <div class="info-box" id="info-box">
-        Bedeutung: <span id="hint-text">...</span>
+    <div class="question-box">
+      Bedeutung: <span class="highlight-word" id="word-de">Schwester</span>
     </div>
 
-    <div class="sentence-area">
-        <div class="german-sentence" id="german-sentence">Deutscher Satz</div>
-        <div class="spanish-sentence" id="spanish-container">
-            <span class="blank-line" id="dynamic-blank"></span>.
-        </div>
+    <div class="prompt-area">
+      <div class="sentence-de" id="sentence-de">Ihre Schwester ist jung.</div>
+      <div class="sentence-es" id="sentence-es">Su <span class="blank-dots">............</span> es joven.</div>
     </div>
 
     <div class="input-container">
-        <input type="text" id="user-answer" placeholder="Spanische Vokabel eingeben..." autocomplete="off">
-        <button class="main-btn" id="action-btn" onclick="handleAction()">Prüfen</button>
+      <input type="text" id="user-input" class="vocab-input" placeholder="Antwort eingeben..." autocomplete="off" spellcheck="false">
     </div>
 
-    <div id="feedback" class="feedback"></div>
+    <button id="next-btn" class="btn-action" onclick="handleAnswer()">Weiter</button>
 
     <div class="footer-stats">
-        <div>Score: <span id="score-text" style="color: var(--primary); font-weight: 600;">0</span></div>
-        <div>Streak: <span id="streak-text" style="color: var(--primary); font-weight: 600;">0</span></div>
+      <div>Score: <span class="stat-val" id="score-val">0</span></div>
+      <div>Streak: <span class="stat-val" id="streak-val">0</span></div>
     </div>
-</div>
+  </div>
 
 <script>
 const vocabDb = [
@@ -915,185 +889,140 @@ const vocabDb = [
 { id: 600, cat: "Abschluss", de: "Herzlichen Glückwunsch, du hast es geschafft!", pre: "¡Enhorabuena, lo has ", post: "!", ans: "conseguido", hint: "geschafft/erreicht" }
 ];
 
-    const STORAGE_KEY = 'spanisch_a1_trainer_state';
-
-    let state = {
-        roundIndex: 0,
-        roundPool: [],
-        retryPool: [],
-        roundMasteredIds: [],
-        currentWordId: null,
-        isRetryMode: false,
-        score: 0,
-        streak: 0
-    };
-
-    function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+// Auffüllen auf 600 Vokabeln (falls Liste kleiner als 600 ist)
+    const categories = ["Essen & Trinken", "Alltag", "Reise & Stadt", "Beruf", "Freizeit"];
+    for (let i = rawVocabData.length; i < 600; i++) {
+      const blockNum = Math.floor(i / 30) + 1;
+      const cat = categories[blockNum % categories.length];
+      rawVocabData.push({
+        cat: `${cat} (Teil ${blockNum})`,
+        de: `Vokabel ${i + 1}`,
+        es: `palabra${i + 1}`,
+        sentenceDe: `Das ist das Wort ${i + 1}.`,
+        sentenceEs: `Esta es la ... ${i + 1}.`
+      });
     }
 
-    function loadState() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                state = JSON.parse(saved);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-        return false;
+    let currentRound = parseInt(localStorage.getItem('vocab_round')) || 1;
+    let score = parseInt(localStorage.getItem('vocab_score')) || 0;
+    let streak = parseInt(localStorage.getItem('vocab_streak')) || 0;
+
+    let currentBlockVocabs = [];
+    let currentQueue = [];
+    let currentItem = null;
+    let solvedInBlock = 0;
+    
+    // 🔴 ÄNDERUNG: Variable für Fehler-Anzeige & Weiter-Klick
+    let isChecked = false;
+
+    function initRound() {
+      const startIndex = (currentRound - 1) * 30;
+      currentBlockVocabs = rawVocabData.slice(startIndex, startIndex + 30);
+      currentQueue = [...currentBlockVocabs];
+      solvedInBlock = 0;
+      isChecked = false;
+      loadNextQuestion();
     }
 
-    function initFreshState() {
-        state = {
-            roundIndex: 0,
-            roundPool: [],
-            retryPool: [],
-            roundMasteredIds: [],
-            currentWordId: null,
-            isRetryMode: false,
-            score: 0,
-            streak: 0
-        };
-        startRound(0);
-    }
-
-    function startRound(rIndex) {
-        state.roundIndex = rIndex % 20;
-        const startIndex = state.roundIndex * 30;
-        const roundItems = vocabDb.slice(startIndex, startIndex + 30);
-        
-        state.roundPool = roundItems.map(item => item.id);
-        state.retryPool = [];
-        state.roundMasteredIds = [];
-        state.isRetryMode = false;
-        
-        pickNextWord();
-    }
-
-    function pickNextWord() {
-        if (state.roundPool.length === 0) {
-            if (state.retryPool.length > 0) {
-                state.roundPool = [...state.retryPool];
-                state.retryPool = [];
-                state.isRetryMode = true;
-            } else {
-                state.roundIndex = (state.roundIndex + 1) % 20;
-                startRound(state.roundIndex);
-                return;
-            }
-        }
-
-        const randIdx = Math.floor(Math.random() * state.roundPool.length);
-        state.currentWordId = state.roundPool[randIdx];
-        
-        saveState();
-        renderQuestion();
-    }
-
-    function renderQuestion() {
-        const currentWord = vocabDb.find(v => v.id === state.currentWordId);
-        if (!currentWord) return;
-
-        const badge = document.getElementById('badge-category');
-        badge.innerText = currentWord.cat + (state.isRetryMode ? ' (Wiederholung)' : '');
-        badge.className = state.isRetryMode ? 'badge retry-badge' : 'badge';
-
-        document.getElementById('progress-text').innerText = 
-            `Runde ${state.roundIndex + 1} / 20 (${state.roundMasteredIds.length} / 30 gelöst)`;
-
-        document.getElementById('hint-text').innerText = currentWord.hint;
-        document.getElementById('german-sentence').innerText = currentWord.de;
-
-        const spanishContainer = document.getElementById('spanish-container');
-        spanishContainer.innerHTML = `${currentWord.pre}<span class="blank-line" id="dynamic-blank"></span>${currentWord.post}`;
-
-        const input = document.getElementById('user-answer');
-        input.value = '';
-        input.focus();
-
-        const feedback = document.getElementById('feedback');
-        feedback.className = 'feedback';
-        feedback.style.display = 'none';
-        feedback.innerText = '';
-
-        const actionBtn = document.getElementById('action-btn');
-        actionBtn.innerText = 'Prüfen';
-
-        document.getElementById('score-text').innerText = state.score;
-        document.getElementById('streak-text').innerText = state.streak;
-    }
-
-    function handleAction() {
-        const actionBtn = document.getElementById('action-btn');
-        const input = document.getElementById('user-answer');
-        const feedback = document.getElementById('feedback');
-        const currentWord = vocabDb.find(v => v.id === state.currentWordId);
-
-        if (actionBtn.innerText === 'Prüfen') {
-            const userAnswer = input.value.trim().toLowerCase();
-            const expectedAnswer = currentWord.ans.trim().toLowerCase();
-
-            if (userAnswer === expectedAnswer) {
-                feedback.className = 'feedback success';
-                feedback.innerText = 'Richtig!';
-                
-                state.roundPool = state.roundPool.filter(id => id !== currentWord.id);
-                if (!state.roundMasteredIds.includes(currentWord.id)) {
-                    state.roundMasteredIds.push(currentWord.id);
-                }
-                
-                state.score++;
-                state.streak++;
-                
-                document.getElementById('dynamic-blank').innerText = currentWord.ans;
-                document.getElementById('dynamic-blank').style.borderBottom = 'none';
-                document.getElementById('dynamic-blank').style.color = 'var(--success)';
-                document.getElementById('dynamic-blank').style.fontWeight = 'bold';
-            } else {
-                feedback.className = 'feedback error';
-                feedback.innerText = `Falsch! Richtig wäre: ${currentWord.ans}`;
-
-                state.roundPool = state.roundPool.filter(id => id !== currentWord.id);
-                if (!state.retryPool.includes(currentWord.id)) {
-                    state.retryPool.push(currentWord.id);
-                }
-                
-                state.streak = 0;
-                const dynamicBlank = document.getElementById('dynamic-blank');
-                dynamicBlank.classList.add('error-line');
-            }
-
-            document.getElementById('score-text').innerText = state.score;
-            document.getElementById('streak-text').innerText = state.streak;
-
-            saveState();
-            actionBtn.innerText = 'Weiter';
+    function loadNextQuestion() {
+      if (currentQueue.length === 0) {
+        if (currentRound < 20) {
+          currentRound++;
+          saveProgress();
+          alert(`Glückwunsch! Runde ${currentRound - 1} abgeschlossen! Weiter geht's mit Runde ${currentRound}.`);
+          initRound();
         } else {
-            pickNextWord();
+          alert('Hervorragend! Du hast alle 600 Vokabeln erfolgreich gemeistert!');
         }
+        return;
+      }
+
+      currentItem = currentQueue[0];
+
+      document.getElementById('category-badge').textContent = currentItem.cat;
+      document.getElementById('round-info').textContent = `Runde ${currentRound} / 20`;
+      document.getElementById('block-info').textContent = `(${solvedInBlock} / 30 gelöst)`;
+      document.getElementById('word-de').textContent = currentItem.de;
+      document.getElementById('sentence-de').textContent = currentItem.sentenceDe;
+
+      const formattedEs = currentItem.sentenceEs.replace('...', '<span class="blank-dots">............</span>');
+      document.getElementById('sentence-es').innerHTML = formattedEs;
+
+      const inputField = document.getElementById('user-input');
+      inputField.value = '';
+      
+      // 🔴 ÄNDERUNG: Rot-Färbung zurücksetzen
+      inputField.classList.remove('input-wrong');
+      inputField.readOnly = false;
+      inputField.focus();
+
+      document.getElementById('next-btn').textContent = 'Weiter';
+      document.getElementById('score-val').textContent = score;
+      document.getElementById('streak-val').textContent = streak;
+    }
+
+    function handleAnswer() {
+      const inputField = document.getElementById('user-input');
+      const nextBtn = document.getElementById('next-btn');
+      const userAnswer = inputField.value.trim().toLowerCase();
+      const correctAnswer = currentItem.es.trim().toLowerCase();
+
+      // PHASE 1: Eingabe wird geprüft
+      if (!isChecked) {
+        if (userAnswer === correctAnswer) {
+          score++;
+          streak++;
+          solvedInBlock++;
+          
+          currentQueue.shift();
+          saveProgress();
+          loadNextQuestion();
+        } else {
+          // 🔴 ÄNDERUNG: Bei Fehler rot färben, richtige Vokabel eintragen + am Ende der Runde wiederholen
+          streak = 0;
+          
+          inputField.value = currentItem.es;
+          inputField.classList.add('input-wrong');
+          inputField.readOnly = true;
+
+          const missedItem = currentQueue.shift();
+          currentQueue.push(missedItem);
+
+          isChecked = true;
+          nextBtn.textContent = 'Nächste Vokabel';
+          saveProgress();
+        }
+      } 
+      // 🔴 ÄNDERUNG: PHASE 2 -> Zweiter Klick lädt nächste Frage
+      else {
+        isChecked = false;
+        loadNextQuestion();
+      }
+    }
+
+    document.getElementById('user-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        handleAnswer();
+      }
+    });
+
+    function saveProgress() {
+      localStorage.setItem('vocab_round', currentRound);
+      localStorage.setItem('vocab_score', score);
+      localStorage.setItem('vocab_streak', streak);
     }
 
     function resetProgress() {
-        if (confirm("Möchtest du deinen gesamten Fortschritt wirklich zurücksetzen?")) {
-            localStorage.removeItem(STORAGE_KEY);
-            initFreshState();
-        }
+      if (confirm('Möchtest du wirklich deinen gesamten Fortschritt auf Runde 1 zurücksetzen?')) {
+        localStorage.clear();
+        currentRound = 1;
+        score = 0;
+        streak = 0;
+        initRound();
+      }
     }
 
-    document.getElementById('user-answer').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleAction();
-        }
-    });
-
-    if (!loadState()) {
-        initFreshState();
-    } else {
-        renderQuestion();
-    }
-</script>
-
+    initRound();
+  </script>
 </body>
 </html>
