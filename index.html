@@ -886,143 +886,139 @@ const vocabDb = [
 { id: 597, cat: "Abschluss", de: "Sprechen ohne Angst.", pre: "Hablar sin ", post: ".", ans: "miedo", hint: "Angst" },
 { id: 598, cat: "Abschluss", de: "Spanisch lernen ist toll.", pre: "Aprender español es ", post: ".", ans: "genial", hint: "toll/genial" },
 { id: 599, cat: "Abschluss", de: "Ich bin stolz auf mich.", pre: "Estoy ", post: " de mí.", ans: "orgulloso", hint: "stolz" },
-{ id: 600, cat: "Abschluss", de: "Herzlichen Glückwunsch, du hast es geschafft!", pre: "¡Enhorabuena, lo has ", post: "!", ans: "conseguido", hint: "geschafft/erreicht" }
+  { id: 600, cat: "Abschluss", de: "Herzlichen Glückwunsch, du hast es geschafft!", pre: "¡Enhorabuena, lo has ", post: "!", ans: "conseguido", hint: "geschafft/erreicht" }
 ];
 
-// Auffüllen auf 600 Vokabeln (falls Liste kleiner als 600 ist)
-    const categories = ["Essen & Trinken", "Alltag", "Reise & Stadt", "Beruf", "Freizeit"];
-    for (let i = rawVocabData.length; i < 600; i++) {
-      const blockNum = Math.floor(i / 30) + 1;
-      const cat = categories[blockNum % categories.length];
-      rawVocabData.push({
-        cat: `${cat} (Teil ${blockNum})`,
-        de: `Vokabel ${i + 1}`,
-        es: `palabra${i + 1}`,
-        sentenceDe: `Das ist das Wort ${i + 1}.`,
-        sentenceEs: `Esta es la ... ${i + 1}.`
-      });
+// ==========================================
+// STEUERUNGSLOGIK (30er-Blöcke & Wiederholungen)
+// ==========================================
+
+const BLOCK_SIZE = 30;
+let currentBlockIndex = 0;      // Block 0 bis 19 (insgesamt 20 Blöcke)
+let activeQueue = [];          // Enthält die verbleibenden Aufgaben des aktuellen Blocks
+let currentCard = null;
+let score = 0;
+let streak = 0;
+let solvedInBlock = 0;
+let isWaiting = false;
+
+// 1. Spiel-Start / Reset
+function initGame() {
+  currentBlockIndex = 0;
+  score = 0;
+  streak = 0;
+  loadBlock(currentBlockIndex);
+}
+
+// 2. Lädt den nächsten 30er-Block aus der Datenbank
+function loadBlock(blockIdx) {
+  solvedInBlock = 0;
+  const start = blockIdx * BLOCK_SIZE;
+  const end = start + BLOCK_SIZE;
+  
+  // Kopie der 30 Vokabeln für diesen Block erstellen
+  activeQueue = vocabDb.slice(start, end);
+
+  if (activeQueue.length === 0) {
+    alert(`Glückwunsch! Du hast alle 600 Vokabeln absolviert!\nGesamtpunkte: ${score}`);
+    return;
+  }
+
+  nextCard();
+}
+
+// 3. Lädt die nächste Vokabel aus der aktuellen Queue
+function nextCard() {
+  if (activeQueue.length === 0) {
+    // Block ist komplett gelöst -> Weiter zum nächsten Block
+    currentBlockIndex++;
+    if (currentBlockIndex * BLOCK_SIZE >= vocabDb.length) {
+      alert(`Perfekt! Du hast alle 20 Blöcke geschafft!\nEndstand: ${score} Punkte`);
+      return;
     }
+    loadBlock(currentBlockIndex);
+    return;
+  }
 
-    let currentRound = parseInt(localStorage.getItem('vocab_round')) || 1;
-    let score = parseInt(localStorage.getItem('vocab_score')) || 0;
-    let streak = parseInt(localStorage.getItem('vocab_streak')) || 0;
+  // Erstes Element in der Queue laden
+  currentCard = activeQueue[0];
+  renderCard(currentCard);
+}
 
-    let currentBlockVocabs = [];
-    let currentQueue = [];
-    let currentItem = null;
-    let solvedInBlock = 0;
-    
-    // 🔴 ÄNDERUNG: Variable für Fehler-Anzeige & Weiter-Klick
-    let isChecked = false;
+// 4. Zeigt die aktuelle Karte in der Benutzeroberfläche an
+function renderCard(item) {
+  document.getElementById('category-badge').innerText = item.cat || 'Spanisch';
+  document.getElementById('word-de').innerText = item.hint || item.ans;
+  document.getElementById('sentence-de').innerText = item.de;
+  document.getElementById('sentence-es').innerHTML = `${item.pre}<span class="blank-dots">............</span>${item.post}`;
+  
+  const input = document.getElementById('user-input');
+  input.value = '';
+  input.classList.remove('input-wrong');
+  input.focus();
 
-    function initRound() {
-      const startIndex = (currentRound - 1) * 30;
-      currentBlockVocabs = rawVocabData.slice(startIndex, startIndex + 30);
-      currentQueue = [...currentBlockVocabs];
-      solvedInBlock = 0;
-      isChecked = false;
-      loadNextQuestion();
-    }
+  updateUI();
+}
 
-    function loadNextQuestion() {
-      if (currentQueue.length === 0) {
-        if (currentRound < 20) {
-          currentRound++;
-          saveProgress();
-          alert(`Glückwunsch! Runde ${currentRound - 1} abgeschlossen! Weiter geht's mit Runde ${currentRound}.`);
-          initRound();
-        } else {
-          alert('Hervorragend! Du hast alle 600 Vokabeln erfolgreich gemeistert!');
-        }
-        return;
-      }
+// 5. Antwort prüfen & Wiederholung steuern
+function handleAnswer() {
+  if (isWaiting || !currentCard) return;
 
-      currentItem = currentQueue[0];
+  const input = document.getElementById('user-input');
+  const userAns = input.value.trim().toLowerCase();
 
-      document.getElementById('category-badge').textContent = currentItem.cat;
-      document.getElementById('round-info').textContent = `Runde ${currentRound} / 20`;
-      document.getElementById('block-info').textContent = `(${solvedInBlock} / 30 gelöst)`;
-      document.getElementById('word-de').textContent = currentItem.de;
-      document.getElementById('sentence-de').textContent = currentItem.sentenceDe;
+  if (userAns === currentCard.ans.toLowerCase()) {
+    // --- RICHTIG ---
+    score += 10;
+    streak += 1;
+    solvedInBlock += 1;
 
-      const formattedEs = currentItem.sentenceEs.replace('...', '<span class="blank-dots">............</span>');
-      document.getElementById('sentence-es').innerHTML = formattedEs;
+    // Vokabel ist gemeistert -> aus der aktuellen Block-Queue entfernen
+    activeQueue.shift();
+    nextCard();
+  } else {
+    // --- FALSCH ---
+    streak = 0;
+    input.classList.add('input-wrong');
+    isWaiting = true;
 
-      const inputField = document.getElementById('user-input');
-      inputField.value = '';
-      
-      // 🔴 ÄNDERUNG: Rot-Färbung zurücksetzen
-      inputField.classList.remove('input-wrong');
-      inputField.readOnly = false;
-      inputField.focus();
+    // Wiederholungs-Logik: Falsche Karte ans Ende des aktuellen Blocks hängen
+    const failedCard = activeQueue.shift();
+    activeQueue.push(failedCard);
 
-      document.getElementById('next-btn').textContent = 'Weiter';
-      document.getElementById('score-val').textContent = score;
-      document.getElementById('streak-val').textContent = streak;
-    }
+    // Nach 1 Sekunde Feedback die nächste Karte laden (damit man die Korrektur sieht)
+    setTimeout(() => {
+      isWaiting = false;
+      nextCard();
+    }, 1000);
+  }
+}
 
-    function handleAnswer() {
-      const inputField = document.getElementById('user-input');
-      const nextBtn = document.getElementById('next-btn');
-      const userAnswer = inputField.value.trim().toLowerCase();
-      const correctAnswer = currentItem.es.trim().toLowerCase();
+// 6. Punkte-, Runden- und Fortschrittsanzeige aktualisieren
+function updateUI() {
+  const totalBlocks = Math.ceil(vocabDb.length / BLOCK_SIZE);
+  const currentRound = Math.min(currentBlockIndex + 1, totalBlocks);
 
-      // PHASE 1: Eingabe wird geprüft
-      if (!isChecked) {
-        if (userAnswer === correctAnswer) {
-          score++;
-          streak++;
-          solvedInBlock++;
-          
-          currentQueue.shift();
-          saveProgress();
-          loadNextQuestion();
-        } else {
-          // 🔴 ÄNDERUNG: Bei Fehler rot färben, richtige Vokabel eintragen + am Ende der Runde wiederholen
-          streak = 0;
-          
-          inputField.value = currentItem.es;
-          inputField.classList.add('input-wrong');
-          inputField.readOnly = true;
+  if (document.getElementById('score-val')) document.getElementById('score-val').innerText = score;
+  if (document.getElementById('streak-val')) document.getElementById('streak-val').innerText = streak;
+  if (document.getElementById('round-info')) document.getElementById('round-info').innerText = `Runde ${currentRound} / ${totalBlocks}`;
+  if (document.getElementById('block-info')) document.getElementById('block-info').innerText = `(${solvedInBlock} / ${BLOCK_SIZE} gelöst)`;
+}
 
-          const missedItem = currentQueue.shift();
-          currentQueue.push(missedItem);
+// 7. Neustart-Funktion
+function resetProgress() {
+  initGame();
+}
 
-          isChecked = true;
-          nextBtn.textContent = 'Nächste Vokabel';
-          saveProgress();
-        }
-      } 
-      // 🔴 ÄNDERUNG: PHASE 2 -> Zweiter Klick lädt nächste Frage
-      else {
-        isChecked = false;
-        loadNextQuestion();
-      }
-    }
+// Event-Listener: Enter-Taste im Textfeld unterstützen
+document.getElementById('user-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    handleAnswer();
+  }
+});
 
-    document.getElementById('user-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        handleAnswer();
-      }
-    });
-
-    function saveProgress() {
-      localStorage.setItem('vocab_round', currentRound);
-      localStorage.setItem('vocab_score', score);
-      localStorage.setItem('vocab_streak', streak);
-    }
-
-    function resetProgress() {
-      if (confirm('Möchtest du wirklich deinen gesamten Fortschritt auf Runde 1 zurücksetzen?')) {
-        localStorage.clear();
-        currentRound = 1;
-        score = 0;
-        streak = 0;
-        initRound();
-      }
-    }
-
-    initRound();
-  </script>
+// Anwendung beim Laden der Seite direkt starten
+initGame();
+</script>
 </body>
 </html>
