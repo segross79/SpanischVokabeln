@@ -873,21 +873,24 @@ const vocabDb = [
 ];
 
 // ==========================================
-// STEUERUNGSLOGIK (30er-Blöcke + Fehler-Wiederholung + Manuelles Weiter)
+// STEUERUNGSLOGIK (30 eindeutige Fragen -> danach Fehler-Wiederholung)
 // ==========================================
 
 const BLOCK_SIZE = 30;
 const TOTAL_ROUNDS = 20;
 
+let masterDb = [];             // Alle 600 Vokabeln (einmalig gemischt)
 let currentRound = 1;
-let activeQueue = [];
+let initialQueue = [];         // Die 30 eindeutigen Fragen der aktuellen Runde
+let repeatQueue = [];          // Sammelt falsche Antworten für die Wiederholungsphase
 let currentCard = null;
+let isRepeatPhase = false;     // false = Erstdurchlauf der 30, true = Wiederholung der Fehler
 let score = 0;
 let streak = 0;
-let solvedInBlock = 0;
-let isChecked = false; // Status: false = Warten auf "Prüfen", true = Warten auf "Weiter"
+let solvedInBlock = 0;         // Zählt richtig gelöste Vokabeln in der aktuellen Runde (0 bis 30)
+let isChecked = false;         // false = Warten auf "Prüfen", true = Warten auf "Weiter"
 
-// Array mitsamt allen Elementen zufällig mischen (Fisher-Yates Shuffle)
+// Array einmalig mischen (Fisher-Yates Shuffle)
 function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -899,43 +902,58 @@ function shuffleArray(array) {
 
 // 1. Spiel-Start
 function initGame() {
+  masterDb = shuffleArray(vocabDb); // Alle Vokabeln einmalig mischen
   currentRound = 1;
   score = 0;
   streak = 0;
-  startNewRound(currentRound);
+  startRound(currentRound);
 }
 
-// 2. Startet eine neue 30er-Runde mit zufälligen Vokabeln
-function startNewRound(roundNum) {
+// 2. Startet eine spezifische Runde (Kollektion von 30 eindeutigen Vokabeln)
+function startRound(roundNum) {
   solvedInBlock = 0;
-  
-  // 30 zufällige Vokabeln aus dem Gesamt-Pool ziehen
-  const shuffledDb = shuffleArray(vocabDb);
-  activeQueue = shuffledDb.slice(0, BLOCK_SIZE);
+  repeatQueue = [];
+  isRepeatPhase = false;
+
+  // Exakt 30 Vokabeln für diese Runde herausschneiden (Runde 1: 0..29, Runde 2: 30..59, etc.)
+  const startIdx = (roundNum - 1) * BLOCK_SIZE;
+  const endIdx = startIdx + BLOCK_SIZE;
+  initialQueue = masterDb.slice(startIdx, endIdx);
 
   nextCard();
 }
 
-// 3. Nächste Vokabel aus der aktuellen 30er-Queue laden
+// 3. Nächste Vokabel laden
 function nextCard() {
   isChecked = false;
 
-  // Prüfen, ob der 30er-Block geschafft ist
-  if (activeQueue.length === 0) {
-    if (currentRound >= TOTAL_ROUNDS) {
-      alert(`🎉 Fantastisch! Du hast alle ${TOTAL_ROUNDS} Runden absolviert!\nEndstand: ${score} Punkte.`);
-      initGame();
-      return;
-    }
-    currentRound++;
-    startNewRound(currentRound);
-    return;
+  // Wenn der Erstdurchlauf fertig ist, schalte auf Wiederholungsphase um
+  if (!isRepeatPhase && initialQueue.length === 0) {
+    isRepeatPhase = true;
   }
 
-  // Erstes Element der Arbeits-Queue nehmen
-  currentCard = activeQueue[0];
+  // Wenn auch die Wiederholungs-Queue leer ist -> Runde ist VOLLSTÄNDIG geschafft!
+  if (isRepeatPhase && repeatQueue.length === 0) {
+    if (currentRound >= TOTAL_ROUNDS) {
+      alert(`🎉 Herzlichen Glückwunsch! Du hast alle ${TOTAL_ROUNDS} Runden (600 Vokabeln) komplett gemeistert!\nEndstand: ${score} Punkte.`);
+      initGame();
+      return;
+    } else {
+      alert(`✅ Runde ${currentRound} abgeschlossen!\nAlle 30 Vokabeln dieser Runde wurden korrekt gelöst.\n\nKlicke auf OK, um mit Runde ${currentRound + 1} zu starten.`);
+      currentRound++;
+      startRound(currentRound);
+      return;
+    }
+  }
 
-  // UI aktualisieren
+  // Aktuelle Karte auswählen
+  if (!isRepeatPhase) {
+    currentCard = initialQueue[0];
+  } else {
+    currentCard = repeatQueue[0];
+  }
+
+  // UI befüllen
   document.getElementById('category-badge').innerText = currentCard.cat || 'Spanisch';
   document.getElementById('word-de').innerText = currentCard.hint || currentCard.ans;
   document.getElementById('sentence-de').innerText = currentCard.de;
@@ -957,7 +975,7 @@ function nextCard() {
   updateUIStats();
 }
 
-// 4. Klick-Handler für Hauptbutton (Schaltet um zwischen "Prüfen" und "Weiter")
+// 4. Klick-Handler (Umschalten zwischen "Prüfen" und "Weiter")
 function handleAction() {
   if (!isChecked) {
     checkAnswer();
@@ -966,7 +984,7 @@ function handleAction() {
   }
 }
 
-// 5. Antwort prüfen & Fehler-Wiederholungs-Logik
+// 5. Antwort überprüfen
 function checkAnswer() {
   if (!currentCard) return;
 
@@ -981,22 +999,33 @@ function checkAnswer() {
   input.disabled = true;
 
   if (userAns === correctAns) {
-    // Richtig: Vokabel gemeistert und aus dem Block entfernen
+    // --- RICHTIG ---
     score += 10;
     streak += 1;
     solvedInBlock += 1;
-    
-    activeQueue.shift(); // Entfernt das erste Element
+
+    if (!isRepeatPhase) {
+      initialQueue.shift(); // Aus Erstdurchlauf entfernen
+    } else {
+      repeatQueue.shift(); // Aus Wiederholungsliste entfernen
+    }
     
     input.classList.add('input-correct');
     feedbackEl.innerText = 'Richtig! Ausgezeichnet!';
     feedbackEl.className = 'feedback correct';
   } else {
-    // Falsch: Vokabel ans Ende des 30er-Blocks verschieben (wird wiederholt!)
+    // --- FALSCH ---
     streak = 0;
-    
-    const failedCard = activeQueue.shift();
-    activeQueue.push(failedCard); // Hinten anstellen
+
+    if (!isRepeatPhase) {
+      // Im Erstdurchlauf: Karte aus initialQueue nehmen und in den Wiederholungs-Speicher legen
+      const failedCard = initialQueue.shift();
+      repeatQueue.push(failedCard);
+    } else {
+      // In der Wiederholungsphase: Karte ans Ende der Wiederholungs-Queue hängen
+      const failedCard = repeatQueue.shift();
+      repeatQueue.push(failedCard);
+    }
     
     input.classList.add('input-wrong');
     feedbackEl.innerText = `Falsch! Richtig ist: "${currentCard.ans}"`;
@@ -1005,12 +1034,11 @@ function checkAnswer() {
 
   updateUIStats();
 
-  // Button für den nächsten Klick auf "Weiter" schalten
   btn.innerText = 'Weiter';
   btn.focus();
 }
 
-// 6. Statistiken & Rundenanzeige aktualisieren
+// 6. Statistiken aktualisieren
 function updateUIStats() {
   document.getElementById('score-val').innerText = score;
   document.getElementById('streak-val').innerText = streak;
@@ -1023,18 +1051,19 @@ function resetProgress() {
   initGame();
 }
 
-// Enter-Taste: Einmal drücken = Prüfen, nochmals drücken = Weiter
+// Enter-Taste unterstützen (Einmal Enter = Prüfen, nochmal Enter = Weiter)
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     handleAction();
   }
 });
 
-// Anwendung beim Laden direkt initialisieren
+// Anwendung beim Laden direkt starten
 initGame();
 </script>
 </body>
 </html>
+
 
 
 
