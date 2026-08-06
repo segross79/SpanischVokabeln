@@ -209,8 +209,6 @@
 
 <script>
 const vocabDb = [
-
-
  { id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
 { id: 2, cat: "Pronomen", de: "Du bist mein Freund.", pre: "", post: " eres mi amigo.", ans: "tú", hint: "du" },
 { id: 3, cat: "Pronomen", de: "Er ist groß.", pre: "", post: " es alto.", ans: "él", hint: "er" },
@@ -814,255 +812,162 @@ const vocabDb = [
 { id: 547, cat: "Adjektiv", de: "Ein gefährlicher Weg.", pre: "Un camino ", post: ".", ans: "peligroso", hint: "gefährlich" },
 { id: 548, cat: "Adjektiv", de: "Ein sicherer Ort.", pre: "Un lugar ", post: ".", ans: "seguro", hint: "sicher" },
 { id: 549, cat: "Adjektiv", de: "Ein bequemer Stuhl.", pre: "Una silla ", post: ".", ans: "cómoda", hint: "bequem" },
-{ id: 550, cat: "Adjektiv", de: "Eine saubere Küche.", pre: "Una cocina ", post: ".", ans: "limpia", hint: "sauber" },
-
-{ id: 551, cat: "Transport", de: "Die Fahrkarte bitte.", pre: "El ", post: ", por favor.", ans: "billete", hint: "Fahrkarte" },
-{ id: 552, cat: "Transport", de: "Wo ist die Haltestelle?", pre: "¿Dónde está la ", post: "?", ans: "parada", hint: "Haltestelle" },
-{ id: 553, cat: "Transport", de: "Der Zug fährt ab.", pre: "El tren ", post: ".", ans: "sale", hint: "abfahren/rausgehen" },
-{ id: 554, cat: "Transport", de: "Wir kommen pünktlich an.", pre: "Llegamos a ", post: ".", ans: "tiempo", hint: "pünktlich/rechtzeitig" },
-{ id: 555, cat: "Transport", de: "Ein Platz am Fenster.", pre: "Un asiento de ", post: ".", ans: "ventana", hint: "Fenster" },
-{ id: 556, cat: "Transport", de: "Ein Platz am Gang.", pre: "Un asiento de ", post: ".", ans: "pasillo", hint: "Gang" },
-{ id: 557, cat: "Transport", de: "Gute Reise!", pre: "¡Buen ", post: "!", ans: "viaje", hint: "Gute Reise" },
-{ id: 558, cat: "Transport", de: "Wir mieten ein Auto.", pre: "Alquilamos un ", post: ".", ans: "coche", hint: "Auto" },
-{ id: 559, cat: "Transport", de: "Fahren Sie vorsichtig.", pre: "Conduzca con ", post: ".", ans: "cuidado", hint: "Vorsicht" },
-{ id: 560, cat: "Transport", de: "Der Verkehr ist dicht.", pre: "Hay mucho ", post: ".", ans: "tráfico", hint: "Verkehr" },
-
-{ id: 561, cat: "Freizeit", de: "Wir gehen ins Theater.", pre: "Vamos al ", post: ".", ans: "teatro", hint: "Theater" },
-{ id: 562, cat: "Freizeit", de: "Ein Konzert besuchen.", pre: "Ir a un ", post: ".", ans: "concierto", hint: "Konzert" },
-{ id: 563, cat: "Freizeit", de: "Ich spiele ein Instrument.", pre: "Toco un ", post: ".", ans: "instrumento", hint: "Instrument" },
-{ id: 564, cat: "Freizeit", de: "Tanzstunden nehmen.", pre: "Tomar clases de ", post: ".", ans: "baile", hint: "Tanz" },
-{ id: 565, cat: "Freizeit", de: "Ein Museum besuchen.", pre: "Visitar un ", post: ".", ans: "museo", hint: "Museum" },
-{ id: 566, cat: "Freizeit", de: "Wir machen ein Picknick.", pre: "Hacemos un ", post: ".", ans: "picnic", hint: "Picknick" },
-{ id: 567, cat: "Freizeit", de: "Am Wochenende entspannen.", pre: "Descansar el fin de ", post: ".", ans: "semana", hint: "Wochenende" },
-{ id: 568, cat: "Freizeit", de: "Feiern mit Freunden.", pre: "Celebrar con ", post: ".", ans: "amigos", hint: "Freunde" },
-{ id: 569, cat: "Freizeit", de: "Ein schönes Hobby.", pre: "Un afición ", post: ".", ans: "bonita", hint: "schön" },
-{ id: 570, cat: "Freizeit", de: "Ich habe viel Spaß.", pre: "Me divierto ", post: ".", ans: "mucho", hint: "viel" },
-
-{ id: 571, cat: "Redewendung", de: "Guten Morgen!", pre: "¡Buenos ", post: "!", ans: "días", hint: "Guten Morgen" },
-{ id: 572, cat: "Redewendung", de: "Guten Abend!", pre: "¡Buenas ", post: "!", ans: "noches", hint: "Guten Abend / Gute Nacht" },
-{ id: 573, cat: "Redewendung", de: "Wie geht es dir?", pre: "¿Cómo ", post: "?", ans: "estás", hint: "wie geht's" },
-{ id: 574, cat: "Redewendung", de: "Schön dich kennenzulernen.", pre: "Mucho ", post: ".", ans: "gusto", hint: "Freude/Gefallen" },
-{ id: 575, cat: "Redewendung", de: "Gleichfalls!", pre: "¡", post: "mente!", ans: "igual", hint: "gleichfalls" },
-{ id: 576, cat: "Redewendung", de: "Auf Wiedersehen!", pre: "¡", post: " luego!", ans: "hasta", hint: "bis später / tschüss" },
-{ id: 577, cat: "Redewendung", de: "Entschuldige bitte.", pre: "Perdóna", post: ".", ans: "me", hint: "entschuldige mich" },
-{ id: 578, cat: "Redewendung", de: "Keine Ursache.", pre: "No hay de ", post: ".", ans: "qué", hint: "keine Ursache" },
-{ id: 579, cat: "Redewendung", de: "Viel Glück!", pre: "¡Mucha ", post: "!", ans: "suerte", hint: "Glück" },
-{ id: 580, cat: "Redewendung", de: "Herzlichen Glückwunsch!", pre: "¡Feli", post: "dades!", ans: "ci", hint: "Glückwünsche" },
-
-{ id: 581, cat: "Zahl", de: "Elf Spieler im Team.", pre: "", post: " jugadores en el equipo.", ans: "once", hint: "elf" },
-{ id: 582, cat: "Zahl", de: "Zwölf Monate im Jahr.", pre: "", post: " meses en el año.", ans: "doce", hint: "zwölf" },
-{ id: 583, cat: "Zahl", de: "Dreizehn bringt Glück.", pre: "", post: " da suerte.", ans: "trece", hint: "dreizehn" },
-{ id: 584, cat: "Zahl", de: "Vierzehn Tage Urlaub.", pre: "", post: " días de vacaciones.", ans: "catorce", hint: "vierzehn" },
-{ id: 585, cat: "Zahl", de: "Fünfzehn Minuten Pause.", pre: "", post: " minutos de descanso.", ans: "quince", hint: "fünfzehn" },
-{ id: 586, cat: "Zahl", de: "Zwanzig Euro gekostet.", pre: "Ha costado ", post: " euros.", ans: "veinte", hint: "zwanzig" },
-{ id: 587, cat: "Zahl", de: "Dreißig Tage im April.", pre: "", post: " días en abril.", ans: "treinta", hint: "dreißig" },
-{ id: 588, cat: "Zahl", de: "Hundert Prozent richtig.", pre: "", post: " por ciento correcto.", ans: "cien", hint: "hundert" },
-{ id: 589, cat: "Zahl", de: "Tausend Dank!", pre: "¡", post: " gracias!", ans: "mil", hint: "tausend" },
-{ id: 590, cat: "Zahl", de: "Der erste Platz.", pre: "El ", post: " lugar.", ans: "primer", hint: "erste(r)" },
-
-{ id: 591, cat: "Abschluss", de: "Ich verstehe die Lektion.", pre: "Entiendo la ", post: ".", ans: "lección", hint: "Lektion" },
-{ id: 592, cat: "Abschluss", de: "Übung macht den Meister.", pre: "La práctica hace al ", post: ".", ans: "maestro", hint: "Meister" },
-{ id: 593, cat: "Abschluss", de: "Ich habe das Ziel erreicht.", pre: "He alcanzado la ", post: ".", ans: "meta", hint: "Ziel" },
-{ id: 594, cat: "Abschluss", de: "Lernen macht Spaß.", pre: "Aprender es ", post: ".", ans: "divertido", hint: "lustig/unterhaltsam" },
-{ id: 595, cat: "Abschluss", de: "Ein großer Erfolg.", pre: "Un gran ", post: ".", ans: "éxito", hint: "Erfolg" },
-{ id: 596, cat: "Abschluss", de: "Jeden Tag ein bisschen.", pre: "Cada día un ", post: ".", ans: "poco", hint: "wenig" },
-{ id: 597, cat: "Abschluss", de: "Sprechen ohne Angst.", pre: "Hablar sin ", post: ".", ans: "miedo", hint: "Angst" },
-{ id: 598, cat: "Abschluss", de: "Spanisch lernen ist toll.", pre: "Aprender español es ", post: ".", ans: "genial", hint: "toll/genial" },
-{ id: 599, cat: "Abschluss", de: "Ich bin stolz auf mich.", pre: "Estoy ", post: " de mí.", ans: "orgulloso", hint: "stolz" },
-  { id: 600, cat: "Abschluss", de: "Herzlichen Glückwunsch, du hast es geschafft!", pre: "¡Enhorabuena, lo has ", post: "!", ans: "conseguido", hint: "geschafft/erreicht" }
+{ id: 550, cat: "Adjektiv", de: "Das Zimmer ist sauber.", pre: "La habitación está ", post: ".", ans: "limpia", hint: "sauber (weiblich)" }
 ];
 
-// ==========================================
-// STEUERUNGSLOGIK (30 Fragen + Fehler-Wiederholung + Versuchs-Zähler)
-// ==========================================
+const STORAGE_KEY = 'spanisch_vokabeltrainer_state';
 
-const BLOCK_SIZE = 30;
-const TOTAL_ROUNDS = 20;
+let state = {
+  solvedIds: [],
+  attempts: 0,
+  score: 0,
+  streak: 0,
+  currentId: null
+};
 
-let masterDb = [];             // Alle 600 Vokabeln (einmalig gemischt)
-let currentRound = 1;
-let initialQueue = [];         // Die 30 eindeutigen Fragen der aktuellen Runde
-let repeatQueue = [];          // Sammelt falsche Antworten für die Wiederholungsphase
-let currentCard = null;
-let isRepeatPhase = false;     // false = Erstdurchlauf, true = Wiederholung der Fehler
-let score = 0;
-let streak = 0;
-let solvedInBlock = 0;         // Zählt richtig gelöste Vokabeln in der aktuellen Runde (0 bis 30)
-let attemptsInBlock = 0;       // Zählt alle Versuche (richtig + falsch) in der aktuellen Runde
-let isChecked = false;         // false = Warten auf "Prüfen", true = Warten auf "Weiter"
+let currentVocab = null;
+let isAnswered = false;
 
-// Array einmalig mischen (Fisher-Yates Shuffle)
-function shuffleArray(array) {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-// 1. Spiel-Start
-function initGame() {
-  masterDb = shuffleArray(vocabDb);
-  currentRound = 1;
-  score = 0;
-  streak = 0;
-  startRound(currentRound);
-}
-
-// 2. Startet eine spezifische Runde (Kollektion von 30 eindeutigen Vokabeln)
-function startRound(roundNum) {
-  solvedInBlock = 0;
-  attemptsInBlock = 0; // Versuche für die neue Runde auf 0 zurücksetzen
-  repeatQueue = [];
-  isRepeatPhase = false;
-
-  const startIdx = (roundNum - 1) * BLOCK_SIZE;
-  const endIdx = startIdx + BLOCK_SIZE;
-  initialQueue = masterDb.slice(startIdx, endIdx);
-
-  nextCard();
-}
-
-// 3. Nächste Vokabel laden
-function nextCard() {
-  isChecked = false;
-
-  if (!isRepeatPhase && initialQueue.length === 0) {
-    isRepeatPhase = true;
-  }
-
-  if (isRepeatPhase && repeatQueue.length === 0) {
-    if (currentRound >= TOTAL_ROUNDS) {
-      alert(`🎉 Herzlichen Glückwunsch! Du hast alle ${TOTAL_ROUNDS} Runden (600 Vokabeln) komplett gemeistert!\nEndstand: ${score} Punkte.`);
-      initGame();
-      return;
-    } else {
-      alert(`✅ Runde ${currentRound} abgeschlossen!\nBenötigte Versuche: ${attemptsInBlock}\n\nKlicke auf OK, um mit Runde ${currentRound + 1} zu starten.`);
-      currentRound++;
-      startRound(currentRound);
-      return;
+function loadProgress() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      state = JSON.parse(saved);
+    } catch (e) {
+      console.error("Fehler beim Laden des Fortschritts", e);
     }
   }
+}
 
-  if (!isRepeatPhase) {
-    currentCard = initialQueue[0];
-  } else {
-    currentCard = repeatQueue[0];
+function resetProgress() {
+  if (confirm("Möchtest du deinen gesamten Fortschritt zurücksetzen?")) {
+    localStorage.removeItem(STORAGE_KEY);
+    state = {
+      solvedIds: [],
+      attempts: 0,
+      score: 0,
+      streak: 0,
+      currentId: null
+    };
+    loadNextVocab();
   }
+}
 
-  // UI befüllen
-  document.getElementById('category-badge').innerText = currentCard.cat || 'Spanisch';
-  document.getElementById('word-de').innerText = currentCard.hint || currentCard.ans;
-  document.getElementById('sentence-de').innerText = currentCard.de;
-  document.getElementById('sentence-es').innerHTML = `${currentCard.pre}<span class="blank-dots">............</span>${currentCard.post}`;
+function updateUI() {
+  document.getElementById('attempts-val').textContent = state.attempts;
+  document.getElementById('score-val').textContent = state.score;
+  document.getElementById('streak-val').textContent = state.streak;
+  document.getElementById('block-info').textContent = `(${state.solvedIds.length} / ${vocabDb.length} gelöst)`;
   
-  // Eingabefeld zurücksetzen
+  const round = Math.floor(state.solvedIds.length / 20) + 1;
+  const maxRounds = Math.ceil(vocabDb.length / 20);
+  document.getElementById('round-info').textContent = `Runde ${round} / ${maxRounds}`;
+}
+
+function loadNextVocab() {
+  isAnswered = false;
   const input = document.getElementById('user-input');
+  const btn = document.getElementById('btn-action');
+  const feedback = document.getElementById('feedback');
+
   input.value = '';
-  input.disabled = false;
   input.className = '';
-  input.focus();
+  input.disabled = false;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  btn.textContent = 'Prüfen';
 
-  // Button & Feedback zurücksetzen
-  const btn = document.getElementById('btn-action');
-  btn.innerText = 'Prüfen';
-  document.getElementById('feedback').innerText = '';
-  document.getElementById('feedback').className = 'feedback';
+  const remaining = vocabDb.filter(v => !state.solvedIds.includes(v.id));
 
-  updateUIStats();
-}
-
-// 4. Klick-Handler (Umschalten zwischen "Prüfen" und "Weiter")
-function handleAction() {
-  if (!isChecked) {
-    checkAnswer();
-  } else {
-    nextCard();
+  if (remaining.length === 0) {
+    document.getElementById('category-badge').textContent = "Fertig!";
+    document.getElementById('word-de').textContent = "Alle Vokabeln gelernt!";
+    document.getElementById('sentence-de').textContent = "Glückwunsch! Du hast alle Vokabeln meisterhaft gelöst.";
+    document.getElementById('sentence-es').textContent = "";
+    input.style.display = 'none';
+    btn.style.display = 'none';
+    updateUI();
+    return;
   }
+
+  let found = remaining.find(v => v.id === state.currentId);
+  if (!found) {
+    found = remaining[Math.floor(Math.random() * remaining.length)];
+    state.currentId = found.id;
+    saveProgress();
+  }
+
+  currentVocab = found;
+
+  document.getElementById('category-badge').textContent = currentVocab.cat;
+  document.getElementById('word-de').textContent = currentVocab.hint ? `${currentVocab.ans} (${currentVocab.hint})` : currentVocab.ans;
+  document.getElementById('sentence-de').textContent = currentVocab.de;
+  
+  const blankSpan = `<span class="blank-dots">...</span>`;
+  document.getElementById('sentence-es').innerHTML = `${currentVocab.pre}${blankSpan}${currentVocab.post}`;
+
+  updateUI();
+  input.focus();
 }
 
-// 5. Antwort überprüfen
-function checkAnswer() {
-  if (!currentCard) return;
-
+function handleAction() {
   const input = document.getElementById('user-input');
-  const feedbackEl = document.getElementById('feedback');
+  const feedback = document.getElementById('feedback');
   const btn = document.getElementById('btn-action');
+
+  if (isAnswered) {
+    loadNextVocab();
+    return;
+  }
 
   const userAns = input.value.trim().toLowerCase();
-  const correctAns = currentCard.ans.toLowerCase();
+  const targetAns = currentVocab.ans.trim().toLowerCase();
 
-  isChecked = true;
-  input.disabled = true;
-  attemptsInBlock++; // Bei jedem Überprüfen den Versuchs-Zähler erhöhen
+  state.attempts++;
 
-  if (userAns === correctAns) {
-    // --- RICHTIG ---
-    score += 10;
-    streak += 1;
-    solvedInBlock += 1;
-
-    if (!isRepeatPhase) {
-      initialQueue.shift();
-    } else {
-      repeatQueue.shift();
-    }
+  if (userAns === targetAns) {
+    input.className = 'input-correct';
+    feedback.className = 'feedback correct';
+    feedback.textContent = 'Richtig! Excellent!';
     
-    input.classList.add('input-correct');
-    feedbackEl.innerText = 'Richtig! Ausgezeichnet!';
-    feedbackEl.className = 'feedback correct';
+    if (!state.solvedIds.includes(currentVocab.id)) {
+      state.solvedIds.push(currentVocab.id);
+    }
+    state.score += 10;
+    state.streak++;
+    state.currentId = null;
+    saveProgress();
+    updateUI();
+
+    isAnswered = true;
+    btn.textContent = 'Weiter';
   } else {
-    // --- FALSCH ---
-    streak = 0;
+    input.className = 'input-wrong';
+    feedback.className = 'feedback wrong';
+    feedback.textContent = `Falsch. Richtige Antwort: "${currentVocab.ans}"`;
+    state.streak = 0;
+    saveProgress();
+    updateUI();
 
-    if (!isRepeatPhase) {
-      const failedCard = initialQueue.shift();
-      repeatQueue.push(failedCard);
-    } else {
-      const failedCard = repeatQueue.shift();
-      repeatQueue.push(failedCard);
+    isAnswered = true;
+    btn.textContent = 'Weiter';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  loadNextVocab();
+
+  document.getElementById('user-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleAction();
     }
-    
-    input.classList.add('input-wrong');
-    feedbackEl.innerText = `Falsch! Richtig ist: "${currentCard.ans}"`;
-    feedbackEl.className = 'feedback wrong';
-  }
-
-  updateUIStats();
-
-  btn.innerText = 'Weiter';
-  btn.focus();
-}
-
-// 6. Statistiken aktualisieren
-function updateUIStats() {
-  if (document.getElementById('attempts-val')) document.getElementById('attempts-val').innerText = attemptsInBlock;
-  if (document.getElementById('score-val')) document.getElementById('score-val').innerText = score;
-  if (document.getElementById('streak-val')) document.getElementById('streak-val').innerText = streak;
-  if (document.getElementById('round-info')) document.getElementById('round-info').innerText = `Runde ${currentRound} / ${TOTAL_ROUNDS}`;
-  if (document.getElementById('block-info')) document.getElementById('block-info').innerText = `(${solvedInBlock} / ${BLOCK_SIZE} gelöst)`;
-}
-
-// 7. Reset-Funktion
-function resetProgress() {
-  initGame();
-}
-
-// Enter-Taste unterstützen (Einmal Enter = Prüfen, nochmal Enter = Weiter)
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    handleAction();
-  }
+  });
 });
-
-// Anwendung beim Laden direkt starten
-initGame();
 </script>
 </body>
 </html>
-
-
-
-
-
