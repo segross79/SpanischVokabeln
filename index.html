@@ -208,6 +208,26 @@
 </div>
 
 <script>
+
+// ==========================================
+// ERGÄNZUNG OBERHALB DER VOKABELN
+// ==========================================
+
+// Verhindert das Neuladen der Seite bei jedem Formular-Submit / Enter-Druck
+document.addEventListener('submit', (e) => {
+    e.preventDefault();
+});
+
+// Speicher-Funktionen für den LocalStorage
+function saveState(data) {
+    localStorage.setItem('vokabelTrainerState', JSON.stringify(data));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('vokabelTrainerState');
+    return saved ? JSON.parse(saved) : null;
+}
+
 const vocabDb = [
  { id: 1, cat: "Pronomen", de: "Ich bin müde.", pre: "", post: " estoy cansado.", ans: "yo", hint: "ich" },
 { id: 2, cat: "Pronomen", de: "Du bist mein Freund.", pre: "", post: " eres mi amigo.", ans: "tú", hint: "du" },
@@ -814,6 +834,30 @@ const vocabDb = [
 { id: 549, cat: "Adjektiv", de: "Ein bequemer Stuhl.", pre: "Una silla ", post: ".", ans: "cómoda", hint: "bequem" },
 { id: 550, cat: "Adjektiv", de: "Das Zimmer ist sauber.", pre: "La habitación está ", post: ".", ans: "limpia", hint: "sauber (weiblich)" }
 ];
+
+// ==========================================
+// ERGÄNZUNG UNTERHALB DER VOKABELN
+// ==========================================
+
+// Sichere den aktuellen Zustand bei jeder Eingabe oder vor dem Verlassen der Seite (F5)
+window.addEventListener('beforeunload', () => {
+    if (typeof state !== 'undefined') {
+        saveState(state);
+    }
+});
+
+// Stellt den Speicherstand beim Laden der Seite automatisch wieder her
+document.addEventListener('DOMContentLoaded', () => {
+    const restoredState = loadState();
+    if (restoredState && typeof state !== 'undefined') {
+        Object.assign(state, restoredState);
+        
+        // Aktualisiert die Anzeige mit dem wiederhergestellten Stand
+        if (typeof renderCurrentWord === 'function') renderCurrentWord();
+        if (typeof showQuestion === 'function') showQuestion();
+    }
+});
+
 
 const STORAGE_KEY = 'spanisch_vokabeltrainer_state';
 
