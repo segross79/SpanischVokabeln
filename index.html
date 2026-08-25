@@ -1197,79 +1197,79 @@ const vocabDb = [
   { id: 1000, cat: "Phrasen & Ausdrücke", de: "Geschafft! Das Ende.", pre: "¡Fin del ", post: "!", ans: "curso", hint: "el fin – das Ende" }
 
         ];
+let currentIndex = 0;
+let correctCount = 0;
+let isAnswered = false;
 
-        // Damit der Rest des Codes mit deiner vocabDb funktioniert:
-        const sentences = vocabDb;
+const germanPrompt = document.getElementById('germanPrompt');
+const userInput = document.getElementById('userInput');
+const submitBtn = document.getElementById('submitBtn');
+const feedback = document.getElementById('feedback');
+const progress = document.getElementById('progress');
+const score = document.getElementById('score');
 
-        let currentIndex = 0;
-        let score = 0;
-        let answered = false;
+function loadQuestion() {
+    if (currentIndex >= vocabDb.length) {
+        germanPrompt.innerHTML = "<strong>Gratulation! Du hast alle Übungen abgeschlossen!</strong>";
+        userInput.style.display = 'none';
+        submitBtn.style.display = 'none';
+        feedback.style.display = 'none';
+        return;
+    }
 
-        const germanPrompt = document.getElementById('germanPrompt');
-        const userInput = document.getElementById('userInput');
-        const feedback = document.getElementById('feedback');
-        const submitBtn = document.getElementById('submitBtn');
-        const progress = document.getElementById('progress');
-        const scoreDisplay = document.getElementById('score');
+    const q = vocabDb[currentIndex];
+    germanPrompt.innerHTML = `<div>${q.de}</div><div style="font-size: 0.95rem; color: #3498db; margin-top: 6px;">${q.pre}<span style="border-bottom: 2px solid #3498db; padding: 0 10px; display: inline-block;">...</span>${q.post}</div><div style="font-size: 0.8rem; color: #888; margin-top: 4px; font-weight: normal;"><i>Tipp: ${q.hint}</i></div>`;
+    
+    userInput.value = '';
+    userInput.focus();
+    feedback.style.display = 'none';
+    feedback.className = 'feedback';
+    submitBtn.textContent = 'Überprüfen';
+    isAnswered = false;
 
-        function loadSentence() {
-            if (currentIndex >= sentences.length) {
-                germanPrompt.innerHTML = "🎉 **Geschafft!** Du hast alle Sätze durchgearbeitet.";
-                userInput.style.display = 'none';
-                submitBtn.style.display = 'none';
-                feedback.style.display = 'none';
-                return;
-            }
+    updateStats();
+}
 
-            germanPrompt.textContent = sentences[currentIndex].de;
-            userInput.value = "";
-            feedback.style.display = 'none';
-            userInput.focus();
-            answered = false;
-            submitBtn.textContent = "Überprüfen";
-            
-            progress.textContent = `Fortschritt: ${currentIndex + 1} / ${sentences.length}`;
-            scoreDisplay.textContent = `Richtig: ${score}`;
-        }
+function updateStats() {
+    progress.textContent = `Fortschritt: ${currentIndex + 1} / ${vocabDb.length}`;
+    score.textContent = `Richtig: ${correctCount}`;
+}
 
-        function cleanString(str) {
-            return str.trim().toLowerCase().replace(/[¿?¡!.,]/g, "");
-        }
+function checkAnswer() {
+    if (currentIndex >= vocabDb.length) return;
 
-        function checkAnswer() {
-            if (answered) {
-                currentIndex++;
-                loadSentence();
-                return;
-            }
+    if (isAnswered) {
+        currentIndex++;
+        loadQuestion();
+        return;
+    }
 
-            const userVal = cleanString(userInput.value);
-            const correctVal = cleanString(sentences[currentIndex].es);
+    const currentAns = vocabDb[currentIndex].ans.trim();
+    const userAns = userInput.value.trim();
 
-            feedback.style.display = 'block';
-            if (userVal === correctVal) {
-                feedback.textContent = "Richtig! ¡Muy bien!";
-                feedback.className = "feedback correct";
-                score++;
-                scoreDisplay.textContent = `Richtig: ${score}`;
-            } else {
-                feedback.textContent = `Falsch. Richtig wäre: "${sentences[currentIndex].es}"`;
-                feedback.className = "feedback incorrect";
-            }
+    feedback.style.display = 'block';
 
-            answered = true;
-            submitBtn.textContent = "Weiter";
-        }
+    if (userAns.toLowerCase() === currentAns.toLowerCase()) {
+        correctCount++;
+        feedback.textContent = 'Richtig!';
+        feedback.className = 'feedback correct';
+    } else {
+        feedback.textContent = `Falsch! Richtig ist: "${currentAns}"`;
+        feedback.className = 'feedback incorrect';
+    }
 
-        userInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                checkAnswer();
-            }
-        });
+    isAnswered = true;
+    submitBtn.textContent = 'Nächste Frage';
+    updateStats();
+}
 
-        loadSentence();
+userInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkAnswer();
+    }
+});
+
+loadQuestion();
     </script>
-
 </body>
 </html>
-
