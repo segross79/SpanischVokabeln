@@ -103,10 +103,9 @@
             <span id="progress">Fortschritt: 0 / 0</span>
             <span id="score">Richtig: 0</span>
         </div>
- 
+    </div> <!-- FEHLER 3 BEHOBEN: Hier fehlte das schließende div -->
 
     <script>
-        // Hier kommt dein gewohnter Block hin:
 const vocabDb = [
   // ==========================================
   // 1. VERBEN & AKTIONEN (1-150)
@@ -272,7 +271,7 @@ const vocabDb = [
   { id: 149, cat: "Verben & Aktionen", de: "Ich vergesse die Adresse.", pre: "Suelo ", post: " las calles.", ans: "olvidar", hint: "olvidar – vergessen" },
   { id: 150, cat: "Verben & Aktionen", de: "Wir beenden den Kurs.", pre: "Vamos a ", post: " el curso.", ans: "concluir", hint: "concluir – abschließen/beenden" },
 
-
+  // Alltag & Mensch
   { id: 238, cat: "Alltag & Mensch", de: "Der Boden ist sauber.", pre: "El ", post: " está limpio.", ans: "suelo", hint: "el suelo – der Boden" },
   { id: 239, cat: "Alltag & Mensch", de: "Die Decke ist hoch.", pre: "El ", post: " es alto.", ans: "techo", hint: "el techo – die Decke" },
   { id: 240, cat: "Alltag & Mensch", de: "Wir steigen die Treppe hoch.", pre: "Subimos por las ", post: ".", ans: "escaleras", hint: "las escaleras – die Treppe" },
@@ -382,9 +381,12 @@ const vocabDb = [
   { id: 334, cat: "Essen & Trinken", de: "Ein Schokoladeneis.", pre: "Un ", post: " de chocolate.", ans: "helado", hint: "el helado – das Eis" },
   { id: 335, cat: "Essen & Trinken", de: "Ein Stück Kuchen.", pre: "Un trozo de ", post: ".", ans: "pastel", hint: "el pastel – der Kuchen" },
   { id: 336, cat: "Essen & Trinken", de: "Dunkle Schokolade.", pre: "Un poco de ", post: " negro.", ans: "chocolate", hint: "el chocolate – die Schokolade" },
-  { id: 337, cat: "Essen & Trinken", de: "Ein süßer Keks.", pre: "Una ", post: " 
+  
+  // FEHLER 1 BEHOBEN: Hier fehlten der Rest des Strings für ID 337 und die schließende Klammer. Außerdem fehlte das Start-Objekt für ID 913.
+  { id: 337, cat: "Essen & Trinken", de: "Ein süßer Keks.", pre: "Una ", post: " dulce.", ans: "galleta", hint: "la galleta – der Keks" },
   { id: 342, cat: "Essen & Trinken", de: "Die Rechnung, bitte.", pre: "La ", post: ", por favor.", ans: "cuenta", hint: "la cuenta – die Rechnung" },
-   pre: "¡Toma ", post: "!", ans: "asiento", hint: "tomar asiento – Platz nehmen" },
+  { id: 913, cat: "Phrasen & Ausdrücke", de: "Nimm Platz.", pre: "¡Toma ", post: "!", ans: "asiento", hint: "tomar asiento – Platz nehmen" },
+  
   { id: 914, cat: "Phrasen & Ausdrücke", de: "Fühl dich wie zu Hause.", pre: "Estás en tu ", post: ".", ans: "casa", hint: "en tu casa – wie zu Hause" },
   { id: 915, cat: "Phrasen & Ausdrücke", de: "Was möchtest du trinken?", pre: "¿Qué quieres ", post: "?", ans: "tomar", hint: "tomar – trinken/nehmen" },
   { id: 916, cat: "Phrasen & Ausdrücke", de: "Ich nehme ein Wasser.", pre: "Voy a tomar un ", post: ".", ans: "agua", hint: "el agua – das Wasser" },
@@ -472,9 +474,10 @@ const vocabDb = [
   { id: 998, cat: "Phrasen & Ausdrücke", de: "Ich erwarte dich.", pre: "Te ", post: ".", ans: "espero", hint: "esperar – warten/erwarten" },
   { id: 999, cat: "Phrasen & Ausdrücke", de: "Gute Reise nach Hause.", pre: "Buen viaje a ", post: ".", ans: "casa", hint: "la casa – das Haus/Heim" },
   { id: 1000, cat: "Phrasen & Ausdrücke", de: "Geschafft! Das Ende.", pre: "¡Fin del ", post: "!", ans: "curso", hint: "el fin – das Ende" }
+];
 
-        ];
-
+// FEHLER 2 BEHOBEN: Hier fehlte die Deklaration von currentIndex
+let currentIndex = 0;
 let correctCount = 0;
 let isAnswered = false;
 
