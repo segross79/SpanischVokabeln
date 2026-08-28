@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Sentence Practice</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.25rem;
+        }
+        .german-sentence {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-bottom: 0.5rem;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .secondary-btn {
+            background-color: #95a5a6;
+        }
+        .secondary-btn:hover {
+            background-color: #7f8c8d;
+        }
+        .feedback {
+            margin-top: 1rem;
+            font-weight: 600;
+            padding: 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .correct {
+            background-color: #e8f8f5;
+            color: #27ae60;
+        }
+        .incorrect {
+            background-color: #fdedec;
+            color: #c0392b;
+        }
+        .stats {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            display: flex;
+            justify-content: space-between;
+        }
+        .hint-box {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            background-color: #f8f9fa;
+            border-left: 3px solid #f1c40f;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        .hint-btn {
+            background-color: transparent;
+            color: #95a5a6;
+            border: 1px solid #ddd;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+        }
+        .hint-btn:hover {
+            background-color: #f4f7f6;
+            color: #7f8c8d;
+        }
+        .chapter-select {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="menuScreen">
+            <h2>Wähle ein Kapitel</h2>
+            <div class="chapter-select" id="chapterList">
+                <!-- Wird dynamisch gefüllt -->
+            </div>
+        </div>
+
+        <div id="quizScreen" style="display: none;">
+            <h2 id="screenTitle">Übersetze ins Spanische (A1)</h2>
+            <div id="modeIndicator" style="font-size: 0.85rem; color: #e67e22; font-weight: bold; margin-bottom: 10px;"></div>
+            <div class="german-sentence" id="germanPrompt">Lade Satz...</div>
+
+            <div class="hint-box" id="hintBox" style="display: none;"></div>
+
+            <input type="text" id="userInput" placeholder="Deine Übersetzung hier..." autocomplete="off">
+            <button id="submitBtn" onclick="checkAnswer()">Überprüfen</button>
+            <button id="hintBtn" class="hint-btn" onclick="showHint()">Tipp anzeigen</button>
+            <button id="backToMenuBtn" class="secondary-btn" onclick="returnToMenu()" style="display: none;">Zurück zur Kapitelwahl</button>
+
+            <div id="feedback" class="feedback" style="display: none;"></div>
+
+            <div class="stats">
+                <span id="progress">Fortschritt: 0 / 0</span>
+                <span id="score">Richtig: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const vocabDb = [
+  // ==========================================
+  // 1. VERBEN & AKTIONEN (1-150)
+  // ==========================================
+
+  // Essenzielle Hilfs- & Grundverben (1-10)
+  { id: 1, cat: "Verben & Aktionen", de: "Ich bin müde.", pre: "Yo ", post: " cansado.", ans: "estoy", hint: "estar – sein (Zustand/Ort)" },
+  { id: 2, cat: "Verben & Aktionen", de: "Er ist Spanier.", pre: "Él ", post: " español.", ans: "es", hint: "ser – sein (Eigenschaft)" },
+  { id: 3, cat: "Verben & Aktionen", de: "Ich habe zwei Brüder.", pre: "Yo ", post: " dos hermanos.", ans: "tengo", hint: "tener – haben" },
+  { id: 4, cat: "Verben & Aktionen", de: "Was machst du?", pre: "¿Qué ", post: " tú?", ans: "haces", hint: "hacer – machen/tun" },
+  { id: 5, cat: "Verben & Aktionen", de: "Wir gehen ins Kino.", pre: "Nosotros ", post: " al cine.", ans: "vamos", hint: "ir – gehen/fahren" },
+  { id: 6, cat: "Verben & Aktionen", de: "Es gibt viel Essen.", pre: "Tiene que ", post: " mucha comida.", ans: "haber", hint: "haber – geben/haben (Hilfsverb)" },
+  { id: 7, cat: "Verben & Aktionen", de: "Kannst du mir helfen?", pre: "¿", post: " ayudarme?", ans: "Puedes", hint: "poder – können" },
+  { id: 8, cat: "Verben & Aktionen", de: "Ich möchte ein Eis.", pre: "Yo ", post: " un helado.", ans: "quiero", hint: "querer – wollen/lieben" },
+  { id: 9, cat: "Verben & Aktionen", de: "Ich weiß es nicht.", pre: "No lo ", post: ".", ans: "sé", hint: "saber – wissen" },
+  { id: 10, cat: "Verben & Aktionen", de: "Wo legst du das Buch hin?", pre: "¿Dónde ", post: " el libro?", ans: "pones", hint: "poner – stellen/legen" },
+
+  // Kommunikation & Denken (11-30)
+  { id: 11, cat: "Verben & Aktionen", de: "Was sagst du?", pre: "¿Qué ", post: "?", ans: "dices", hint: "decir – sagen" },
+  { id: 12, cat: "Verben & Aktionen", de: "Ich spreche Spanisch.", pre: "Yo ", post: " español.", ans: "hablo", hint: "hablar – sprechen" },
+  { id: 13, cat: "Verben & Aktionen", de: "Ich höre Musik.", pre: "Yo ", post: " música.", ans: "escucho", hint: "escuchar – zuhören" },
+  { id: 14, cat: "Verben & Aktionen", de: "Hörst du das?", pre: "¿", post: " eso?", ans: "Oyes", hint: "oír – hören" },
+  { id: 15, cat: "Verben & Aktionen", de: "Ich sehe den Fernseher.", pre: "Yo ", post: " la televisión.", ans: "veo", hint: "ver – sehen" },
+  { id: 16, cat: "Verben & Aktionen", de: "Schau mal!", pre: "¡", post: "!", ans: "Mira", hint: "mirar – schauen" },
+  { id: 17, cat: "Verben & Aktionen", de: "Ich verstehe die Frage nicht.", pre: "No ", post: " la pregunta.", ans: "entiendo", hint: "entender – verstehen" },
+  { id: 18, cat: "Verben & Aktionen", de: "Jetzt begreife ich es.", pre: "Ahora lo ", post: ".", ans: "comprendo", hint: "comprender – begreifen" },
+  { id: 19, cat: "Verben & Aktionen", de: "Ich denke an dich.", pre: "", post: " en ti.", ans: "Pienso", hint: "pensar – denken" },
+  { id: 20, cat: "Verben & Aktionen", de: "Ich glaube ja.", pre: "", post: " que sí.", ans: "Creo", hint: "creer – glauben" },
+  { id: 21, cat: "Verben & Aktionen", de: "Erinnerst du dich?", pre: "¿", post: " tú?", ans: "Recuerdas", hint: "recordar – sich erinnern" },
+  { id: 22, cat: "Verben & Aktionen", de: "Ich vergesse das nie.", pre: "Nunca ", post: " eso.", ans: "olvido", hint: "olvidar – vergessen" },
+  { id: 23, cat: "Verben & Aktionen", de: "Ich möchte etwas fragen.", pre: "Quiero ", post: " algo.", ans: "preguntar", hint: "preguntar – fragen" },
+  { id: 24, cat: "Verben & Aktionen", de: "Er antwortet schnell.", pre: "Él ", post: " rápido.", ans: "responde", hint: "responder – antworten" },
+  { id: 25, cat: "Verben & Aktionen", de: "Erzähl mir eine Geschichte.", pre: "Puedes ", post: " una historia.", ans: "contar", hint: "contar – erzählen/zählen" },
+  { id: 26, cat: "Verben & Aktionen", de: "Kannst du das erklären?", pre: "¿Puedes ", post: " esto?", ans: "explicar", hint: "explicar – erklären" },
+  { id: 27, cat: "Verben & Aktionen", de: "Was bedeutet das?", pre: "¿Qué ", post: " esto?", ans: "significa", hint: "significar – bedeuten" },
+  { id: 28, cat: "Verben & Aktionen", de: "Ich rufe dich morgen an.", pre: "Te ", post: " mañana.", ans: "llamo", hint: "llamar – rufen/anrufen" },
+  { id: 29, cat: "Verben & Aktionen", de: "Ich verspreche es.", pre: "Lo ", post: ".", ans: "prometo", hint: "prometer – versprechen" },
+  { id: 30, cat: "Verben & Aktionen", de: "Lüge nicht.", pre: "No debes ", post: ".", ans: "mentir", hint: "mentir – lügen" },
+
+  // Bewegung & Ort (31-50)
+  { id: 31, cat: "Verben & Aktionen", de: "Kommst du zur Party?", pre: "¿", post: " a la fiesta?", ans: "Vienes", hint: "venir – kommen" },
+  { id: 32, cat: "Verben & Aktionen", de: "Der Zug kommt um 8 an.", pre: "El tren ", post: " a las ocho.", ans: "llega", hint: "llegar – ankommen" },
+  { id: 33, cat: "Verben & Aktionen", de: "Ich gehe heute Abend aus.", pre: "Hoy ", post: " por la noche.", ans: "salgo", hint: "salir – hinausgehen/ausgehen" },
+  { id: 34, cat: "Verben & Aktionen", de: "Sie treten ins Haus ein.", pre: "Ellos ", post: " en la casa.", ans: "entran", hint: "entrar – eintreten" },
+  { id: 35, cat: "Verben & Aktionen", de: "Wann kehrst du zurück?", pre: "¿Cuándo ", post: "?", ans: "vuelves", hint: "volver – zurückkehren" },
+  { id: 36, cat: "Verben & Aktionen", de: "Ich komme bald zurück.", pre: "Voy a ", post: " pronto.", ans: "regresar", hint: "regresar – zurückkommen" },
+  { id: 37, cat: "Verben & Aktionen", de: "Ich verbringe den Tag hier.", pre: "Voy a ", post: " el día aquí.", ans: "pasar", hint: "pasar – vorbeigehen/verbringen" },
+  { id: 38, cat: "Verben & Aktionen", de: "Wir spazieren im Park.", pre: "Nosotros ", post: " por el parque.", ans: "caminamos", hint: "caminar – laufen/spazieren" },
+  { id: 39, cat: "Verben & Aktionen", de: "Er wandert langsam.", pre: "Él prefiere ", post: " despacio.", ans: "andar", hint: "andar – gehen/wandern" },
+  { id: 40, cat: "Verben & Aktionen", de: "Ich renne jeden Morgen.", pre: "Yo ", post: " cada mañana.", ans: "corro", hint: "correr – rennen" },
+  { id: 41, cat: "Verben & Aktionen", de: "Ich reise gern.", pre: "Me gusta ", post: ".", ans: "viajar", hint: "viajar – reisen" },
+  { id: 42, cat: "Verben & Aktionen", de: "Wir steigen die Treppe hoch.", pre: "Vamos a ", post: " las escaleras.", ans: "subir", hint: "subir – hochgehen/einsteigen" },
+  { id: 43, cat: "Verben & Aktionen", de: "Wir steigen aus dem Bus aus.", pre: "Vamos a ", post: " del autobús.", ans: "bajar", hint: "bajar – runtergehen/aussteigen" },
+  { id: 44, cat: "Verben & Aktionen", de: "Die Blätter fallen im Herbst.", pre: "Las hojas van a ", post: ".", ans: "caer", hint: "caer – fallen" },
+  { id: 45, cat: "Verben & Aktionen", de: "Ich trage den Koffer.", pre: "Yo ", post: " la maleta.", ans: "llevo", hint: "llevar – tragen/bringen" },
+  { id: 46, cat: "Verben & Aktionen", de: "Bringst du das Essen mit?", pre: "¿", post: " la comida?", ans: "Traes", hint: "traer – mitbringen" },
+  { id: 47, cat: "Verben & Aktionen", de: "Bewege den Stuhl nicht.", pre: "No debes ", post: " la silla.", ans: "mover", hint: "mover – bewegen" },
+  { id: 48, cat: "Verben & Aktionen", de: "Das Auto hält hier an.", pre: "El coche va a ", post: " aquí.", ans: "parar", hint: "parar – anhalten" },
+  { id: 49, cat: "Verben & Aktionen", de: "Wir überqueren die Straße.", pre: "Vamos a ", post: " la calle.", ans: "cruzar", hint: "cruzar – überqueren" },
+  { id: 50, cat: "Verben & Aktionen", de: "Folge mir!", pre: "Puedes ", post: " mi camino.", ans: "seguir", hint: "seguir – folgen/weitermachen" },
+
+  // Alltag & Handlungen (51-90)
+  { id: 51, cat: "Verben & Aktionen", de: "Wir essen um zwei.", pre: "Nosotros ", post: " a las dos.", ans: "comemos", hint: "comer – essen" },
+  { id: 52, cat: "Verben & Aktionen", de: "Ich trinke Wasser.", pre: "Yo ", post: " agua.", ans: "bebo", hint: "beber – trinken" },
+  { id: 53, cat: "Verben & Aktionen", de: "Ich nehme ein Taxi.", pre: "Yo ", post: " un taxi.", ans: "tomo", hint: "tomar – nehmen/trinken" },
+  { id: 54, cat: "Verben & Aktionen", de: "Ich kaufe Brot.", pre: "Yo ", post: " pan.", ans: "compro", hint: "comprar – kaufen" },
+  { id: 55, cat: "Verben & Aktionen", de: "Ich bezahle die Rechnung.", pre: "Yo ", post: " la cuenta.", ans: "pago", hint: "pagar – bezahlen" },
+  { id: 56, cat: "Verben & Aktionen", de: "Ich benutze den Computer.", pre: "Yo ", post: " el ordenador.", ans: "uso", hint: "usar – benutzen" },
+  { id: 57, cat: "Verben & Aktionen", de: "Wir verwenden Werkzeug.", pre: "Vamos a ", post: " las herramientas.", ans: "utilizar", hint: "utilizar – verwenden" },
+  { id: 58, cat: "Verben & Aktionen", de: "Ich suche den Schlüssel.", pre: "Yo ", post: " la llave.", ans: "busco", hint: "buscar – suchen" },
+  { id: 59, cat: "Verben & Aktionen", de: "Ich finde meine Brille nicht.", pre: "No ", post: " mis gafas.", ans: "encuentro", hint: "encontrar – finden" },
+  { id: 60, cat: "Verben & Aktionen", de: "Ich brauche Hilfe.", pre: "Yo ", post: " ayuda.", ans: "necesito", hint: "necesitar – brauchen" },
+  { id: 61, cat: "Verben & Aktionen", de: "Ich bestelle einen Kaffee.", pre: "Yo ", post: " un café.", ans: "pido", hint: "pedir – bitten/bestellen" },
+  { id: 62, cat: "Verben & Aktionen", de: "Gibst du mir das Buch?", pre: "¿Me ", post: " el libro?", ans: "das", hint: "dar – geben" },
+  { id: 63, cat: "Verben & Aktionen", de: "Ich bekomme ein Geschenk.", pre: "Yo ", post: " un regalo.", ans: "recibo", hint: "recibir – bekommen/empfangen" },
+  { id: 64, cat: "Verben & Aktionen", de: "Öffne die Tür.", pre: "Puedes ", post: " la puerta.", ans: "abrir", hint: "abrir – öffnen" },
+  { id: 65, cat: "Verben & Aktionen", de: "Er schließt das Fenster.", pre: "Él ", post: " la ventana.", ans: "cierra", hint: "cerrar – schließen" },
+  { id: 66, cat: "Verben & Aktionen", de: "Ich möchte mein Geld wechseln.", pre: "Quiero ", post: " mi dinero.", ans: "cambiar", hint: "cambiar – ändern/wechseln" },
+  { id: 67, cat: "Verben & Aktionen", de: "Wir fangen jetzt an.", pre: "Vamos a ", post: " ahora.", ans: "empezar", hint: "empezar – anfangen" },
+  { id: 68, cat: "Verben & Aktionen", de: "Das Spiel beginnt.", pre: "El juego va a ", post: ".", ans: "comenzar", hint: "comenzar – beginnen" },
+  { id: 69, cat: "Verben & Aktionen", de: "Ich beende meine Arbeit.", pre: "Voy a ", post: " mi trabajo.", ans: "terminar", hint: "terminar – beenden" },
+  { id: 70, cat: "Verben & Aktionen", de: "Ich bin gleich fertig.", pre: "Voy a ", post: " pronto.", ans: "acabar", hint: "acabar – enden/fertigstellen" },
+  { id: 71, cat: "Verben & Aktionen", de: "Ich warte hier.", pre: "Yo ", post: " aquí.", ans: "espero", hint: "esperar – warten/hoffen" },
+  { id: 72, cat: "Verben & Aktionen", de: "Kannst du mir helfen?", pre: "¿Me puedes ", post: "?", ans: "ayudar", hint: "ayudar – helfen" },
+  { id: 73, cat: "Verben & Aktionen", de: "Ich arbeite viel.", pre: "Yo ", post: " mucho.", ans: "trabajo", hint: "trabajar – arbeiten" },
+  { id: 74, cat: "Verben & Aktionen", de: "Er studiert Medizin.", pre: "Él ", post: " medicina.", ans: "estudia", hint: "estudiar – studieren/lernen" },
+  { id: 75, cat: "Verben & Aktionen", de: "Ich lerne Spanisch.", pre: "Yo ", post: " español.", ans: "aprendo", hint: "aprender – lernen" },
+  { id: 76, cat: "Verben & Aktionen", de: "Der Lehrer lehrt gut.", pre: "El profesor sabe ", post: " bien.", ans: "enseñar", hint: "enseñar – lehren/zeigen" },
+  { id: 77, cat: "Verben & Aktionen", de: "Ich lebe in Madrid.", pre: "Yo ", post: " en Madrid.", ans: "vivo", hint: "vivir – leben" },
+  { id: 78, cat: "Verben & Aktionen", de: "Ich schlafe 8 Stunden.", pre: "Yo ", post: " ocho horas.", ans: "duermo", hint: "dormir – schlafen" },
+  { id: 79, cat: "Verben & Aktionen", de: "Ich wache um 7 Uhr auf.", pre: "Voy a ", post: " a las siete.", ans: "despertarme", hint: "despertarse – aufwachen" },
+  { id: 80, cat: "Verben & Aktionen", de: "Ich stehe früh auf.", pre: "Suelo ", post: " temprano.", ans: "levantarme", hint: "levantarse – aufstehen" },
+  { id: 81, cat: "Verben & Aktionen", de: "Ich dusche mich jeden Tag.", pre: "Prefiero ", post: " cada día.", ans: "ducharme", hint: "ducharse – duschen" },
+  { id: 82, cat: "Verben & Aktionen", de: "Ich wasche meine Hände.", pre: "Voy a ", post: " las manos.", ans: "lavarme", hint: "lavarse – waschen" },
+  { id: 83, cat: "Verben & Aktionen", de: "Er zieht sich schnell an.", pre: "Va a ", post: " rápido.", ans: "vestirse", hint: "vestirse – sich anziehen" },
+  { id: 84, cat: "Verben & Aktionen", de: "Ich putze das Zimmer.", pre: "Voy a ", post: " la habitación.", ans: "limpiar", hint: "limpiar – putzen" },
+  { id: 85, cat: "Verben & Aktionen", de: "Meine Mutter kocht gut.", pre: "Sabe ", post: " bien.", ans: "cocinar", hint: "cocinar – kochen" },
+  { id: 86, cat: "Verben & Aktionen", de: "Du musst den Hund pflegen.", pre: "Tienes que ", post: " al perro.", ans: "cuidar", hint: "cuidar – betreuen/pflegen" },
+  { id: 87, cat: "Verben & Aktionen", de: "Ich repariere das Auto.", pre: "Voy a ", post: " el coche.", ans: "arreglar", hint: "arreglar – reparieren/ordnen" },
+  { id: 88, cat: "Verben & Aktionen", de: "Bewahre das Dokument auf.", pre: "Debes ", post: " el documento.", ans: "guardar", hint: "guardar – aufbewahren" },
+  { id: 89, cat: "Verben & Aktionen", de: "Lass das Buch auf dem Tisch.", pre: "Puedes ", post: " el libro en la mesa.", ans: "dejar", hint: "dejar – lassen/hinterlassen" },
+  { id: 90, cat: "Verben & Aktionen", de: "Ich bleibe zu Hause.", pre: "Prefiero ", post: " en casa.", ans: "quedarme", hint: "quedarse – bleiben" },
+
+  // Freizeit, Arbeit & Psychologie (91-150)
+  { id: 91, cat: "Verben & Aktionen", de: "Wir spielen Fußball.", pre: "Nosotros ", post: " al fútbol.", ans: "jugamos", hint: "jugar – spielen (Spiel/Sport)" },
+  { id: 92, cat: "Verben & Aktionen", de: "Er spielt Gitarre.", pre: "Él sabe ", post: " la guitarra.", ans: "tocar", hint: "tocar – berühren/Instrument spielen" },
+  { id: 93, cat: "Verben & Aktionen", de: "Sie singt sehr schön.", pre: "A ella le gusta ", post: " muy bien.", ans: "cantar", hint: "cantar – singen" },
+  { id: 94, cat: "Verben & Aktionen", de: "Tanzst du mit mir?", pre: "¿Quieres ", post: " conmigo?", ans: "bailar", hint: "bailar – tanzen" },
+  { id: 95, cat: "Verben & Aktionen", de: "Wir lachen viel.", pre: "Nos gusta ", post: " mucho.", ans: "reír", hint: "reír – lachen" },
+  { id: 96, cat: "Verben & Aktionen", de: "Sie lächelt immer.", pre: "Le gusta ", post: " siempre.", ans: "sonreír", hint: "sonreír – lächeln" },
+  { id: 97, cat: "Verben & Aktionen", de: "Das Baby weint.", pre: "El bebé empieza a ", post: ".", ans: "llorar", hint: "llorar – weinen" },
+  { id: 98, cat: "Verben & Aktionen", de: "Genieße deinen Urlaub!", pre: "Debes ", post: " tus vacaciones.", ans: "disfrutar", hint: "disfrutar – genießen" },
+  { id: 99, cat: "Verben & Aktionen", de: "Das gefällt mir.", pre: "Me ", post: " esto.", ans: "gusta", hint: "gustar – gefallen" },
+  { id: 100, cat: "Verben & Aktionen", de: "Das gefällt mir sehr.", pre: "Me ", post: " esta música.", ans: "encanta", hint: "encantar – sehr gefallen" },
+  { id: 101, cat: "Verben & Aktionen", de: "Ich bevorzuge Tee.", pre: "Yo ", post: " el té.", ans: "prefiero", hint: "preferir – bevorzugen" },
+  { id: 102, cat: "Verben & Aktionen", de: "Ich wünsche dir Glück.", pre: "Te quiero ", post: " suerte.", ans: "desear", hint: "desear – wünschen" },
+  { id: 103, cat: "Verben & Aktionen", de: "Ich fühle mich gut.", pre: "Me puedo ", post: " bien.", ans: "sentir", hint: "sentir – fühlen" },
+  { id: 104, cat: "Verben & Aktionen", de: "Das scheint gut zu sein.", pre: "Va a ", post: " buena idea.", ans: "parecer", hint: "parecer – scheinen/wirken" },
+  { id: 105, cat: "Verben & Aktionen", de: "Ich versuche es noch einmal.", pre: "Voy a ", post: " otra vez.", ans: "intentar", hint: "intentar – versuchen" },
+  { id: 106, cat: "Verben & Aktionen", de: "Probier dieses Essen.", pre: "Debes ", post: " esta comida.", ans: "probar", hint: "probar – probieren" },
+  { id: 107, cat: "Verben & Aktionen", de: "Er erreicht sein Ziel.", pre: "Va a ", post: " su meta.", ans: "lograr", hint: "lograr – erreichen" },
+  { id: 108, cat: "Verben & Aktionen", de: "Ich bekomme ein Ticket.", pre: "Quiero ", post: " una entrada.", ans: "conseguir", hint: "conseguir – bekommen/erreichen" },
+  { id: 109, cat: "Verben & Aktionen", de: "Verliere den Schlüssel nicht.", pre: "No debes ", post: " la llave.", ans: "perder", hint: "perder – verlieren" },
+  { id: 110, cat: "Verben & Aktionen", de: "Wir gewinnen das Spiel.", pre: "Vamos a ", post: " el partido.", ans: "ganar", hint: "ganar – gewinnen/verdienen" },
+  { id: 111, cat: "Verben & Aktionen", de: "Ich spare Geld.", pre: "Quiero ", post: " dinero.", ans: "ahorrar", hint: "ahorrar – sparen" },
+  { id: 112, cat: "Verben & Aktionen", de: "Du gibst zu viel aus.", pre: "No debes ", post: " tanto.", ans: "gastar", hint: "gastar – ausgeben" },
+  { id: 113, cat: "Verben & Aktionen", de: "Er verkauft sein Auto.", pre: "Quiere ", post: " su coche.", ans: "vender", hint: "vender – verkaufen" },
+  { id: 114, cat: "Verben & Aktionen", de: "Wir mieten eine Wohnung.", pre: "Vamos a ", post: " un piso.", ans: "alquilar", hint: "alquilar – mieten" },
+  { id: 115, cat: "Verben & Aktionen", de: "Der Fernseher funktioniert nicht.", pre: "No quiere ", post: ".", ans: "funcionar", hint: "funcionar – funktionieren" },
+  { id: 116, cat: "Verben & Aktionen", de: "Er erschafft ein Kunstwerk.", pre: "Quiere ", post: " arte.", ans: "crear", hint: "crear – erschaffen" },
+  { id: 117, cat: "Verben & Aktionen", de: "Sie bauen ein Haus.", pre: "Van a ", post: " una casa.", ans: "construir", hint: "construir – bauen" },
+  { id: 118, cat: "Verben & Aktionen", de: "Das zerstört alles.", pre: "Va a ", post: " todo.", ans: "destruir", hint: "destruir – zerstören" },
+  { id: 119, cat: "Verben & Aktionen", de: "Das Glas zerbricht.", pre: "Se va a ", post: " el vaso.", ans: "romper", hint: "romper – zerbrechen" },
+  { id: 120, cat: "Verben & Aktionen", de: "Ich muss das Uhrwerk reparieren.", pre: "Tengo que ", post: " el reloj.", ans: "arreglar", hint: "arreglar – reparieren" },
+  { id: 121, cat: "Verben & Aktionen", de: "Das Baby wird heute geboren.", pre: "El bebé va a ", post: " hoy.", ans: "nacer", hint: "nacer – geboren werden" },
+  { id: 122, cat: "Verben & Aktionen", de: "Pflanzen sterben ohne Wasser.", pre: "Van a ", post: " sin agua.", ans: "morir", hint: "morir – sterben" },
+  { id: 123, cat: "Verben & Aktionen", de: "Wozu nützt das?", pre: "¿Para qué va a ", post: "?", ans: "servir", hint: "servir – dienen/nützen" },
+  { id: 124, cat: "Verben & Aktionen", de: "Du musst wählen.", pre: "Tienes que ", post: " una opción.", ans: "elegir", hint: "elegir – auswählen" },
+  { id: 125, cat: "Verben & Aktionen", de: "Der Hund beißt nicht.", pre: "El perro no va a ", post: ".", ans: "morder", hint: "morder – beißen" },
+  { id: 126, cat: "Verben & Aktionen", de: "Schneide das Brot.", pre: "Debes ", post: " el pan.", ans: "cortar", hint: "cortar – schneiden" },
+  { id: 127, cat: "Verben & Aktionen", de: "Kleben Sie das Foto auf.", pre: "Puedes ", post: " la foto aquí.", ans: "pegar", hint: "pegar – kleben/schlagen" },
+  { id: 128, cat: "Verben & Aktionen", de: "Rauchen ist ungesund.", pre: "No es bueno ", post: ".", ans: "fumar", hint: "fumar – rauchen" },
+  { id: 129, cat: "Verben & Aktionen", de: "Ich träume oft.", pre: "Me gusta ", post: " mucho.", ans: "soñar", hint: "soñar – träumen" },
+  { id: 130, cat: "Verben & Aktionen", de: "Ich begehre Erfolg.", pre: "Suelo ", post: " lo mejor.", ans: "desear", hint: "desear – begehren" },
+  { id: 131, cat: "Verben & Aktionen", de: "Ich muss das Dokument unterschreiben.", pre: "Tengo que ", post: " aquí.", ans: "firmar", hint: "firmar – unterschreiben" },
+  { id: 132, cat: "Verben & Aktionen", de: "Wir feiern heute Nacht.", pre: "Vamos a ", post: " hoy.", ans: "celebrar", hint: "celebrar – feiern" },
+  { id: 133, cat: "Verben & Aktionen", de: "Er erklärt die Regeln.", pre: "Sabe ", post: " la regla.", ans: "explicar", hint: "explicar – erklären" },
+  { id: 134, cat: "Verben & Aktionen", de: "Ich schätze deine Arbeit.", pre: "Me gusta ", post: " tu trabajo.", ans: "valorar", hint: "valorar – schätzen" },
+  { id: 135, cat: "Verben & Aktionen", de: "Wir organisieren ein Event.", pre: "Vamos a ", post: " un evento.", ans: "organizar", hint: "organizar – organisieren" },
+  { id: 136, cat: "Verben & Aktionen", de: "Er besucht seine Großmutter.", pre: "Va a ", post: " a su abuela.", ans: "visitar", hint: "visitar – besuchen" },
+  { id: 137, cat: "Verben & Aktionen", de: "Ich lade dich ein.", pre: "Te quiero ", post: ".", ans: "invitar", hint: "invitar – einladen" },
+  { id: 138, cat: "Verben & Aktionen", de: "Wir bereiten das Essen vor.", pre: "Vamos a ", post: " la cena.", ans: "preparar", hint: "preparar – vorbereiten" },
+  { id: 139, cat: "Verben & Aktionen", de: "Er unterstützt seinen Freund.", pre: "Le gusta ", post: " a su amigo.", ans: "apoyar", hint: "apoyar – unterstützen" },
+  { id: 140, cat: "Verben & Aktionen", de: "Ich vermeide Fehler.", pre: "Prefiero ", post: " los errores.", ans: "evitar", hint: "evitar – vermeiden" },
+  { id: 141, cat: "Verben & Aktionen", de: "Sie verbessert ihr Spanisch.", pre: "Quiere ", post: " su español.", ans: "mejorar", hint: "mejorar – verbessern" },
+  { id: 142, cat: "Verben & Aktionen", de: "Er vergleicht die Preise.", pre: "Le gusta ", post: " precios.", ans: "comparar", hint: "comparar – vergleichen" },
+  { id: 143, cat: "Verben & Aktionen", de: "Ich zeichne ein Bild.", pre: "Me gusta ", post: " paisajes.", ans: "dibujar", hint: "dibujar – zeichnen" },
+  { id: 144, cat: "Verben & Aktionen", de: "Sie malt ein Porträt.", pre: "Sabe ", post: " muy bien.", ans: "pintar", hint: "pintar – malen" },
+  { id: 145, cat: "Verben & Aktionen", de: "Er fährt das Auto.", pre: "Sabe ", post: " un coche.", ans: "conducir", hint: "conducir – fahren/steuern" },
+  { id: 146, cat: "Verben & Aktionen", de: "Ich schicke einen Brief.", pre: "Voy a ", post: " una carta.", ans: "enviar", hint: "enviar – senden/schicken" },
+  { id: 147, cat: "Verben & Aktionen", de: "Sie empfängt die Gäste.", pre: "Sabe ", post: " a la gente.", ans: "recibir", hint: "recibir – empfangen" },
+  { id: 148, cat: "Verben & Aktionen", de: "Er genießt die Sonne.", pre: "Le gusta ", post: " del sol.", ans: "disfrutar", hint: "disfrutar – genießen" },
+  { id: 149, cat: "Verben & Aktionen", de: "Ich vergesse die Adresse.", pre: "Suelo ", post: " las calles.", ans: "olvidar", hint: "olvidar – vergessen" },
+  { id: 150, cat: "Verben & Aktionen", de: "Wir beenden den Kurs.", pre: "Vamos a ", post: " el curso.", ans: "concluir", hint: "concluir – abschließen/beenden" },
+
+  // ==========================================
+  // 2. NOMEN: ALLTAG, MENSCH & GESELLSCHAFT (151-350)
+  // ==========================================
+
+  // Person, Familie & Beziehungen (151-173)
+  { id: 151, cat: "Alltag & Mensch", de: "Sie ist eine nette Person.", pre: "Ella es una ", post: " amable.", ans: "persona", hint: "la persona – die Person" },
+  { id: 152, cat: "Alltag & Mensch", de: "Der Mann ist groß.", pre: "El ", post: " es alto.", ans: "hombre", hint: "el hombre – der Mann" },
+  { id: 153, cat: "Alltag & Mensch", de: "Die Frau liest.", pre: "La ", post: " lee un libro.", ans: "mujer", hint: "la mujer – die Frau" },
+  { id: 154, cat: "Alltag & Mensch", de: "Das Kind spielt.", pre: "El ", post: " juega fuera.", ans: "niño", hint: "el niño – das Kind" },
+  { id: 155, cat: "Alltag & Mensch", de: "Das Baby schläft.", pre: "El ", post: " duerme mucho.", ans: "bebé", hint: "el bebé – das Baby" },
+  { id: 156, cat: "Alltag & Mensch", de: "Das Mädchen tanzt.", pre: "La ", post: " baila bien.", ans: "chica", hint: "la chica – das Mädchen" },
+  { id: 157, cat: "Alltag & Mensch", de: "Er ist ein guter Freund.", pre: "Es un buen ", post: ".", ans: "amigo", hint: "el amigo – der Freund" },
+  { id: 158, cat: "Alltag & Mensch", de: "Mein Arbeitskollege hilft mir.", pre: "Mi ", post: " me ayuda.", ans: "compañero", hint: "el compañero – der Kollege" },
+  { id: 159, cat: "Alltag & Mensch", de: "Der Nachbar ist freundlich.", pre: "El ", post: " es amable.", ans: "vecino", hint: "el vecino – der Nachbar" },
+  { id: 160, cat: "Alltag & Mensch", de: "Meine Familie ist groß.", pre: "Mi ", post: " es grande.", ans: "familia", hint: "la familia – die Familie" },
+  { id: 161, cat: "Alltag & Mensch", de: "Mein Vater arbeitet viel.", pre: "Mi ", post: " trabaja mucho.", ans: "padre", hint: "el padre – der Vater" },
+  { id: 162, cat: "Alltag & Mensch", de: "Meine Mutter kocht gut.", pre: "Mi ", post: " cocina bien.", ans: "madre", hint: "la madre – die Mutter" },
+  { id: 163, cat: "Alltag & Mensch", de: "Meine Eltern sind nett.", pre: "Mis ", post: " son amables.", ans: "padres", hint: "los padres – die Eltern" },
+  { id: 164, cat: "Alltag & Mensch", de: "Mein Sohn studiert.", pre: "Mi ", post: " estudia.", ans: "hijo", hint: "el hijo – der Sohn" },
+  { id: 165, cat: "Alltag & Mensch", de: "Meine Tochter liest gerne.", pre: "Mi ", post: " lee mucho.", ans: "hija", hint: "la hija – die Tochter" },
+  { id: 166, cat: "Alltag & Mensch", de: "Mein Bruder ist älter.", pre: "Mi ", post: " es mayor.", ans: "hermano", hint: "el hermano – der Bruder" },
+  { id: 167, cat: "Alltag & Mensch", de: "Meine Schwester wohnt hier.", pre: "Mi ", post: " vive aquí.", ans: "hermana", hint: "la hermana – die Schwester" },
+  { id: 168, cat: "Alltag & Mensch", de: "Mein Großvater ist alt.", pre: "Mi ", post: " es mayor.", ans: "abuelo", hint: "el abuelo – der Großvater" },
+  { id: 169, cat: "Alltag & Mensch", de: "Meine Großmutter kocht.", pre: "Mi ", post: " cocina.", ans: "abuela", hint: "la abuela – die Großmutter" },
+  { id: 170, cat: "Alltag & Mensch", de: "Mein Onkel lebt in Madrid.", pre: "Mi ", post: " vive en Madrid.", ans: "tío", hint: "el tío – der Onkel" },
+  { id: 171, cat: "Alltag & Mensch", de: "Meine Tante arbeitet hier.", pre: "Mi ", post: " trabaja aquí.", ans: "tía", hint: "la tía – die Tante" },
+  { id: 172, cat: "Alltag & Mensch", de: "Mein Cousin besucht uns.", pre: "Mi ", post: " viene hoy.", ans: "primo", hint: "el primo – der Cousin" },
+  { id: 173, cat: "Alltag & Mensch", de: "Mein Neffe spielt draußen.", pre: "Mi ", post: " juega.", ans: "sobrino", hint: "el sobrino – der Neffe" },
+
+  // Körper & Gesundheit (174-200)
+  { id: 174, cat: "Alltag & Mensch", de: "Der menschliche Körper.", pre: "El ", post: " humano.", ans: "cuerpo", hint: "el cuerpo – der Körper" },
+  { id: 175, cat: "Alltag & Mensch", de: "Mein Kopf tut weh.", pre: "Me duele la ", post: ".", ans: "cabeza", hint: "la cabeza – der Kopf" },
+  { id: 176, cat: "Alltag & Mensch", de: "Er hat ein schönes Gesicht.", pre: "Tiene una ", post: " bonita.", ans: "cara", hint: "la cara – das Gesicht" },
+  { id: 177, cat: "Alltag & Mensch", de: "Das rechte Auge.", pre: "El ", post: " derecho.", ans: "ojo", hint: "el ojo – das Auge" },
+  { id: 178, cat: "Alltag & Mensch", de: "Meine Nase ist rot.", pre: "Mi ", post: " está roja.", ans: "nariz", hint: "la nariz – die Nase" },
+  { id: 179, cat: "Alltag & Mensch", de: "Mache den Mund auf.", pre: "Abre la ", post: ".", ans: "boca", hint: "la boca – der Mund" },
+  { id: 180, cat: "Alltag & Mensch", de: "Das rechte Ohr.", pre: "La ", post: " derecha.", ans: "oreja", hint: "la oreja – das Ohr" },
+  { id: 181, cat: "Alltag & Mensch", de: "Ich habe schwarzes Haar.", pre: "Tengo el ", post: " negro.", ans: "pelo", hint: "el pelo – das Haar" },
+  { id: 182, cat: "Alltag & Mensch", de: "Mein Hals tut weh.", pre: "Me duele el ", post: ".", ans: "cuello", hint: "el cuello – der Hals" },
+  { id: 183, cat: "Alltag & Mensch", de: "Die rechte Schulter.", pre: "El ", post: " derecho.", ans: "hombro", hint: "el hombro – die Schulter" },
+  { id: 184, cat: "Alltag & Mensch", de: "Ein starker Arm.", pre: "Un ", post: " fuerte.", ans: "brazo", hint: "el brazo – der Arm" },
+  { id: 185, cat: "Alltag & Mensch", de: "Wasche deine Hände.", pre: "Lava tu ", post: ".", ans: "mano", hint: "la mano – die Hand" },
+  { id: 186, cat: "Alltag & Mensch", de: "Der Zeigefinger.", pre: "El ", post: " de la mano.", ans: "dedo", hint: "el dedo – der Finger" },
+  { id: 187, cat: "Alltag & Mensch", de: "Die Brust tut weh.", pre: "Me duele el ", post: ".", ans: "pecho", hint: "el pecho – die Brust" },
+  { id: 188, cat: "Alltag & Mensch", de: "Mein Rücken ist gerade.", pre: "Tengo la ", post: " recta.", ans: "espalda", hint: "la espalda – der Rücken" },
+  { id: 189, cat: "Alltag & Mensch", de: "Mein Magen ist voll.", pre: "Tengo el ", post: " lleno.", ans: "estómago", hint: "el estómago – der Magen" },
+  { id: 190, cat: "Alltag & Mensch", de: "Das linke Bein.", pre: "La ", post: " izquierda.", ans: "pierna", hint: "la pierna – das Bein" },
+  { id: 191, cat: "Alltag & Mensch", de: "Mein Fuß tut weh.", pre: "Me duele el ", post: ".", ans: "pie", hint: "el pie – der Fuß" },
+  { id: 192, cat: "Alltag & Mensch", de: "Empfindliche Haut.", pre: "La ", post: " sensible.", ans: "piel", hint: "la piel – die Haut" },
+  { id: 193, cat: "Alltag & Mensch", de: "Rotes Blut.", pre: "La ", post: " es roja.", ans: "sangre", hint: "la sangre – das Blut" },
+  { id: 194, cat: "Alltag & Mensch", de: "Ein gesundes Herz.", pre: "Un ", post: " sano.", ans: "corazón", hint: "el corazón – das Herz" },
+  { id: 195, cat: "Alltag & Mensch", de: "Gesundheit ist wichtig.", pre: "La ", post: " es importante.", ans: "salud", hint: "la salud – die Gesundheit" },
+  { id: 196, cat: "Alltag & Mensch", de: "Eine schwere Krankheit.", pre: "Una ", post: " grave.", ans: "enfermedad", hint: "la enfermedad – die Krankheit" },
+  { id: 197, cat: "Alltag & Mensch", de: "Ich habe starke Schmerzen.", pre: "Tengo mucho ", post: ".", ans: "dolor", hint: "el dolor – der Schmerz" },
+  { id: 198, cat: "Alltag & Mensch", de: "Er hat Fieber.", pre: "Él tiene ", post: ".", ans: "fiebre", hint: "la fiebre – das Fieber" },
+  { id: 199, cat: "Alltag & Mensch", de: "Nimm die Medizin.", pre: "Toma la ", post: ".", ans: "medicina", hint: "la medicina – die Medizin" },
+  { id: 200, cat: "Alltag & Mensch", de: "Ein wirksames Medikament.", pre: "Un ", post: " eficaz.", ans: "medicamento", hint: "el medicamento – das Medikament" },
+
+  // Arzt & Bekleidung (201-220)
+  { id: 201, cat: "Alltag & Mensch", de: "Der Arzt ist sehr nett.", pre: "El ", post: " es muy amable.", ans: "médico", hint: "el médico – der Arzt" },
+  { id: 202, cat: "Alltag & Mensch", de: "Das Krankenhaus ist groß.", pre: "El ", post: " es grande.", ans: "hospital", hint: "el hospital – das Krankenhaus" },
+  { id: 203, cat: "Alltag & Mensch", de: "Die Apotheke ist geöffnet.", pre: "La ", post: " está abierta.", ans: "farmacia", hint: "la farmacia – die Apotheke" },
+  { id: 204, cat: "Alltag & Mensch", de: "Ich kaufe neue Kleidung.", pre: "Compro ", post: " nueva.", ans: "ropa", hint: "la ropa – die Kleidung" },
+  { id: 205, cat: "Alltag & Mensch", de: "Das weiße Hemd.", pre: "La ", post: " blanca.", ans: "camisa", hint: "la camisa – das Hemd" },
+  { id: 206, cat: "Alltag & Mensch", de: "Ein schwarzes T-Shirt.", pre: "Una ", post: " negra.", ans: "camiseta", hint: "la camiseta – das T-Shirt" },
+  { id: 207, cat: "Alltag & Mensch", de: "Die Hose ist lang.", pre: "Los ", post: " son largos.", ans: "pantalones", hint: "los pantalones – die Hose" },
+  { id: 208, cat: "Alltag & Mensch", de: "Ein schönes Kleid.", pre: "Un ", post: " bonito.", ans: "vestido", hint: "el vestido – das Kleid" },
+  { id: 209, cat: "Alltag & Mensch", de: "Der kurze Rock.", pre: "La ", post: " corta.", ans: "falda", hint: "la falda – der Rock" },
+  { id: 210, cat: "Alltag & Mensch", de: "Eine warme Jacke.", pre: "Una ", post: " caliente.", ans: "chaqueta", hint: "la chaqueta – die Jacke" },
+  { id: 211, cat: "Alltag & Mensch", de: "Der Mantel ist braun.", pre: "El ", post: " es marrón.", ans: "abrigo", hint: "el abrigo – der Mantel" },
+  { id: 212, cat: "Alltag & Mensch", de: "Ein blauer Pullover.", pre: "Un ", post: " azul.", ans: "jersey", hint: "el jersey – der Pullover" },
+  { id: 213, cat: "Alltag & Mensch", de: "Ein neuer Schuh.", pre: "Un ", post: " nuevo.", ans: "zapato", hint: "el zapato – der Schuh" },
+  { id: 214, cat: "Alltag & Mensch", de: "Bequeme Turnschuhe.", pre: "Unas ", post: " cómodas.", ans: "zapatillas", hint: "las zapatillas – die Turnschuhe" },
+  { id: 215, cat: "Alltag & Mensch", de: "Warme Socken.", pre: "Unos ", post: " calientes.", ans: "calcetines", hint: "los calcetines – die Socken" },
+  { id: 216, cat: "Alltag & Mensch", de: "Ein schwarzer Hut.", pre: "Un ", post: " negro.", ans: "sombrero", hint: "el sombrero – der Hut" },
+  { id: 217, cat: "Alltag & Mensch", de: "Ich brauche meine Brille.", pre: "Necesito mis ", post: ".", ans: "gafas", hint: "las gafas – die Brille" },
+  { id: 218, cat: "Alltag & Mensch", de: "Eine große Tasche.", pre: "Un ", post: " grande.", ans: "bolso", hint: "el bolso – die Tasche" },
+  { id: 219, cat: "Alltag & Mensch", de: "Der Schlüssel ist in der Hosentasche.", pre: "La llave está en el ", post: ".", ans: "bolsillo", hint: "el bolsillo – die Hosentasche" },
+  { id: 220, cat: "Alltag & Mensch", de: "Ein brauner Gürtel.", pre: "Un ", post: " marrón.", ans: "cinturón", hint: "el cinturón – der Gürtel" },
+
+  // Aussehen & Wohnen (221-255)
+  { id: 221, cat: "Alltag & Mensch", de: "Ein teures Schmuckstück.", pre: "Una ", post: " cara.", ans: "joya", hint: "la joya – der Schmuck" },
+  { id: 222, cat: "Alltag & Mensch", de: "Wie viel Uhr ist es?", pre: "¿Qué hora es en el ", post: "?", ans: "reloj", hint: "el reloj – die Uhr" },
+  { id: 223, cat: "Alltag & Mensch", de: "Welche Größe brauchst du?", pre: "¿Qué ", post: " necesitas?", ans: "tamaño", hint: "el tamaño – die Größe" },
+  { id: 224, cat: "Alltag & Mensch", de: "Das Haus ist alt.", pre: "La ", post: " es vieja.", ans: "casa", hint: "la casa – das Haus" },
+  { id: 225, cat: "Alltag & Mensch", de: "Eine schöne Wohnung.", pre: "Un ", post: " bonito.", ans: "piso", hint: "el piso – die Wohnung" },
+  { id: 226, cat: "Alltag & Mensch", de: "Ein hohes Gebäude.", pre: "Un ", post: " alto.", ans: "edificio", hint: "el edificio – das Gebäude" },
+  { id: 227, cat: "Alltag & Mensch", de: "Das Zimmer ist hell.", pre: "La ", post: " es clara.", ans: "habitación", hint: "la habitación – das Zimmer" },
+  { id: 228, cat: "Alltag & Mensch", de: "Ein großes Wohnzimmer.", pre: "Un ", post: " grande.", ans: "salón", hint: "el salón – das Wohnzimmer" },
+  { id: 229, cat: "Alltag & Mensch", de: "Das Schlafzimmer ist ruhig.", pre: "El ", post: " es tranquilo.", ans: "dormitorio", hint: "el dormitorio – das Schlafzimmer" },
+  { id: 230, cat: "Alltag & Mensch", de: "Die Küche ist sauber.", pre: "La ", post: " está limpia.", ans: "cocina", hint: "la cocina – die Küche" },
+  { id: 231, cat: "Alltag & Mensch", de: "Das Badezimmer ist klein.", pre: "El ", post: " es pequeño.", ans: "baño", hint: "el baño – das Badezimmer" },
+  { id: 232, cat: "Alltag & Mensch", de: "Ein sonniger Balkon.", pre: "Un ", post: " soleado.", ans: "balcón", hint: "el balcón – der Balkon" },
+  { id: 233, cat: "Alltag & Mensch", de: "Eine große Terrasse.", pre: "Una ", post: " grande.", ans: "terraza", hint: "la terraza – die Terrasse" },
+  { id: 234, cat: "Alltag & Mensch", de: "Ein schöner Garten.", pre: "Un ", post: " bonito.", ans: "jardín", hint: "el jardín – der Garten" },
+  { id: 235, cat: "Alltag & Mensch", de: "Schließe die Tür.", pre: "Cierra la ", post: ".", ans: "puerta", hint: "la puerta – die Tür" },
+  { id: 236, cat: "Alltag & Mensch", de: "Öffne das Fenster.", pre: "Abre la ", post: ".", ans: "ventana", hint: "la ventana – das Fenster" },
+  { id: 237, cat: "Alltag & Mensch", de: "Eine weiße Wand.", pre: "Una ", post: " blanca.", ans: "pared", hint: "la pared – die Wand" },
+  { id: 238, cat: "Alltag & Mensch", de: "Der Boden ist sauber.", pre: "El ", post: " está limpio.", ans: "suelo", hint: "el suelo – der Boden" },
+  { id: 239, cat: "Alltag & Mensch", de: "Die Decke ist hoch.", pre: "El ", post: " es alto.", ans: "techo", hint: "el techo – die Decke" },
+  { id: 240, cat: "Alltag & Mensch", de: "Wir steigen die Treppe hoch.", pre: "Subimos por las ", post: ".", ans: "escaleras", hint: "las escaleras – die Treppe" },
+  { id: 241, cat: "Alltag & Mensch", de: "Wo ist der Schlüssel?", pre: "¿Dónde está la ", post: "?", ans: "llave", hint: "la llave – der Schlüssel" },
+  { id: 242, cat: "Alltag & Mensch", de: "Ein neues Möbelstück.", pre: "Un ", post: " nuevo.", ans: "mueble", hint: "el mueble – das Möbelstück" },
+  { id: 243, cat: "Alltag & Mensch", de: "Der Tisch ist aus Holz.", pre: "La ", post: " es de madera.", ans: "mesa", hint: "la mesa – der Tisch" },
+  { id: 244, cat: "Alltag & Mensch", de: "Ein bequemer Stuhl.", pre: "Una ", post: " cómoda.", ans: "silla", hint: "la silla – der Stuhl" },
+  { id: 245, cat: "Alltag & Mensch", de: "Ein großes Sofa.", pre: "Un ", post: " grande.", ans: "sofá", hint: "el sofá – das Sofa" },
+  { id: 246, cat: "Alltag & Mensch", de: "Ein bequemes Bett.", pre: "Una ", post: " cómoda.", ans: "cama", hint: "la cama – das Bett" },
+  { id: 247, cat: "Alltag & Mensch", de: "Der Schrank ist voll.", pre: "El ", post: " está lleno.", ans: "armario", hint: "el armario – der Schrank" },
+  { id: 248, cat: "Alltag & Mensch", de: "Bücher im Regal.", pre: "Libros en la ", post: ".", ans: "estantería", hint: "la estantería – das Regal" },
+  { id: 249, cat: "Alltag & Mensch", de: "Mache das Licht an.", pre: "Enciende la ", post: ".", ans: "luz", hint: "la luz – das Licht" },
+  { id: 250, cat: "Alltag & Mensch", de: "Eine neue Lampe.", pre: "Una ", post: " nueva.", ans: "lámpara", hint: "la lámpara – die Lampe" },
+  { id: 251, cat: "Alltag & Mensch", de: "Ein großer Spiegel.", pre: "Un ", post: " grande.", ans: "espejo", hint: "el espejo – der Spiegel" },
+  { id: 252, cat: "Alltag & Mensch", de: "Wir schauen Fernsehen.", pre: "Vemos la ", post: ".", ans: "televisión", hint: "la televisión – der Fernseher" },
+  { id: 253, cat: "Alltag & Mensch", de: "Die Klimaanlage läuft.", pre: "El ", post: " funciona.", ans: "aire acondicionado", hint: "el aire acondicionado – die Klimaanlage" },
+  { id: 254, cat: "Alltag & Mensch", de: "Die Heizung ist an.", pre: "La ", post: " está encendida.", ans: "calefacción", hint: "la calefacción – die Heizung" },
+  { id: 255, cat: "Alltag & Mensch", de: "Bringe den Müll raus.", pre: "Saca la ", post: ".", ans: "basura", hint: "la basura – der Müll" },
+
+  // Arbeit, Schule & Kommunikation (256-283)
+  { id: 256, cat: "Alltag & Mensch", de: "Ich habe viel Arbeit.", pre: "Tengo mucho ", post: ".", ans: "trabajo", hint: "el trabajo – die Arbeit" },
+  { id: 257, cat: "Alltag & Mensch", de: "Eine gute Anstellung.", pre: "Un buen ", post: ".", ans: "empleo", hint: "el empleo – die Anstellung" },
+  { id: 258, cat: "Alltag & Mensch", de: "Eine große Firma.", pre: "Una ", post: " grande.", ans: "empresa", hint: "la empresa – die Firma" },
+  { id: 259, cat: "Alltag & Mensch", de: "Ich arbeite im Büro.", pre: "Trabajo en la ", post: ".", ans: "oficina", hint: "la oficina – das Büro" },
+  { id: 260, cat: "Alltag & Mensch", de: "Der Chef ist nett.", pre: "El ", post: " es simpático.", ans: "jefe", hint: "el jefe – der Chef" },
+  { id: 261, cat: "Alltag & Mensch", de: "Ein wichtiger Kunde.", pre: "Un ", post: " importante.", ans: "cliente", hint: "el cliente – der Kunde" },
+  { id: 262, cat: "Alltag & Mensch", de: "Ein neues Projekt.", pre: "Un ", post: " nuevo.", ans: "proyecto", hint: "el proyecto – das Projekt" },
+  { id: 263, cat: "Alltag & Mensch", de: "Wir haben ein Meeting.", pre: "Tenemos una ", post: ".", ans: "reunión", hint: "la reunión – das Meeting/Treffen" },
+  { id: 264, cat: "Alltag & Mensch", de: "Eine gute Vereinbarung.", pre: "Un buen ", post: ".", ans: "acuerdo", hint: "el acuerdo – die Vereinbarung" },
+  { id: 265, cat: "Alltag & Mensch", de: "Viel Erfolg!", pre: "¡Mucho ", post: "!", ans: "éxito", hint: "el éxito – der Erfolg" },
+  { id: 266, cat: "Alltag & Mensch", de: "Kein Problem.", pre: "No hay ", post: ".", ans: "problema", hint: "el problema – das Problem" },
+  { id: 267, cat: "Alltag & Mensch", de: "Eine gute Lösung.", pre: "Una buena ", post: ".", ans: "solución", hint: "la solución – die Lösung" },
+  { id: 268, cat: "Alltag & Mensch", de: "Die Kinder gehen zur Schule.", pre: "Van a la ", post: ".", ans: "escuela", hint: "la escuela – die Schule" },
+  { id: 269, cat: "Alltag & Mensch", de: "Ich studiere an der Universität.", pre: "Estudio en la ", post: ".", ans: "universidad", hint: "la universidad – die Universität" },
+  { id: 270, cat: "Alltag & Mensch", de: "Der Lehrer erklärt gut.", pre: "El ", post: " explica bien.", ans: "profesor", hint: "el profesor – der Lehrer" },
+  { id: 271, cat: "Alltag & Mensch", de: "Ein fleißiger Student.", pre: "Un ", post: " aplicado.", ans: "estudiante", hint: "el estudiante – der Student/Schüler" },
+  { id: 272, cat: "Alltag & Mensch", de: "Ein Spanischkurs.", pre: "Un ", post: " de español.", ans: "curso", hint: "el curso – der Kurs" },
+  { id: 273, cat: "Alltag & Mensch", de: "Ich lese ein Buch.", pre: "Leo un ", post: ".", ans: "libro", hint: "el libro – das Buch" },
+  { id: 274, cat: "Alltag & Mensch", de: "Schreib das ins Heft.", pre: "Escribe en el ", post: ".", ans: "cuaderno", hint: "el cuaderno – das Heft" },
+  { id: 275, cat: "Alltag & Mensch", de: "Ein Blatt Papier.", pre: "Una hoja de ", post: ".", ans: "papel", hint: "el papel – das Papier" },
+  { id: 276, cat: "Alltag & Mensch", de: "Ein blauer Stift.", pre: "Un ", post: " azul.", ans: "bolígrafo", hint: "el bolígrafo – der Stift" },
+  { id: 277, cat: "Alltag & Mensch", de: "Ich schreibe einen Brief.", pre: "Escribo una ", post: ".", ans: "carta", hint: "la carta – der Brief" },
+  { id: 278, cat: "Alltag & Mensch", de: "Eine neue Nachricht.", pre: "Un ", post: " nuevo.", ans: "mensaje", hint: "el mensaje – die Nachricht" },
+  { id: 279, cat: "Alltag & Mensch", de: "Ein wichtiger Anruf.", pre: "Una ", post: " importante.", ans: "llamada", hint: "la llamada – der Anruf" },
+  { id: 280, cat: "Alltag & Mensch", de: "Eine schwere Sprache.", pre: "Un ", post: " difícil.", ans: "idioma", hint: "el idioma – die Sprache" },
+  { id: 281, cat: "Alltag & Mensch", de: "Ein schönes Wort.", pre: "Una ", post: " bonita.", ans: "palabra", hint: "la palabra – das Wort" },
+  { id: 282, cat: "Alltag & Mensch", de: "Ich habe eine Frage.", pre: "Tengo una ", post: ".", ans: "pregunta", hint: "la pregunta – die Frage" },
+  { id: 283, cat: "Alltag & Mensch", de: "Die richtige Antwort.", pre: "La ", post: " correcta.", ans: "respuesta", hint: "la respuesta – die Antwort" },
+
+  // ==========================================
+  // 3. NOMEN: ESSEN, TRINKEN & GASTRONOMIE (284-350)
+  // ==========================================
+
+  // Grundnahrungsmittel & Zutaten (284-315)
+  { id: 284, cat: "Essen & Trinken", de: "Das Essen ist lecker.", pre: "La ", post: " está rica.", ans: "comida", hint: "la comida – das Essen" },
+  { id: 285, cat: "Essen & Trinken", de: "Ein gutes Frühstück.", pre: "Un buen ", post: ".", ans: "desayuno", hint: "el desayuno – das Frühstück" },
+  { id: 286, cat: "Essen & Trinken", de: "Das Mittagessen ist bereit.", pre: "El ", post: " está listo.", ans: "almuerzo", hint: "el almuerzo – das Mittagessen" },
+  { id: 287, cat: "Essen & Trinken", de: "Ein leichtes Abendessen.", pre: "Una ", post: " ligera.", ans: "cena", hint: "la cena – das Abendessen" },
+  { id: 288, cat: "Essen & Trinken", de: "Kaltes Wasser, bitte.", pre: "Un poco de ", post: " fría.", ans: "agua", hint: "el agua – das Wasser" },
+  { id: 289, cat: "Essen & Trinken", de: "Frisches Brot.", pre: "Un poco de ", post: " fresco.", ans: "pan", hint: "el pan – das Brot" },
+  { id: 290, cat: "Essen & Trinken", de: "Weißer Reis.", pre: "Un poco de ", post: " blanco.", ans: "arroz", hint: "el arroz – der Reis" },
+  { id: 291, cat: "Essen & Trinken", de: "Italienische Nudeln.", pre: "Un poco de ", post: " italiana.", ans: "pasta", hint: "la pasta – die Nudeln" },
+  { id: 292, cat: "Essen & Trinken", de: "Ein gekochtes Ei.", pre: "Un ", post: " cocido.", ans: "huevo", hint: "el huevo – das Ei" },
+  { id: 293, cat: "Essen & Trinken", de: "Spanischer Käse.", pre: "Un poco de ", post: " español.", ans: "queso", hint: "el queso – der Käse" },
+  { id: 294, cat: "Essen & Trinken", de: "Kalte Milch.", pre: "Un poco de ", post: " fría.", ans: "leche", hint: "la leche – die Milch" },
+  { id: 295, cat: "Essen & Trinken", de: "Brot mit Butter.", pre: "Pan con ", post: ".", ans: "mantequilla", hint: "la mantequilla – die Butter" },
+  { id: 296, cat: "Essen & Trinken", de: "Olivenöl.", pre: "Un poco de ", post: " de oliva.", ans: "aceite", hint: "el aceite – das Öl" },
+  { id: 297, cat: "Essen & Trinken", de: "Ein wenig Salz.", pre: "Un poco de ", post: ".", ans: "sal", hint: "la sal – das Salz" },
+  { id: 298, cat: "Essen & Trinken", de: "Schwarzer Pfeffer.", pre: "Un poco de ", post: " negra.", ans: "pimienta", hint: "la pimienta – der Pfeffer" },
+  { id: 299, cat: "Essen & Trinken", de: "Kaffee ohne Zucker.", pre: "Café sin ", post: ".", ans: "azúcar", hint: "el azúcar – der Zucker" },
+  { id: 300, cat: "Essen & Trinken", de: "Ein Kilo Mehl.", pre: "Un kilo de ", post: ".", ans: "harina", hint: "la harina – das Mehl" },
+  { id: 301, cat: "Essen & Trinken", de: "Frisches Fleisch.", pre: "Un poco de ", post: " fresca.", ans: "carne", hint: "la carne – das Fleisch" },
+  { id: 302, cat: "Essen & Trinken", de: "Gebratenes Hähnchen.", pre: "Un poco de ", post: " asado.", ans: "pollo", hint: "el pollo – das Hähnchen" },
+  { id: 303, cat: "Essen & Trinken", de: "Saftiges Rindfleisch.", pre: "Un poco de ", post: " sabrosa.", ans: "ternera", hint: "la ternera – das Rindfleisch" },
+  { id: 304, cat: "Essen & Trinken", de: "Schweinefleisch.", pre: "Un poco de ", post: ".", ans: "cerdo", hint: "el cerdo – das Schweinefleisch" },
+  { id: 305, cat: "Essen & Trinken", de: "Serrano-Schinken.", pre: "Un poco de ", post: " serrano.", ans: "jamón", hint: "el jamón – der Schinken" },
+  { id: 306, cat: "Essen & Trinken", de: "Frischer Fisch.", pre: "Un poco de ", post: " fresco.", ans: "pescado", hint: "el pescado – der Fisch" },
+  { id: 307, cat: "Essen & Trinken", de: "Leckere Meeresfrüchte.", pre: "Un poco de ", post: " rico.", ans: "marisco", hint: "el marisco – die Meeresfrüchte" },
+  { id: 308, cat: "Essen & Trinken", de: "Frisches Gemüse.", pre: "Mucha ", post: " fresca.", ans: "verdura", hint: "la verdura – das Gemüse" },
+  { id: 309, cat: "Essen & Trinken", de: "Gekochte Kartoffel.", pre: "Una ", post: " cocida.", ans: "patata", hint: "la patata – die Kartoffel" },
+  { id: 310, cat: "Essen & Trinken", de: "Rote Tomate.", pre: "Un ", post: " rojo.", ans: "tomate", hint: "el tomate – die Tomate" },
+  { id: 311, cat: "Essen & Trinken", de: "Eine weiße Zwiebel.", pre: "Una ", post: " blanca.", ans: "cebolla", hint: "la cebolla – die Zwiebel" },
+  { id: 312, cat: "Essen & Trinken", de: "Ein wenig Knoblauch.", pre: "Un poco de ", post: ".", ans: "ajo", hint: "el ajo – der Knoblauch" },
+  { id: 313, cat: "Essen & Trinken", de: "Frischer Kopfsalat.", pre: "Una ", post: " fresca.", ans: "lechuga", hint: "la lechuga – der Salat (Kopf)" },
+  { id: 314, cat: "Essen & Trinken", de: "Ein gemischter Salat.", pre: "Una ", post: " mixta.", ans: "ensalada", hint: "la ensalada – der Salat (Gericht)" },
+  { id: 315, cat: "Essen & Trinken", de: "Süße Karotte.", pre: "Una ", post: " dulce.", ans: "zanahoria", hint: "la zanahoria – die Karotte" },
+
+  // Obst, Getränke & Gastronomie (316-350)
+  { id: 316, cat: "Essen & Trinken", de: "Grüne Paprika.", pre: "Un ", post: " verde.", ans: "pimiento", hint: "el pimiento – die Paprika" },
+  { id: 317, cat: "Essen & Trinken", de: "Ein kleiner Pilz.", pre: "Un ", post: " pequeño.", ans: "champiñón", hint: "el champiñón – der Pilz" },
+  { id: 318, cat: "Essen & Trinken", de: "Süßes Obst.", pre: "Mucha ", post: " dulce.", ans: "fruta", hint: "la fruta – das Obst" },
+  { id: 319, cat: "Essen & Trinken", de: "Ein roter Apfel.", pre: "Una ", post: " roja.", ans: "manzana", hint: "la manzana – der Apfel" },
+  { id: 320, cat: "Essen & Trinken", de: "Eine gelbe Banane.", pre: "Un ", post: " amarillo.", ans: "plátano", hint: "el plátano – die Banane" },
+  { id: 321, cat: "Essen & Trinken", de: "Saftige Orange.", pre: "Una ", post: " jugosa.", ans: "naranja", hint: "la naranja – die Orange" },
+  { id: 322, cat: "Essen & Trinken", de: "Saure Zitrone.", pre: "Un ", post: " ácido.", ans: "limón", hint: "el limón – die Zitrone" },
+  { id: 323, cat: "Essen & Trinken", de: "Süße Erdbeere.", pre: "Una ", post: " dulce.", ans: "fresa", hint: "la fresa – die Erdbeere" },
+  { id: 324, cat: "Essen & Trinken", de: "Süße Traube.", pre: "Una ", post: " dulce.", ans: "uva", hint: "la uva – die Traube" },
+  { id: 325, cat: "Essen & Trinken", de: "Eine frische Melone.", pre: "Un ", post: " fresco.", ans: "melón", hint: "el melón – die Melone" },
+  { id: 326, cat: "Essen & Trinken", de: "Kühle Wassermelone.", pre: "Una ", post: " fría.", ans: "sandía", hint: "la sandía – die Wassermelone" },
+  { id: 327, cat: "Essen & Trinken", de: "Eine reife Avocado.", pre: "Un ", post: " maduro.", ans: "aguacate", hint: "el aguacate – die Avocado" },
+  { id: 328, cat: "Essen & Trinken", de: "Ein heißer Kaffee.", pre: "Un ", post: " caliente.", ans: "café", hint: "el café – der Kaffee" },
+  { id: 329, cat: "Essen & Trinken", de: "Ein grüner Tee.", pre: "Un ", post: " verde.", ans: "té", hint: "el té – der Tee" },
+  { id: 330, cat: "Essen & Trinken", de: "Orangensaft.", pre: "Un ", post: " de naranja.", ans: "zumo", hint: "el zumo – der Saft" },
+  { id: 331, cat: "Essen & Trinken", de: "Kaltes Bier.", pre: "Una ", post: " fría.", ans: "cerveza", hint: "la cerveza – das Bier" },
+  { id: 332, cat: "Essen & Trinken", de: "Rotwein.", pre: "Un ", post: " tinto.", ans: "vino", hint: "el vino – der Wein" },
+  { id: 333, cat: "Essen & Trinken", de: "Kaltes Erfrischungsgetränk.", pre: "Un ", post: " frío.", ans: "refresco", hint: "el refresco – das Erfrischungsgetränk" },
+  { id: 334, cat: "Essen & Trinken", de: "Ein Schokoladeneis.", pre: "Un ", post: " de chocolate.", ans: "helado", hint: "el helado – das Eis" },
+  { id: 335, cat: "Essen & Trinken", de: "Ein Stück Kuchen.", pre: "Un trozo de ", post: ".", ans: "pastel", hint: "el pastel – der Kuchen" },
+  { id: 336, cat: "Essen & Trinken", de: "Dunkle Schokolade.", pre: "Un poco de ", post: " negro.", ans: "chocolate", hint: "el chocolate – die Schokolade" },
+  { id: 337, cat: "Essen & Trinken", de: "Ein süßer Keks.", pre: "Una ", post: " dulce.", ans: "galleta", hint: "la galleta – der Keks" },
+  { id: 338, cat: "Essen & Trinken", de: "Ein gutes Restaurant.", pre: "Un buen ", post: ".", ans: "restaurante", hint: "el restaurante – das Restaurant" },
+  { id: 339, cat: "Essen & Trinken", de: "Eine gemütliche Bar.", pre: "Un ", post: " acogedor.", ans: "bar", hint: "el bar – die Bar" },
+  { id: 340, cat: "Essen & Trinken", de: "Der Kellner bringt das Essen.", pre: "El ", post: " trae la comida.", ans: "camarero", hint: "el camarero – der Kellner" },
+  { id: 341, cat: "Essen & Trinken", de: "Bringen Sie mir die Speisekarte.", pre: "Traiga la ", post: ", por favor.", ans: "carta", hint: "la carta – die Speisekarte" },
+  { id: 342, cat: "Essen & Trinken", de: "Die Rechnung, bitte.", pre: "La ", post: ", por favor.", ans: "cuenta", hint: "la cuenta – die Rechnung" },
+  { id: 343, cat: "Essen & Trinken", de: "Ein gutes Trinkgeld.", pre: "Una buena ", post: ".", ans: "propina", hint: "la propina – das Trinkgeld" },
+  { id: 344, cat: "Essen & Trinken", de: "Ich habe eine Reservierung.", pre: "Tengo una ", post: ".", ans: "reserva", hint: "la reserva – die Reservierung" },
+  { id: 345, cat: "Essen & Trinken", de: "Leckere Tapas.", pre: "Unas ", post: " ricas.", ans: "tapas", hint: "las tapas – kleine Gerichte" },
+  { id: 346, cat: "Essen & Trinken", de: "Ein tiefer Teller.", pre: "Un ", post: " hondo.", ans: "plato", hint: "el plato – der Teller" },
+  { id: 347, cat: "Essen & Trinken", de: "Ein Glas Wasser.", pre: "Un ", post: " de agua.", ans: "vaso", hint: "el vaso – das Trinkglas" },
+  { id: 348, cat: "Essen & Trinken", de: "Ein Weinglas.", pre: "Una ", post: " de vino.", ans: "copa", hint: "la copa – das Wein-/Sektglas" },
+  { id: 349, cat: "Essen & Trinken", de: "Eine Tasse Kaffee.", pre: "Una ", post: " de café.", ans: "taza", hint: "la taza – die Tasse" },
+  { id: 350, cat: "Essen & Trinken", de: "Eine Flasche Wasser.", pre: "Una ", post: " de agua.", ans: "botella", hint: "la botella – die Flasche" },
+
+  // ==========================================
+  // 4. NOMEN: STADT, VERKEHR, NATUR & MEDIEN (351-420)
+  // ==========================================
+
+  // Geschirr & Stadt (351-380)
+  { id: 351, cat: "Stadt & Natur", de: "Das Besteck ist sauber.", pre: "El ", post: " está limpio.", ans: "cubierto", hint: "el cubierto – das Besteck" },
+  { id: 352, cat: "Stadt & Natur", de: "Eine Gabel zum Essen.", pre: "Un ", post: " para comer.", ans: "tenedor", hint: "el tenedor – die Gabel" },
+  { id: 353, cat: "Stadt & Natur", de: "Ein scharfes Messer.", pre: "Un ", post: " afilado.", ans: "cuchillo", hint: "el cuchillo – das Messer" },
+  { id: 354, cat: "Stadt & Natur", de: "Ein Löffel für die Suppe.", pre: "Una ", post: " para la sopa.", ans: "cuchara", hint: "la cuchara – der Löffel" },
+  { id: 355, cat: "Stadt & Natur", de: "Eine Papierserviette.", pre: "Una ", post: " de papel.", ans: "servilleta", hint: "la servilleta – die Serviette" },
+  { id: 356, cat: "Stadt & Natur", de: "Eine schöne Stadt.", pre: "Una ", post: " bonita.", ans: "ciudad", hint: "la ciudad – die Stadt" },
+  { id: 357, cat: "Stadt & Natur", de: "Ein kleines Dorf.", pre: "Un ", post: " pequeño.", ans: "pueblo", hint: "el pueblo – das Dorf" },
+  { id: 358, cat: "Stadt & Natur", de: "Das Zentrum der Stadt.", pre: "El ", post: " de la ciudad.", ans: "centro", hint: "el centro – das Zentrum" },
+  { id: 359, cat: "Stadt & Natur", de: "Eine lange Straße.", pre: "Una ", post: " larga.", ans: "calle", hint: "la calle – die Straße" },
+  { id: 360, cat: "Stadt & Natur", de: "Eine breite Prachtstraße.", pre: "Una ", post: " ancha.", ans: "avenida", hint: "la avenida – die Prachtstraße/Allee" },
+  { id: 361, cat: "Stadt & Natur", de: "Der Hauptplatz.", pre: "La ", post: " principal.", ans: "plaza", hint: "la plaza – der Platz" },
+  { id: 362, cat: "Stadt & Natur", de: "Ein grüner Park.", pre: "Un ", post: " verde.", ans: "parque", hint: "el parque – der Park" },
+  { id: 363, cat: "Stadt & Natur", de: "Ein schönes Viertel.", pre: "Un ", post: " bonito.", ans: "barrio", hint: "el barrio – das Viertel" },
+  { id: 364, cat: "Stadt & Natur", de: "An der Ecke der Straße.", pre: "En la ", post: " de la calle.", ans: "esquina", hint: "la esquina – die Ecke" },
+  { id: 365, cat: "Stadt & Natur", de: "Eine alte Brücke.", pre: "Un ", post: " viejo.", ans: "puente", hint: "el puente – die Brücke" },
+  { id: 366, cat: "Stadt & Natur", de: "Ein kleines Geschäft.", pre: "Una ", post: " pequeña.", ans: "tienda", hint: "la tienda – das Geschäft" },
+  { id: 367, cat: "Stadt & Natur", de: "Ich gehe zum Supermarkt.", pre: "Voy al ", post: ".", ans: "supermercado", hint: "el supermercado – der Supermarkt" },
+  { id: 368, cat: "Stadt & Natur", de: "Der Markt ist geöffnet.", pre: "El ", post: " está abierto.", ans: "mercado", hint: "el mercado – der Markt" },
+  { id: 369, cat: "Stadt & Natur", de: "Ein großes Einkaufszentrum.", pre: "Un ", post: " grande.", ans: "centro comercial", hint: "el centro comercial – das Einkaufszentrum" },
+  { id: 370, cat: "Stadt & Natur", de: "Frisches Brot aus der Bäckerei.", pre: "Pan de la ", post: ".", ans: "panadería", hint: "la panadería – die Bäckerei" },
+  { id: 371, cat: "Stadt & Natur", de: "Ich gehe zur Bank.", pre: "Voy al ", post: ".", ans: "banco", hint: "el banco – die Bank (Geldinstitut)" },
+  { id: 372, cat: "Stadt & Natur", de: "Die Post ist nah.", pre: "La oficina de ", post: " está cerca.", ans: "correos", hint: "el correo – die Post" },
+  { id: 373, cat: "Stadt & Natur", de: "Wir gehen ins Kino.", pre: "Vamos al ", post: ".", ans: "cine", hint: "el cine – das Kino" },
+  { id: 374, cat: "Stadt & Natur", de: "Ein altes Theater.", pre: "Un ", post: " antiguo.", ans: "teatro", hint: "el teatro – das Theater" },
+  { id: 375, cat: "Stadt & Natur", de: "Das Museum ist interessant.", pre: "El ", post: " es interesante.", ans: "museo", hint: "el museo – das Museum" },
+  { id: 376, cat: "Stadt & Natur", de: "Eine große Kirche.", pre: "Una ", post: " grande.", ans: "iglesia", hint: "la iglesia – die Kirche" },
+  { id: 377, cat: "Stadt & Natur", de: "Gute Reise!", pre: "¡Buen ", post: "!", ans: "viaje", hint: "el viaje – die Reise" },
+  { id: 378, cat: "Stadt & Natur", de: "Eine Fahrkarte kaufen.", pre: "Comprar un ", post: ".", ans: "billete", hint: "el billete – die Fahrkarte" },
+  { id: 379, cat: "Stadt & Natur", de: "Schweres Gepäck.", pre: "Mucho ", post: ".", ans: "equipaje", hint: "el equipaje – das Gepäck" },
+  { id: 380, cat: "Stadt & Natur", de: "Ein großer Koffer.", pre: "Una ", post: " grande.", ans: "maleta", hint: "la maleta – der Koffer" },
+
+  // Verkehr & Orientierung (381-402)
+  { id: 381, cat: "Stadt & Natur", de: "Deinen Reisepass bitte.", pre: "Su ", post: ", por favor.", ans: "pasaporte", hint: "el pasaporte – der Pass" },
+  { id: 382, cat: "Stadt & Natur", de: "Ein Stadtplan von Madrid.", pre: "Un ", post: " de Madrid.", ans: "mapa", hint: "el mapa – die Karte/Stadtplan" },
+  { id: 383, cat: "Stadt & Natur", de: "Öffentlicher Transport.", pre: "El ", post: " público.", ans: "transporte", hint: "el transporte – der Transport" },
+  { id: 384, cat: "Stadt & Natur", de: "Ein schnelles Auto.", pre: "Un ", post: " rápido.", ans: "coche", hint: "el coche – das Auto" },
+  { id: 385, cat: "Stadt & Natur", de: "Der Bus kommt an.", pre: "El ", post: " llega.", ans: "autobús", hint: "el autobús – der Bus" },
+  { id: 386, cat: "Stadt & Natur", de: "Der Zug ist pünktlich.", pre: "El ", post: " a tiempo.", ans: "tren", hint: "el tren – der Zug" },
+  { id: 387, cat: "Stadt & Natur", de: "U-Bahn fahren.", pre: "Ir en ", post: ".", ans: "metro", hint: "el metro – die U-Bahn" },
+  { id: 388, cat: "Stadt & Natur", de: "Ein Taxi nehmen.", pre: "Tomar un ", post: ".", ans: "taxi", hint: "el taxi – das Taxi" },
+  { id: 389, cat: "Stadt & Natur", de: "Das Flugzeug fliegt.", pre: "El ", post: " vuela.", ans: "avión", hint: "el avión – das Flugzeug" },
+  { id: 390, cat: "Stadt & Natur", de: "Ein großes Schiff.", pre: "Un ", post: " grande.", ans: "barco", hint: "el barco – das Schiff" },
+  { id: 391, cat: "Stadt & Natur", de: "Fahrrad fahren.", pre: "Ir en ", post: ".", ans: "bicicleta", hint: "la bicicleta – das Fahrrad" },
+  { id: 392, cat: "Stadt & Natur", de: "Der Bahnhof ist nah.", pre: "La ", post: " está cerca.", ans: "estación", hint: "la estación – der Bahnhof" },
+  { id: 393, cat: "Stadt & Natur", de: "Ein großer Flughafen.", pre: "Un ", post: " grande.", ans: "aeropuerto", hint: "el aeropuerto – der Flughafen" },
+  { id: 394, cat: "Stadt & Natur", de: "Die Bushaltestelle.", pre: "La ", post: " del autobús.", ans: "parada", hint: "la parada – die Haltestelle" },
+  { id: 395, cat: "Stadt & Natur", de: "Ein direkter Flug.", pre: "Un ", post: " directo.", ans: "vuelo", hint: "el vuelo – der Flug" },
+  { id: 396, cat: "Stadt & Natur", de: "Viel Verkehr.", pre: "Mucho ", post: ".", ans: "tráfico", hint: "el tráfico – der Verkehr" },
+  { id: 397, cat: "Stadt & Natur", de: "Die richtige Adresse.", pre: "La ", post: " correcta.", ans: "dirección", hint: "la dirección – die Adresse/Richtung" },
+  { id: 398, cat: "Stadt & Natur", de: "Ein langer Weg.", pre: "Un ", post: " largo.", ans: "camino", hint: "el camino – der Weg" },
+  { id: 399, cat: "Stadt & Natur", de: "Im Norden des Landes.", pre: "En el ", post: " del país.", ans: "norte", hint: "el norte – der Norden" },
+  { id: 400, cat: "Stadt & Natur", de: "Im Süden Spaniens.", pre: "En el ", post: " de España.", ans: "sur", hint: "el sur – der Süden" },
+  { id: 401, cat: "Stadt & Natur", de: "Im Osten der Stadt.", pre: "En el ", post: " de la ciudad.", ans: "este", hint: "el este – der Osten" },
+  { id: 402, cat: "Stadt & Natur", de: "Im Westen Spaniens.", pre: "En el ", post: " de España.", ans: "oeste", hint: "el oeste – der Westen" },
+
+  // Zeit & Natur (403-420)
+  { id: 403, cat: "Stadt & Natur", de: "Ein schöner Tag.", pre: "Un ", post: " bonito.", ans: "día", hint: "el día – der Tag" },
+  { id: 404, cat: "Stadt & Natur", de: "Eine ruhige Nacht.", pre: "Una ", post: " tranquila.", ans: "noche", hint: "la noche – die Nacht" },
+  { id: 405, cat: "Stadt & Natur", de: "Guten Morgen.", pre: "Buena ", post: ".", ans: "mañana", hint: "la mañana – der Morgen/Vormittag" },
+  { id: 406, cat: "Stadt & Natur", de: "Heute Nachmittag.", pre: "Esta ", post: ".", ans: "tarde", hint: "la tarde – der Nachmittag" },
+  { id: 407, cat: "Stadt & Natur", de: "Die Woche ist lang.", pre: "La ", post: " es larga.", ans: "semana", hint: "la semana – die Woche" },
+  { id: 408, cat: "Stadt & Natur", de: "Nächsten Monat.", pre: "El próximo ", post: ".", ans: "mes", hint: "el mes – der Monat" },
+  { id: 409, cat: "Stadt & Natur", de: "Ein neues Jahr.", pre: "Un nuevo ", post: ".", ans: "año", hint: "el año – das Jahr" },
+  { id: 410, cat: "Stadt & Natur", de: "Wie viel Uhr ist es?", pre: "¿Qué ", post: " es?", ans: "hora", hint: "la hora – die Uhrzeit/Stunde" },
+  { id: 411, cat: "Stadt & Natur", de: "Warte einen Moment.", pre: "Espera un ", post: ".", ans: "momento", hint: "el momento – der Moment" },
+  { id: 412, cat: "Stadt & Natur", de: "Warte eine Minute.", pre: "Espera un ", post: ".", ans: "minuto", hint: "el minuto – die Minute" },
+  { id: 413, cat: "Stadt & Natur", de: "Ein schöner Urlaub.", pre: "Unas buenas ", post: ".", ans: "vacaciones", hint: "las vacaciones – der Urlaub" },
+  { id: 414, cat: "Stadt & Natur", de: "Das Wetter ist gut.", pre: "El ", post: " es bueno.", ans: "tiempo", hint: "el tiempo – das Wetter/die Zeit" },
+  { id: 415, cat: "Stadt & Natur", de: "Die Sonne scheint.", pre: "El ", post: " brilla.", ans: "sol", hint: "el sol – die Sonne" },
+  { id: 416, cat: "Stadt & Natur", de: "Ein schöner Mond.", pre: "Una ", post: " bonita.", ans: "luna", hint: "la luna – der Mond" },
+  { id: 417, cat: "Stadt & Natur", de: "Ein klarer Stern.", pre: "Una ", post: " clara.", ans: "estrella", hint: "la estrella – der Stern" },
+  { id: 418, cat: "Stadt & Natur", de: "Das Meer ist blau.", pre: "El ", post: " es azul.", ans: "mar", hint: "el mar – das Meer" },
+  { id: 419, cat: "Stadt & Natur", de: "Ein schöner Strand.", pre: "Una ", post: " bonita.", ans: "playa", hint: "la playa – der Strand" },
+  { id: 420, cat: "Stadt & Natur", de: "Ein hoher Berg.", pre: "Una ", post: " alta.", ans: "montaña", hint: "la montaña – der Berg" },
+
+  // ==========================================
+  // 6. WICHTIGE VERBEN (421-480)
+  // ==========================================
+  { id: 421, cat: "Verben", de: "Ich muss gehen.", pre: "Tengo que ", post: ".", ans: "ir", hint: "ir – gehen/fahren" },
+  { id: 422, cat: "Verben", de: "Ich möchte kommen.", pre: "Quiero ", post: ".", ans: "venir", hint: "venir – kommen" },
+  { id: 423, cat: "Verben", de: "Ich muss arbeiten.", pre: "Tengo que ", post: ".", ans: "trabajar", hint: "trabajar – arbeiten" },
+  { id: 424, cat: "Verben", de: "Ich möchte Spanisch lernen.", pre: "Quiero ", post: " español.", ans: "aprender", hint: "aprender – lernen" },
+  { id: 425, cat: "Verben", de: "Ich möchte studieren.", pre: "Quiero ", post: ".", ans: "estudiar", hint: "estudiar – studieren/lernen" },
+  { id: 426, cat: "Verben", de: "Ich kann sprechen.", pre: "Puedo ", post: ".", ans: "hablar", hint: "hablar – sprechen" },
+  { id: 427, cat: "Verben", de: "Ich möchte essen.", pre: "Quiero ", post: ".", ans: "comer", hint: "comer – essen" },
+  { id: 428, cat: "Verben", de: "Ich möchte trinken.", pre: "Quiero ", post: " agua.", ans: "beber", hint: "beber – trinken" },
+  { id: 429, cat: "Verben", de: "Ich muss schlafen.", pre: "Tengo que ", post: ".", ans: "dormir", hint: "dormir – schlafen" },
+  { id: 430, cat: "Verben", de: "Ich möchte kaufen.", pre: "Quiero ", post: " pan.", ans: "comprar", hint: "comprar – kaufen" },
+  { id: 431, cat: "Verben", de: "Kannst du bezahlen?", pre: "¿Puedes ", post: "?", ans: "pagar", hint: "pagar – bezahlen" },
+  { id: 432, cat: "Verben", de: "Ich möchte verstehen.", pre: "Quiero ", post: ".", ans: "comprender", hint: "comprender – verstehen" },
+  { id: 433, cat: "Verben", de: "Ich schaffe es nicht zu verstehen.", pre: "No logro ", post: ".", ans: "entender", hint: "entender – verstehen" },
+  { id: 434, cat: "Verben", de: "Ich möchte schreiben.", pre: "Quiero ", post: " una carta.", ans: "escribir", hint: "escribir – schreiben" },
+  { id: 435, cat: "Verben", de: "Ich mag lesen.", pre: "Me gusta ", post: ".", ans: "leer", hint: "leer – lesen" },
+  { id: 436, cat: "Verben", de: "Kannst du mir helfen?", pre: "¿Puedes ", post: "?", ans: "ayudar", hint: "ayudar – helfen" },
+  { id: 437, cat: "Verben", de: "Ich möchte fragen.", pre: "Quiero ", post: " algo.", ans: "preguntar", hint: "preguntar – fragen" },
+  { id: 438, cat: "Verben", de: "Kannst du antworten?", pre: "¿Puedes ", post: "?", ans: "responder", hint: "responder – antworten" },
+  { id: 439, cat: "Verben", de: "Ich möchte reisen.", pre: "Quiero ", post: ".", ans: "viajar", hint: "viajar – reisen" },
+  { id: 440, cat: "Verben", de: "Wo möchtest du wohnen?", pre: "¿Dónde quieres ", post: "?", ans: "vivir", hint: "vivir – wohnen/leben" },
+  { id: 441, cat: "Verben", de: "Wir müssen ankommen.", pre: "Tenemos que ", post: ".", ans: "llegar", hint: "llegar – ankommen" },
+  { id: 442, cat: "Verben", de: "Ich muss weggehen.", pre: "Tengo que ", post: ".", ans: "salir", hint: "salir – ausgehen/verlassen" },
+  { id: 443, cat: "Verben", de: "Ich möchte eintreten.", pre: "Quiero ", post: ".", ans: "entrar", hint: "entrar – eintreten" },
+  { id: 444, cat: "Verben", de: "Ich möchte mieten.", pre: "Quiero ", post: " un coche.", ans: "alquilar", hint: "alquilar – mieten" },
+  { id: 445, cat: "Verben", de: "Kannst du das öffnen?", pre: "¿Puedes ", post: " la puerta?", ans: "abrir", hint: "abrir – öffnen" },
+  { id: 446, cat: "Verben", de: "Ich muss das Fenster schließen.", pre: "Tengo que ", post: " la ventana.", ans: "cerrar", hint: "cerrar – schließen" },
+  { id: 447, cat: "Verben", de: "Ich möchte suchen.", pre: "Quiero ", post: " mis llaves.", ans: "buscar", hint: "buscar – suchen" },
+  { id: 448, cat: "Verben", de: "Ich muss es finden.", pre: "Tengo que ", post: " la solución.", ans: "encontrar", hint: "encontrar – finden" },
+  { id: 449, cat: "Verben", de: "Ich möchte kochen.", pre: "Quiero ", post: ".", ans: "cocinar", hint: "cocinar – kochen" },
+  { id: 450, cat: "Verben", de: "Ich möchte duschen.", pre: "Quiero ", post: ".", ans: "ducharme", hint: "ducharse – duschen" },
+  { id: 451, cat: "Verben", de: "Ich möchte aufstehen.", pre: "Quiero ", post: " temprano.", ans: "levantarme", hint: "levantarse – aufstehen" },
+  { id: 452, cat: "Verben", de: "Ich muss mich anziehen.", pre: "Tengo que ", post: ".", ans: "vestirme", hint: "vestirse – sich anziehen" },
+  { id: 453, cat: "Verben", de: "Ich möchte mich hinsetzen.", pre: "Quiero ", post: ".", ans: "sentarme", hint: "sentarse – sich hinsetzen" },
+  { id: 454, cat: "Verben", de: "Ich muss warten.", pre: "Tengo que ", post: ".", ans: "esperar", hint: "esperar – warten/hoffen" },
+  { id: 455, cat: "Verben", de: "Ich muss anrufen.", pre: "Tengo que ", post: ".", ans: "llamar", hint: "llamar – anrufen/rufen" },
+  { id: 456, cat: "Verben", de: "Ich möchte bestellen.", pre: "Quiero ", post: " comida.", ans: "pedir", hint: "pedir – bestellen/bitten" },
+  { id: 457, cat: "Verben", de: "Ich möchte nehmen.", pre: "Quiero ", post: " un taxi.", ans: "tomar", hint: "tomar – nehmen/trinken" },
+  { id: 458, cat: "Verben", de: "Ich möchte bringen.", pre: "Quiero ", post: " un regalo.", ans: "traer", hint: "traer – bringen" },
+  { id: 459, cat: "Verben", de: "Kannst du das machen?", pre: "¿Puedes ", post: " esto?", ans: "hacer", hint: "hacer – machen/tun" },
+  { id: 460, cat: "Verben", de: "Ich möchte sehen.", pre: "Quiero ", post: " la película.", ans: "ver", hint: "ver – sehen" },
+  { id: 461, cat: "Verben", de: "Ich möchte schauen.", pre: "Quiero ", post: " las fotos.", ans: "mirar", hint: "mirar – schauen/ansehen" },
+  { id: 462, cat: "Verben", de: "Ich möchte zuhören.", pre: "Quiero ", post: " música.", ans: "escuchar", hint: "escuchar – zuhören/hören" },
+  { id: 463, cat: "Verben", de: "Ich möchte wissen.", pre: "Quiero ", post: " la verdad.", ans: "saber", hint: "saber – wissen" },
+  { id: 464, cat: "Verben", de: "Ich möchte kennenlernen.", pre: "Quiero ", post: " Madrid.", ans: "conocer", hint: "conocer – kennen/kennenlernen" },
+  { id: 465, cat: "Verben", de: "Ich kann es nicht tun.", pre: "No puedo ", post: ".", ans: "hacerlo", hint: "poder / hacerlo – können / es tun" },
+  { id: 466, cat: "Verben", de: "Ich möchte haben.", pre: "Quiero ", post: " más tiempo.", ans: "tener", hint: "tener – haben" },
+  { id: 467, cat: "Verben", de: "Ich möchte geben.", pre: "Quiero ", post: " un consejo.", ans: "dar", hint: "dar – geben" },
+  { id: 468, cat: "Verben", de: "Ich möchte sagen.", pre: "Quiero ", post: " algo.", ans: "decir", hint: "decir – sagen" },
+  { id: 469, cat: "Verben", de: "Ich möchte stellen/legen.", pre: "Quiero ", post: " esto aquí.", ans: "poner", hint: "poner – stellen/legen" },
+  { id: 470, cat: "Verben", de: "Ich möchte denken.", pre: "Quiero ", post: " en ello.", ans: "pensar", hint: "pensar – denken" },
+  { id: 471, cat: "Verben", de: "Ich möchte glauben.", pre: "Quiero ", post: " que sí.", ans: "creer", hint: "creer – glauben" },
+  { id: 472, cat: "Verben", de: "Ich möchte spüren.", pre: "Quiero ", post: " el calor.", ans: "sentir", hint: "sentir – fühlen/spüren" },
+  { id: 473, cat: "Verben", de: "Dieser Ort wird gefallen.", pre: "Va a ", post: " este lugar.", ans: "gustar", hint: "gustar – gefallen/mögen" },
+  { id: 474, cat: "Verben", de: "Ich werde Hilfe brauchen.", pre: "Voy a ", post: " ayuda.", ans: "necesitar", hint: "necesitar – brauchen" },
+  { id: 475, cat: "Verben", de: "Ich möchte ändern.", pre: "Quiero ", post: " de plan.", ans: "cambiar", hint: "cambiar – ändern/wechseln" },
+  { id: 476, cat: "Verben", de: "Ich muss das benutzen.", pre: "Tengo que ", post: " esto.", ans: "usar", hint: "usar – benutzen/verwenden" },
+  { id: 477, cat: "Verben", de: "Ich möchte verkaufen.", pre: "Quiero ", post: " mi coche.", ans: "vender", hint: "vender – verkaufen" },
+  { id: 478, cat: "Verben", de: "Ich möchte es versuchen.", pre: "Quiero ", post: ".", ans: "intentar", hint: "intentar – versuchen" },
+  { id: 479, cat: "Verben", de: "Ich möchte beginnen.", pre: "Quiero ", post: " ahora.", ans: "empezar", hint: "empezar – beginnen" },
+  { id: 480, cat: "Verben", de: "Ich muss aufhören.", pre: "Tengo que ", post: ".", ans: "terminar", hint: "terminar – beenden/aufhören" },
+
+  // ==========================================
+  // 7. WICHTIGE ADJEKTIVE (481-540)
+  // ==========================================
+  { id: 481, cat: "Adjektive", de: "Ein gutes Buch.", pre: "Un ", post: " libro.", ans: "buen", hint: "bueno/a – gut" },
+  { id: 482, cat: "Adjektive", de: "Ein schlechter Tag.", pre: "Un ", post: " día.", ans: "mal", hint: "malo/a – schlecht" },
+  { id: 483, cat: "Adjektive", de: "Eine große Stadt.", pre: "Una ciudad ", post: ".", ans: "grande", hint: "grande – groß" },
+  { id: 484, cat: "Adjektive", de: "Ein kleines Zimmer.", pre: "Un cuarto ", post: ".", ans: "pequeño", hint: "pequeño/a – klein" },
+  { id: 485, cat: "Adjektive", de: "Eine schöne Frau.", pre: "Una mujer ", post: ".", ans: "bonita", hint: "bonito/a – schön" },
+  { id: 486, cat: "Adjektive", de: "Ein hässliches Haus.", pre: "Una casa ", post: ".", ans: "fea", hint: "feo/a – hässlich" },
+  { id: 487, cat: "Adjektive", de: "Ein neues Auto.", pre: "Un coche ", post: ".", ans: "nuevo", hint: "nuevo/a – neu" },
+  { id: 488, cat: "Adjektive", de: "Ein altes Gebäude.", pre: "Un edificio ", post: ".", ans: "viejo", hint: "viejo/a – alt" },
+  { id: 489, cat: "Adjektive", de: "Ein junger Mann.", pre: "Un hombre ", post: ".", ans: "joven", hint: "joven – jung" },
+  { id: 490, cat: "Adjektive", de: "Ein teures Restaurant.", pre: "Un restaurante ", post: ".", ans: "caro", hint: "caro/a – teuer" },
+  { id: 491, cat: "Adjektive", de: "Eine günstige Karte.", pre: "Una entrada ", post: ".", ans: "barata", hint: "barato/a – günstig" },
+  { id: 492, cat: "Adjektive", de: "Ein einfaches Spiel.", pre: "Un juego ", post: ".", ans: "fácil", hint: "fácil – einfach" },
+  { id: 493, cat: "Adjektive", de: "Eine schwere Aufgabe.", pre: "Una tarea ", post: ".", ans: "difícil", hint: "difícil – schwer/schwierig" },
+  { id: 494, cat: "Adjektive", de: "Ein schneller Zug.", pre: "Un tren ", post: ".", ans: "rápido", hint: "rápido/a – schnell" },
+  { id: 495, cat: "Adjektive", de: "Ein langsamer Bus.", pre: "Un autobús ", post: ".", ans: "lento", hint: "lento/a – langsam" },
+  { id: 496, cat: "Adjektive", de: "Ein heißer Kaffee.", pre: "Un café ", post: ".", ans: "caliente", hint: "caliente – heiß" },
+  { id: 497, cat: "Adjektive", de: "Kaltes Wasser.", pre: "Agua ", post: ".", ans: "fría", hint: "frío/a – kalt" },
+  { id: 498, cat: "Adjektive", de: "Ein sauberes Zimmer.", pre: "Una habitación ", post: ".", ans: "limpia", hint: "limpio/a – sauber" },
+  { id: 499, cat: "Adjektive", de: "Ein schmutziger Tisch.", pre: "Una mesa ", post: ".", ans: "sucia", hint: "sucio/a – schmutzig" },
+  { id: 500, cat: "Adjektive", de: "Eine offene Tür.", pre: "Una puerta ", post: ".", ans: "abierta", hint: "abierto/a – offen" },
+  { id: 501, cat: "Adjektive", de: "Ein geschlossenes Fenster.", pre: "Una ventana ", post: ".", ans: "cerrada", hint: "cerrado/a – geschlossen" },
+  { id: 502, cat: "Adjektive", de: "Ein voller Schrank.", pre: "Un armario ", post: ".", ans: "lleno", hint: "lleno/a – voll" },
+  { id: 503, cat: "Adjektive", de: "Ein leeres Glas.", pre: "Un vaso ", post: ".", ans: "vacío", hint: "vacío/a – leer" },
+  { id: 504, cat: "Adjektive", de: "Ein netter Mensch.", pre: "Una persona ", post: ".", ans: "simpática", hint: "simpático/a – nett/sympathisch" },
+  { id: 505, cat: "Adjektive", de: "Ein glückliches Kind.", pre: "Un niño ", post: ".", ans: "feliz", hint: "feliz – glücklich" },
+  { id: 506, cat: "Adjektive", de: "Ich bin traurig.", pre: "Estoy ", post: ".", ans: "triste", hint: "triste – traurig" },
+  { id: 507, cat: "Adjektive", de: "Ich bin müde.", pre: "Estoy ", post: ".", ans: "cansado", hint: "cansado/a – müde" },
+  { id: 508, cat: "Adjektive", de: "Ich bin krank.", pre: "Estoy ", post: ".", ans: "enfermo", hint: "enfermo/a – krank" },
+  { id: 509, cat: "Adjektive", de: "Ich bin gesund.", pre: "Estoy ", post: ".", ans: "sano", hint: "sano/a – gesund" },
+  { id: 510, cat: "Adjektive", de: "Ich bin beschäftigt.", pre: "Estoy ", post: ".", ans: "ocupado", hint: "ocupado/a – beschäftigt" },
+  { id: 511, cat: "Adjektive", de: "Ich bin frei.", pre: "Estoy ", post: ".", ans: "libre", hint: "libre – frei" },
+  { id: 512, cat: "Adjektive", de: "Ich bin bereit.", pre: "Estoy ", post: ".", ans: "listo", hint: "listo/a – bereit/schlau" },
+  { id: 513, cat: "Adjektive", de: "Das ist wichtig.", pre: "Es ", post: ".", ans: "importante", hint: "importante – wichtig" },
+  { id: 514, cat: "Adjektive", de: "Das ist möglich.", pre: "Es ", post: ".", ans: "posible", hint: "posible – möglich" },
+  { id: 515, cat: "Adjektive", de: "Das ist unmöglich.", pre: "Es ", post: ".", ans: "imposible", hint: "imposible – unmöglich" },
+  { id: 516, cat: "Adjektive", de: "Das ist sicher.", pre: "Es ", post: ".", ans: "seguro", hint: "seguro/a – sicher" },
+  { id: 517, cat: "Adjektive", de: "Das ist nötig.", pre: "Es ", post: ".", ans: "necesario", hint: "necesario/a – nötig" },
+  { id: 518, cat: "Adjektive", de: "Das ist klar.", pre: "Está ", post: ".", ans: "claro", hint: "claro/a – klar/hell" },
+  { id: 519, cat: "Adjektive", de: "Ein dunkelblauer Pullover.", pre: "Un jersey azul ", post: ".", ans: "oscuro", hint: "oscuro/a – dunkel" },
+  { id: 520, cat: "Adjektive", de: "Ein langer Weg.", pre: "Un camino ", post: ".", ans: "largo", hint: "largo/a – lang" },
+  { id: 521, cat: "Adjektive", de: "Ein kurzer Rock.", pre: "Una falda ", post: ".", ans: "corta", hint: "corto/a – kurz" },
+  { id: 522, cat: "Adjektive", de: "Ein hoher Berg.", pre: "Una montaña ", post: ".", ans: "alta", hint: "alto/a – hoch/groß" },
+  { id: 523, cat: "Adjektive", de: "Ein niedriger Tisch.", pre: "Una mesa ", post: ".", ans: "baja", hint: "bajo/a – niedrig/klein" },
+  { id: 524, cat: "Adjektive", de: "Eine breite Straße.", pre: "Una calle ", post: ".", ans: "ancha", hint: "ancho/a – breit" },
+  { id: 525, cat: "Adjektive", de: "Eine enge Gasse.", pre: "Una calle ", post: ".", ans: "estrecha", hint: "estrecho/a – eng" },
+  { id: 526, cat: "Adjektive", de: "Ein ruhiger Ort.", pre: "Un lugar ", post: ".", ans: "tranquilo", hint: "tranquilo/a – ruhig" },
+  { id: 527, cat: "Adjektive", de: "Eine laute Straße.", pre: "Una calle ", post: ".", ans: "ruidosa", hint: "ruidoso/a – laut" },
+  { id: 528, cat: "Adjektive", de: "Eine nahe Haltestelle.", pre: "Una parada ", post: ".", ans: "cercana", hint: "cercano/a – nah" },
+  { id: 529, cat: "Adjektive", de: "Ein entfernter Ort.", pre: "Un lugar ", post: ".", ans: "lejano", hint: "lejano/a – weit entfernt" },
+  { id: 530, cat: "Adjektive", de: "Der erste Tag.", pre: "El ", post: " día.", ans: "primer", hint: "primero/a – der/die/das erste" },
+  { id: 531, cat: "Adjektive", de: "Die zweite Woche.", pre: "La ", post: " semana.", ans: "segunda", hint: "segundo/a – der/die/das zweite" },
+  { id: 532, cat: "Adjektive", de: "Der dritte Stock.", pre: "El ", post: " piso.", ans: "tercer", hint: "tercero/a – der/die/das dritte" },
+  { id: 533, cat: "Adjektive", de: "Der letzte Tag.", pre: "El ", post: " día.", ans: "último", hint: "último/a – der/die/das letzte" },
+  { id: 534, cat: "Adjektive", de: "Nächste Woche.", pre: "La ", post: " semana.", ans: "próxima", hint: "próximo/a – nächste/r" },
+  { id: 535, cat: "Adjektive", de: "Gleicher Preis.", pre: "El ", post: " precio.", ans: "mismo", hint: "mismo/a – selbe/gleich" },
+  { id: 536, cat: "Adjektive", de: "Ein anderer Tag.", pre: "Otro ", post: ".", ans: "día", hint: "otro/a – ein anderer" },
+  { id: 537, cat: "Adjektive", de: "Der einzige Weg.", pre: "El ", post: " camino.", ans: "único", hint: "único/a – einzig" },
+  { id: 538, cat: "Adjektive", de: "Eine echte Geschichte.", pre: "Una historia ", post: ".", ans: "real", hint: "real – echt/real" },
+  { id: 539, cat: "Adjektive", de: "Eine falsche Antwort.", pre: "Una respuesta ", post: ".", ans: "falsa", hint: "falso/a – falsch" },
+  { id: 540, cat: "Adjektive", de: "Die richtige Antwort.", pre: "La respuesta ", post: ".", ans: "correcta", hint: "correcto/a – richtig" },
+
+  // ==========================================
+  // 8. ADVERBIEN, BINDEWÖRTER & PRÄPOSITIONEN (541-600)
+  // ==========================================
+  { id: 541, cat: "Grammatik & Partikeln", de: "Sehr gut.", pre: "", post: " bien.", ans: "Muy", hint: "muy – sehr" },
+  { id: 542, cat: "Grammatik & Partikeln", de: "Ich habe viel Arbeit.", pre: "Tengo ", post: " trabajo.", ans: "mucho", hint: "mucho/a – viel" },
+  { id: 543, cat: "Grammatik & Partikeln", de: "Ein wenig Wasser.", pre: "Un ", post: " de agua.", ans: "poco", hint: "poco – wenig/bisschen" },
+  { id: 544, cat: "Grammatik & Partikeln", de: "Das ist zu teuer.", pre: "Es ", post: " caro.", ans: "demasiado", hint: "demasiado – zu viel/allzu" },
+  { id: 545, cat: "Grammatik & Partikeln", de: "Ich auch.", pre: "Yo ", post: ".", ans: "también", hint: "también – auch" },
+  { id: 546, cat: "Grammatik & Partikeln", de: "Ich auch nicht.", pre: "Yo ", post: ".", ans: "tampoco", hint: "tampoco – auch nicht" },
+  { id: 547, cat: "Grammatik & Partikeln", de: "Immer pünktlich.", pre: "", post: " a tiempo.", ans: "Siempre", hint: "siempre – immer" },
+  { id: 548, cat: "Grammatik & Partikeln", de: "Niemals wieder.", pre: "", post: " más.", ans: "Nunca", hint: "nunca – niemals" },
+  { id: 549, cat: "Grammatik & Partikeln", de: "Manchmal fahre ich Bus.", pre: "", post: " voy en autobús.", ans: "A veces", hint: "a veces – manchmal" },
+  { id: 550, cat: "Grammatik & Partikeln", de: "Heute ist ein schöner Tag.", pre: "", post: " es un buen día.", ans: "Hoy", hint: "hoy – heute" },
+  { id: 551, cat: "Grammatik & Partikeln", de: "Morgen reisen wir.", pre: "", post: " viajamos.", ans: "Mañana", hint: "mañana – morgen" },
+  { id: 552, cat: "Grammatik & Partikeln", de: "Gestern war ich dort.", pre: "", post: " estuve allí.", ans: "Ayer", hint: "ayer – gestern" },
+  { id: 553, cat: "Grammatik & Partikeln", de: "Jetzt ist es Zeit.", pre: "", post: " es el momento.", ans: "Ahora", hint: "ahora – jetzt" },
+  { id: 554, cat: "Grammatik & Partikeln", de: "Später sprechen wir.", pre: "Hablamos más ", post: ".", ans: "tarde", hint: "luego / más tarde – später" },
+  { id: 555, cat: "Grammatik & Partikeln", de: "Vor dem Essen.", pre: "", post: " de comer.", ans: "Antes", hint: "antes – vorher/vor" },
+  { id: 556, cat: "Grammatik & Partikeln", de: "Nach der Arbeit.", pre: "", post: " del trabajo.", ans: "Después", hint: "después – nachher/nach" },
+  { id: 557, cat: "Grammatik & Partikeln", de: "Schon bereit.", pre: "", post: " listo.", ans: "Ya", hint: "ya – schon" },
+  { id: 558, cat: "Grammatik & Partikeln", de: "Noch nicht.", pre: "Aún ", post: ".", ans: "no", hint: "todavía / aún – noch" },
+  { id: 559, cat: "Grammatik & Partikeln", de: "Hier ist es schöner.", pre: "", post: " es más bonito.", ans: "Aquí", hint: "aquí – hier" },
+  { id: 560, cat: "Grammatik & Partikeln", de: "Dort drüben.", pre: "Por ", post: ".", ans: "allí", hint: "allí – dort" },
+  { id: 561, cat: "Grammatik & Partikeln", de: "Nahe am Haus.", pre: "", post: " de la casa.", ans: "Cerca", hint: "cerca – nah" },
+  { id: 562, cat: "Grammatik & Partikeln", de: "Weit entfernt.", pre: "", post: " de aquí.", ans: "Lejos", hint: "lejos – weit" },
+  { id: 563, cat: "Grammatik & Partikeln", de: "Oben auf dem Tisch.", pre: "", post: " en la mesa.", ans: "Arriba", hint: "arriba – oben" },
+  { id: 564, cat: "Grammatik & Partikeln", de: "Unten im Haus.", pre: "", post: " en la casa.", ans: "Abajo", hint: "abajo – unten" },
+  { id: 565, cat: "Grammatik & Partikeln", de: "Drinnen im Zimmer.", pre: "", post: " de la habitación.", ans: "Dentro", hint: "dentro – drinnen" },
+  { id: 566, cat: "Grammatik & Partikeln", de: "Draußen auf der Straße.", pre: "", post: " en la calle.", ans: "Fuera", hint: "fuera – draußen" },
+  { id: 567, cat: "Grammatik & Partikeln", de: "Vor dem Haus.", pre: "", post: " de la casa.", ans: "Delante", hint: "delante – vor" },
+  { id: 568, cat: "Grammatik & Partikeln", de: "Hinter der Tür.", pre: "", post: " de la puerta.", ans: "Detrás", hint: "detrás – hinter" },
+  { id: 569, cat: "Grammatik & Partikeln", de: "Links abbiegen.", pre: "A la ", post: ".", ans: "izquierda", hint: "izquierda – links" },
+  { id: 570, cat: "Grammatik & Partikeln", de: "Rechts abbiegen.", pre: "A la ", post: ".", ans: "derecha", hint: "derecha – rechts" },
+  { id: 571, cat: "Grammatik & Partikeln", de: "Direkt geradeaus.", pre: "Todo ", post: ".", ans: "recto", hint: "recto – geradeaus" },
+  { id: 572, cat: "Grammatik & Partikeln", de: "Kaffee und Tee.", pre: "Café ", post: " té.", ans: "y", hint: "y – und" },
+  { id: 573, cat: "Grammatik & Partikeln", de: "Kaffee oder Tee?", pre: "¿Café ", post: " té?", ans: "o", hint: "o – oder" },
+  { id: 574, cat: "Grammatik & Partikeln", de: "Gut, aber teuer.", pre: "Bueno, ", post: " caro.", ans: "pero", hint: "pero – aber" },
+  { id: 575, cat: "Grammatik & Partikeln", de: "Ich esse, weil ich Hunger habe.", pre: "Como ", post: " tengo hambre.", ans: "porque", hint: "porque – weil" },
+  { id: 576, cat: "Grammatik & Partikeln", de: "Wenn du willst.", pre: "", post: " quieres.", ans: "Si", hint: "si – wenn/falls" },
+  { id: 577, cat: "Grammatik & Partikeln", de: "Ich weiß, dass du kommst.", pre: "Sé ", post: " vienes.", ans: "que", hint: "que – dass" },
+  { id: 578, cat: "Grammatik & Partikeln", de: "Wie geht es dir?", pre: "¿", post: " estás?", ans: "Cómo", hint: "cómo – wie" },
+  { id: 579, cat: "Grammatik & Partikeln", de: "Was ist das?", pre: "¿", post: " es esto?", ans: "Qué", hint: "qué – was" },
+  { id: 580, cat: "Grammatik & Partikeln", de: "Wer ist das?", pre: "¿", post: " es?", ans: "Quién", hint: "quién – wer" },
+  { id: 581, cat: "Grammatik & Partikeln", de: "Wo ist das Restaurant?", pre: "¿", post: " está el restaurante?", ans: "Dónde", hint: "dónde – wo" },
+  { id: 582, cat: "Grammatik & Partikeln", de: "Wohin gehst du?", pre: "¿A ", post: " vas?", ans: "dónde", hint: "a dónde – wohin" },
+  { id: 583, cat: "Grammatik & Partikeln", de: "Wann kommen wir an?", pre: "¿", post: " llegamos?", ans: "Cuándo", hint: "cuándo – wann" },
+  { id: 584, cat: "Grammatik & Partikeln", de: "Warum lernst du Spanisch?", pre: "¿", post: " estudias español?", ans: "Por qué", hint: "por qué – warum" },
+  { id: 585, cat: "Grammatik & Partikeln", de: "Wie viel kostet das?", pre: "¿", post: " cuesta?", ans: "Cuánto", hint: "cuánto – wie viel" },
+  { id: 586, cat: "Grammatik & Partikeln", de: "Welches Auto gefällt dir?", pre: "¿", post: " coche te gusta?", ans: "Qué", hint: "cuál / qué – welche/r/s" },
+  { id: 587, cat: "Grammatik & Partikeln", de: "Ich fahre nach Madrid.", pre: "Voy ", post: " Madrid.", ans: "a", hint: "a – nach/zu/an" },
+  { id: 588, cat: "Grammatik & Partikeln", de: "Ein Buch von Maria.", pre: "Un libro ", post: " María.", ans: "de", hint: "de – von/aus" },
+  { id: 589, cat: "Grammatik & Partikeln", de: "Ich bin in der Küche.", pre: "Estoy ", post: " la cocina.", ans: "en", hint: "en – in/auf/an" },
+  { id: 590, cat: "Grammatik & Partikeln", de: "Ein Geschenk für dich.", pre: "Un regalo ", post: " ti.", ans: "para", hint: "para – für/um zu" },
+  { id: 591, cat: "Grammatik & Partikeln", de: "Vielen Dank für alles.", pre: "Gracias ", post: " todo.", ans: "por", hint: "por – für/wegen/durch" },
+  { id: 592, cat: "Grammatik & Partikeln", de: "Kaffee mit Milch.", pre: "Café ", post: " leche.", ans: "con", hint: "con – mit" },
+  { id: 593, cat: "Grammatik & Partikeln", de: "Kaffee ohne Zucker.", pre: "Café ", post: " azúcar.", ans: "sin", hint: "sin – ohne" },
+  { id: 594, cat: "Grammatik & Partikeln", de: "Auf dem Tisch.", pre: "", post: " la mesa.", ans: "Sobre", hint: "sobre – über/auf" },
+  { id: 595, cat: "Grammatik & Partikeln", de: "Unter dem Stuhl.", pre: "", post: " la silla.", ans: "Debajo de", hint: "debajo de – unter" },
+  { id: 596, cat: "Grammatik & Partikeln", de: "Zwischen zwei Häusern.", pre: "", post: " dos casas.", ans: "Entre", hint: "entre – zwischen" },
+  { id: 597, cat: "Grammatik & Partikeln", de: "Gegenüber dem Park.", pre: "", post: " del parque.", ans: "Enfrente", hint: "enfrente de – gegenüber" },
+  { id: 598, cat: "Grammatik & Partikeln", de: "Neben der Bank.", pre: "Al ", post: " del banco.", ans: "lado", hint: "al lado de – neben" },
+  { id: 599, cat: "Grammatik & Partikeln", de: "Bis morgen!", pre: "¡", post: " mañana!", ans: "Hasta", hint: "hasta – bis" },
+  { id: 600, cat: "Grammatik & Partikeln", de: "Seit zwei Tagen.", pre: "", post: " hace dos días.", ans: "Desde", hint: "desde – seit/von" },
+
+  // ==========================================
+  // 9. ZAHLEN & MENGEN (601-650)
+  // ==========================================
+  { id: 601, cat: "Zahlen & Mengen", de: "Null Grad.", pre: "Grado ", post: ".", ans: "cero", hint: "cero – null" },
+  { id: 602, cat: "Zahlen & Mengen", de: "Ein Euro.", pre: "", post: " euro.", ans: "un", hint: "uno/un/una – eins / ein" },
+  { id: 603, cat: "Zahlen & Mengen", de: "Zwei Personen.", pre: "", post: " personas.", ans: "dos", hint: "dos – zwei" },
+  { id: 604, cat: "Zahlen & Mengen", de: "Drei Tage.", pre: "", post: " días.", ans: "tres", hint: "tres – drei" },
+  { id: 605, cat: "Zahlen & Mengen", de: "Vier Stunden.", pre: "", post: " horas.", ans: "cuatro", hint: "cuatro – vier" },
+  { id: 606, cat: "Zahlen & Mengen", de: "Fünf Minuten.", pre: "", post: " minutos.", ans: "cinco", hint: "cinco – fünf" },
+  { id: 607, cat: "Zahlen & Mengen", de: "Sechs Monate.", pre: "", post: " meses.", ans: "seis", hint: "seis – sechs" },
+  { id: 608, cat: "Zahlen & Mengen", de: "Sieben Wochen.", pre: "", post: " semanas.", ans: "siete", hint: "siete – sieben" },
+  { id: 609, cat: "Zahlen & Mengen", de: "Acht Euro.", pre: "", post: " euros.", ans: "ocho", hint: "ocho – acht" },
+  { id: 610, cat: "Zahlen & Mengen", de: "Neun Jahre.", pre: "", post: " años.", ans: "nueve", hint: "nueve – neun" },
+  { id: 611, cat: "Zahlen & Mengen", de: "Zehn Prozent.", pre: "", post: " por ciento.", ans: "diez", hint: "diez – zehn" },
+  { id: 612, cat: "Zahlen & Mengen", de: "Elf Wörter.", pre: "", post: " palabras.", ans: "once", hint: "once – elf" },
+  { id: 613, cat: "Zahlen & Mengen", de: "Zwölf Monate.", pre: "", post: " meses.", ans: "doce", hint: "doce – zwölf" },
+  { id: 614, cat: "Zahlen & Mengen", de: "Dreizehn Stühle.", pre: "", post: " sillas.", ans: "trece", hint: "trece – dreizehn" },
+  { id: 615, cat: "Zahlen & Mengen", de: "Vierzehn Tische.", pre: "", post: " mesas.", ans: "catorce", hint: "catorce – vierzehn" },
+  { id: 616, cat: "Zahlen & Mengen", de: "Fünfzehn Tage.", pre: "", post: " días.", ans: "quince", hint: "quince – fünfzehn" },
+  { id: 617, cat: "Zahlen & Mengen", de: "Sechzehn Jahre.", pre: "", post: " años.", ans: "dieciséis", hint: "dieciséis – sechzehn" },
+  { id: 618, cat: "Zahlen & Mengen", de: "Siebzehn Euro.", pre: "", post: " euros.", ans: "diecisiete", hint: "diecisiete – siebzehn" },
+  { id: 619, cat: "Zahlen & Mengen", de: "Achtzehn Grad.", pre: "", post: " grados.", ans: "dieciocho", hint: "dieciocho – achtzehn" },
+  { id: 620, cat: "Zahlen & Mengen", de: "Neunzehn Personen.", pre: "", post: " personas.", ans: "diecinueve", hint: "diecinueve – neunzehn" },
+  { id: 621, cat: "Zahlen & Mengen", de: "Zwanzig Minuten.", pre: "", post: " minutos.", ans: "veinte", hint: "veinte – zwanzig" },
+  { id: 622, cat: "Zahlen & Mengen", de: "Einundzwanzig Tage.", pre: "", post: " días.", ans: "veintiún", hint: "veintiuno – einundzwanzig" },
+  { id: 623, cat: "Zahlen & Mengen", de: "Dreißig Euro.", pre: "", post: " euros.", ans: "treinta", hint: "treinta – dreißig" },
+  { id: 624, cat: "Zahlen & Mengen", de: "Vierzig Minuten.", pre: "", post: " minutos.", ans: "cuarenta", hint: "cuarenta – vierzig" },
+  { id: 625, cat: "Zahlen & Mengen", de: "Fünfzig Kilo.", pre: "", post: " kilos.", ans: "cincuenta", hint: "cincuenta – fünfzig" },
+  { id: 626, cat: "Zahlen & Mengen", de: "Sechzig Kilometer.", pre: "", post: " kilómetros.", ans: "sesenta", hint: "sesenta – sechzig" },
+  { id: 627, cat: "Zahlen & Mengen", de: "Siebzig Prozent.", pre: "", post: " por ciento.", ans: "setenta", hint: "setenta – siebzig" },
+  { id: 628, cat: "Zahlen & Mengen", de: "Achtzig Seiten.", pre: "", post: " páginas.", ans: "ochenta", hint: "ochenta – achtzig" },
+  { id: 629, cat: "Zahlen & Mengen", de: "Neunzig Euro.", pre: "", post: " euros.", ans: "noventa", hint: "noventa – neunzig" },
+  { id: 630, cat: "Zahlen & Mengen", de: "Hundert Euro.", pre: "", post: " euros.", ans: "cien", hint: "cien / ciento – hundert" },
+  { id: 631, cat: "Zahlen & Mengen", de: "Zweihundert Gramm.", pre: "", post: " gramos.", ans: "doscientos", hint: "doscientos/as – zweihundert" },
+  { id: 632, cat: "Zahlen & Mengen", de: "Fünfhundert Meter.", pre: "", post: " metros.", ans: "quinientos", hint: "quinientos/as – fünfhundert" },
+  { id: 633, cat: "Zahlen & Mengen", de: "Tausend Dank.", pre: "", post: " gracias.", ans: "mil", hint: "mil – tausend" },
+  { id: 634, cat: "Zahlen & Mengen", de: "Eine Million Euro.", pre: "Un ", post: " de euros.", ans: "millón", hint: "el millón – die Million" },
+  { id: 635, cat: "Zahlen & Mengen", de: "Ein Paar Schuhe.", pre: "Un ", post: " de zapatos.", ans: "par", hint: "el par – das Paar" },
+  { id: 636, cat: "Zahlen & Mengen", de: "Ein Dutzend Eier.", pre: "Una ", post: " de huevos.", ans: "docena", hint: "la docena – das Dutzend" },
+  { id: 637, cat: "Zahlen & Mengen", de: "Ein Kilo Äpfel.", pre: "Un ", post: " de manzanas.", ans: "kilo", hint: "el kilo – das Kilo" },
+  { id: 638, cat: "Zahlen & Mengen", de: "Ein Liter Milch.", pre: "Un ", post: " de leche.", ans: "litro", hint: "el litro – der Liter" },
+  { id: 639, cat: "Zahlen & Mengen", de: "Ein Meter Stoff.", pre: "Un ", post: " de tela.", ans: "metro", hint: "el metro – der Meter" },
+  { id: 640, cat: "Zahlen & Mengen", de: "Ein Stück Kuchen.", pre: "Un ", post: " de pastel.", ans: "trozo", hint: "el trozo / la pieza – das Stück" },
+  { id: 641, cat: "Zahlen & Mengen", de: "Ein Teil des Buchs.", pre: "Una ", post: " del libro.", ans: "parte", hint: "la parte – der Teil" },
+  { id: 642, cat: "Zahlen & Mengen", de: "Die Hälfte der Zeit.", pre: "La ", post: " del tiempo.", ans: "mitad", hint: "la mitad – die Hälfte" },
+  { id: 643, cat: "Zahlen & Mengen", de: "Ein viertel Liter.", pre: "Un ", post: " de litro.", ans: "cuarto", hint: "el cuarto – das Viertel" },
+  { id: 644, cat: "Zahlen & Mengen", de: "Alles ist gut.", pre: "", post: " está bien.", ans: "Todo", hint: "todo/a – alles/ganz" },
+  { id: 645, cat: "Zahlen & Mengen", de: "Nichts zu danken.", pre: "De ", post: ".", ans: "nada", hint: "nada – nichts" },
+  { id: 646, cat: "Zahlen & Mengen", de: "Etwas Wasser, bitte.", pre: "Un ", post: " de agua.", ans: "poco", hint: "algo / un poco – etwas" },
+  { id: 647, cat: "Zahlen & Mengen", de: "Einige Tage.", pre: "", post: " días.", ans: "Algunos", hint: "alguno/a – einige/manche" },
+  { id: 648, cat: "Zahlen & Mengen", de: "Kein Problem.", pre: "", post: " problema.", ans: "Ningún", hint: "ninguno/a – kein/e" },
+  { id: 649, cat: "Zahlen & Mengen", de: "Mehr Zeit.", pre: "", post: " tiempo.", ans: "Más", hint: "más – mehr" },
+  { id: 650, cat: "Zahlen & Mengen", de: "Weniger Geld.", pre: "", post: " dinero.", ans: "Menos", hint: "menos – weniger" },
+
+  // ==========================================
+  // 10. WOCHENTAGE, MONATE & KALENDER (651-680)
+  // ==========================================
+  { id: 651, cat: "Zeit & Kalender", de: "Montag ist der erste Tag.", pre: "El ", post: " es el primer día.", ans: "lunes", hint: "el lunes – der Montag" },
+  { id: 652, cat: "Zeit & Kalender", de: "Dienstag habe ich Zeit.", pre: "El ", post: " tengo tiempo.", ans: "martes", hint: "el martes – der Dienstag" },
+  { id: 653, cat: "Zeit & Kalender", de: "Mittwoch lerne ich.", pre: "El ", post: " estudio.", ans: "miércoles", hint: "el miércoles – der Mittwoch" },
+  { id: 654, cat: "Zeit & Kalender", de: "Donnerstag arbeite ich.", pre: "El ", post: " trabajo.", ans: "jueves", hint: "el jueves – der Donnerstag" },
+  { id: 655, cat: "Zeit & Kalender", de: "Freitag ist mein Lieblingstag.", pre: "El ", post: " es mi día favorito.", ans: "viernes", hint: "el viernes – der Freitag" },
+  { id: 656, cat: "Zeit & Kalender", de: "Samstag kaufe ich ein.", pre: "El ", post: " hago compras.", ans: "sábado", hint: "el sábado – der Samstag" },
+  { id: 657, cat: "Zeit & Kalender", de: "Sonntag ruhe ich mich aus.", pre: "El ", post: " descanso.", ans: "domingo", hint: "el domingo – der Sonntag" },
+  { id: 658, cat: "Zeit & Kalender", de: "Das Wochenende ist da.", pre: "El ", post: " de semana llegó.", ans: "fin", hint: "el fin de semana – das Wochenende" },
+  { id: 659, cat: "Zeit & Kalender", de: "Kalter Januar.", pre: "En ", post: " hace frío.", ans: "enero", hint: "enero – Januar" },
+  { id: 660, cat: "Zeit & Kalender", de: "Kurzer Februar.", pre: "En ", post: " hay pocos días.", ans: "febrero", hint: "febrero – Februar" },
+  { id: 661, cat: "Zeit & Kalender", de: "März bringt Frühling.", pre: "En ", post: " llega la primavera.", ans: "marzo", hint: "marzo – März" },
+  { id: 662, cat: "Zeit & Kalender", de: "Ostern im April.", pre: "En ", post: " es Pascua.", ans: "abril", hint: "abril – April" },
+  { id: 663, cat: "Zeit & Kalender", de: "Warmer Mai.", pre: "En ", post: " hace buen tiempo.", ans: "mayo", hint: "mayo – Mai" },
+  { id: 664, cat: "Zeit & Kalender", de: "Juni bringt Sommer.", pre: "En ", post: " empieza el verano.", ans: "junio", hint: "junio – Juni" },
+  { id: 665, cat: "Zeit & Kalender", de: "Urlaub im Juli.", pre: "En ", post: " tengo vacaciones.", ans: "julio", hint: "julio – Juli" },
+  { id: 666, cat: "Zeit & Kalender", de: "Heißer August.", pre: "En ", post: " hace mucho calor.", ans: "agosto", hint: "agosto – August" },
+  { id: 667, cat: "Zeit & Kalender", de: "Schulbeginn im September.", pre: "En ", post: " empieza el colegio.", ans: "septiembre", hint: "septiembre – September" },
+  { id: 668, cat: "Zeit & Kalender", de: "Bunter Oktober.", pre: "En ", post: " cae la hoja.", ans: "octubre", hint: "octubre – Oktober" },
+  { id: 669, cat: "Zeit & Kalender", de: "Regnerischer November.", pre: "En ", post: " llueve mucho.", ans: "noviembre", hint: "noviembre – November" },
+  { id: 670, cat: "Zeit & Kalender", de: "Weihnachten im Dezember.", pre: "En ", post: " es Navidad.", ans: "diciembre", hint: "diciembre – Dezember" },
+  { id: 671, cat: "Zeit & Kalender", de: "Schöner Frühling.", pre: "La ", post: " es bonita.", ans: "primavera", hint: "la primavera – der Frühling" },
+  { id: 672, cat: "Zeit & Kalender", de: "Heißer Sommer.", pre: "El ", post: " es caluroso.", ans: "verano", hint: "el verano – der Sommer" },
+  { id: 673, cat: "Zeit & Kalender", de: "Ruhiger Herbst.", pre: "El ", post: " es tranquilo.", ans: "otoño", hint: "el otoño – der Herbst" },
+  { id: 674, cat: "Zeit & Kalender", de: "Kalter Winter.", pre: "El ", post: " es frío.", ans: "invierno", hint: "el invierno – der Winter" },
+  { id: 675, cat: "Zeit & Kalender", de: "Der heutige Tag.", pre: "La ", post: " de hoy.", ans: "fecha", hint: "la fecha – das Datum" },
+  { id: 676, cat: "Zeit & Kalender", de: "Vergangene Zeit.", pre: "El ", post: " pasado.", ans: "tiempo", hint: "el tiempo – die Zeit" },
+  { id: 677, cat: "Zeit & Kalender", de: "Eine halbe Stunde.", pre: "Media ", post: ".", ans: "hora", hint: "la hora – die Stunde" },
+  { id: 678, cat: "Zeit & Kalender", de: "Der Wecker klingelt.", pre: "El ", post: " suena.", ans: "despertador", hint: "el despertador – der Wecker" },
+  { id: 679, cat: "Zeit & Kalender", de: "In der Vergangenheit.", pre: "En el ", post: ".", ans: "pasado", hint: "el pasado – die Vergangenheit" },
+  { id: 680, cat: "Zeit & Kalender", de: "In der Zukunft.", pre: "En el ", post: ".", ans: "futuro", hint: "el futuro – die Zukunft" },
+
+  // ==========================================
+  // 11. FAMILIE, MENSCH & KÖRPER (681-730)
+  // ==========================================
+  { id: 681, cat: "Familie & Körper", de: "Meine Familie ist groß.", pre: "Mi ", post: " es grande.", ans: "familia", hint: "la familia – die Familie" },
+  { id: 682, cat: "Familie & Körper", de: "Mein Vater arbeitet viel.", pre: "Mi ", post: " trabaja mucho.", ans: "padre", hint: "el padre – der Vater" },
+  { id: 683, cat: "Familie & Körper", de: "Meine Mutter kocht gut.", pre: "Mi ", post: " cocina bien.", ans: "madre", hint: "la madre – die Mutter" },
+  { id: 684, cat: "Familie & Körper", de: "Meine Eltern sind nett.", pre: "Mis ", post: " son amables.", ans: "padres", hint: "los padres – die Eltern" },
+  { id: 685, cat: "Familie & Körper", de: "Mein Sohn lernt gut.", pre: "Mi ", post: " estudia bien.", ans: "hijo", hint: "el hijo – der Sohn" },
+  { id: 686, cat: "Familie & Körper", de: "Meine Tochter ist klein.", pre: "Mi ", post: " es pequeña.", ans: "hija", hint: "la hija – die Tochter" },
+  { id: 687, cat: "Familie & Körper", de: "Mein Bruder wohnt hier.", pre: "Mi ", post: " vive aquí.", ans: "hermano", hint: "el hermano – der Bruder" },
+  { id: 688, cat: "Familie & Körper", de: "Meine Schwester ist älter.", pre: "Mi ", post: " es mayor.", ans: "hermana", hint: "la hermana – die Schwester" },
+  { id: 689, cat: "Familie & Körper", de: "Mein Großvater erzählt Geschichten.", pre: "Mi ", post: " cuenta historias.", ans: "abuelo", hint: "el abuelo – der Großvater" },
+  { id: 690, cat: "Familie & Körper", de: "Meine Großmutter kocht lecker.", pre: "Mi ", post: " cocina rico.", ans: "abuela", hint: "la abuela – die Großmutter" },
+  { id: 691, cat: "Familie & Körper", de: "Mein Onkel besucht uns.", pre: "Mi ", post: " nos visita.", ans: "tío", hint: "el tío – der Onkel" },
+  { id: 692, cat: "Familie & Körper", de: "Meine Tante ist nett.", pre: "Mi ", post: " es simpática.", ans: "tía", hint: "la tía – die Tante" },
+  { id: 693, cat: "Familie & Körper", de: "Mein Cousin spielt gern.", pre: "Mi ", post: " juega mucho.", ans: "primo", hint: "el primo – der Cousin" },
+  { id: 694, cat: "Familie & Körper", de: "Mein Neffe ist jung.", pre: "Mi ", post: " es joven.", ans: "sobrino", hint: "el sobrino – der Neffe" },
+  { id: 695, cat: "Familie & Körper", de: "Mein Ehemann ist nett.", pre: "Mi ", post: " es muy bueno.", ans: "marido", hint: "el marido / esposo – der Ehemann" },
+  { id: 696, cat: "Familie & Körper", de: "Meine Ehefrau reist gern.", pre: "Mi ", post: " viaja mucho.", ans: "mujer", hint: "la mujer / esposa – die Ehefrau" },
+  { id: 697, cat: "Familie & Körper", de: "Mein Partner ist hier.", pre: "Mi ", post: " está aquí.", ans: "pareja", hint: "la pareja – der Partner / die Partnerin" },
+  { id: 698, cat: "Familie & Körper", de: "Ein guter Freund.", pre: "Un buen ", post: ".", ans: "amigo", hint: "el amigo – der Freund" },
+  { id: 699, cat: "Familie & Körper", de: "Ein netter Nachbar.", pre: "Un buen ", post: ".", ans: "vecino", hint: "el vecino – der Nachbar" },
+  { id: 700, cat: "Familie & Körper", de: "Ein kleiner Junge.", pre: "Un ", post: " pequeño.", ans: "niño", hint: "el niño – der Junge/das Kind" },
+  { id: 701, cat: "Familie & Körper", de: "Eine junge Frau.", pre: "Una ", post: " joven.", ans: "chica", hint: "la chica / muchacha – das Mädchen" },
+  { id: 702, cat: "Familie & Körper", de: "Ein alter Mann.", pre: "Un ", post: " mayor.", ans: "hombre", hint: "el hombre – der Mann" },
+  { id: 703, cat: "Familie & Körper", de: "Eine nette Frau.", pre: "Una ", post: " amable.", ans: "mujer", hint: "la mujer – die Frau" },
+  { id: 704, cat: "Familie & Körper", de: "Der menschliche Körper.", pre: "El ", post: " humano.", ans: "cuerpo", hint: "el cuerpo – der Körper" },
+  { id: 705, cat: "Familie & Körper", de: "Mein Kopf tut weh.", pre: "Me duele la ", post: ".", ans: "cabeza", hint: "la cabeza – der Kopf" },
+  { id: 706, cat: "Familie & Körper", de: "Schwarze Haare.", pre: "Pelo ", post: ".", ans: "negro", hint: "el pelo / cabello – das Haar" },
+  { id: 707, cat: "Familie & Körper", de: "Ein schönes Gesicht.", pre: "Una ", post: " bonita.", ans: "cara", hint: "la cara – das Gesicht" },
+  { id: 708, cat: "Familie & Körper", de: "Blaue Augen.", pre: "Ojos ", post: ".", ans: "azules", hint: "el ojo – das Auge" },
+  { id: 709, cat: "Familie & Körper", de: "Eine kleine Nase.", pre: "Una ", post: " pequeña.", ans: "nariz", hint: "la nariz – die Nase" },
+  { id: 710, cat: "Familie & Körper", de: "Ein Lächeln auf dem Mund.", pre: "En la ", post: ".", ans: "boca", hint: "la boca – der Mund" },
+  { id: 711, cat: "Familie & Körper", de: "Weiße Zähne.", pre: "Dientes ", post: ".", ans: "blancos", hint: "el diente – der Zahn" },
+  { id: 712, cat: "Familie & Körper", de: "Gutes Gehör im Ohr.", pre: "En la ", post: ".", ans: "oreja", hint: "la oreja / el oído – das Ohr" },
+  { id: 713, cat: "Familie & Körper", de: "Ein langer Hals.", pre: "Un ", post: " largo.", ans: "cuello", hint: "el cuello – der Hals" },
+  { id: 714, cat: "Familie & Körper", de: "Starke Schulter.", pre: "Un ", post: " fuerte.", ans: "hombro", hint: "el hombro – die Schulter" },
+  { id: 715, cat: "Familie & Körper", de: "Rechter Arm.", pre: "El ", post: " derecho.", ans: "brazo", hint: "el brazo – der Arm" },
+  { id: 716, cat: "Familie & Körper", de: "Saubere Hände.", pre: "Las ", post: " limpias.", ans: "manos", hint: "la mano – die Hand" },
+  { id: 717, cat: "Familie & Körper", de: "Fünf Finger.", pre: "Cinco ", post: " en la mano.", ans: "dedos", hint: "el dedo – der Finger" },
+  { id: 718, cat: "Familie & Körper", de: "Gerader Rücken.", pre: "La ", post: " recta.", ans: "espalda", hint: "la espalda – der Rücken" },
+  { id: 719, cat: "Familie & Körper", de: "Mir tut der Bauch weh.", pre: "Me duele la ", post: ".", ans: "barriga", hint: "el estómago / la barriga – der Bauch" },
+  { id: 720, cat: "Familie & Körper", de: "Lange Beine.", pre: "Piernas ", post: ".", ans: "largas", hint: "la pierna – das Bein" },
+  { id: 721, cat: "Familie & Körper", de: "Rechter Fuß.", pre: "El ", post: " derecho.", ans: "pie", hint: "el pie – der Fuß" },
+  { id: 722, cat: "Familie & Körper", de: "Gesunde Haut.", pre: "La ", post: " sana.", ans: "piel", hint: "la piel – die Haut" },
+  { id: 723, cat: "Familie & Körper", de: "Das Herz schlägt.", pre: "El ", post: " late.", ans: "corazón", hint: "el corazón – das Herz" },
+  { id: 724, cat: "Familie & Körper", de: "Rotes Blut.", pre: "Sangre ", post: ".", ans: "roja", hint: "la sangre – das Blut" },
+  { id: 725, cat: "Familie & Körper", de: "Gute Gesundheit.", pre: "Buena ", post: ".", ans: "salud", hint: "la salud – die Gesundheit" },
+  { id: 726, cat: "Familie & Körper", de: "Ich habe Schmerzen.", pre: "Tengo ", post: ".", ans: "dolor", hint: "el dolor – der Schmerz" },
+  { id: 727, cat: "Familie & Körper", de: "Eine starke Erkältung.", pre: "Un ", post: " fuerte.", ans: "resfriado", hint: "el resfriado – die Erkältung" },
+  { id: 728, cat: "Familie & Körper", de: "Hohes Fieber.", pre: "Fiebre ", post: ".", ans: "alta", hint: "la fiebre – das Fieber" },
+  { id: 729, cat: "Familie & Körper", de: "Eine schwere Krankheit.", pre: "Una ", post: " grave.", ans: "enfermedad", hint: "la enfermedad – die Krankheit" },
+  { id: 730, cat: "Familie & Körper", de: "Ein wirksames Medikament.", pre: "Una ", post: " eficaz.", ans: "medicina", hint: "la medicina / el medicamento – das Medikament" },
+
+  // ==========================================
+  // 12. FREIZEIT, HOBBYS, MEDIEN & TECH (731-770)
+  // ==========================================
+  { id: 731, cat: "Freizeit & Tech", de: "Freizeit haben.", pre: "Tiempo ", post: ".", ans: "libre", hint: "el tiempo libre – die Freizeit" },
+  { id: 732, cat: "Freizeit & Tech", de: "Sport treiben.", pre: "Hacer ", post: ".", ans: "deporte", hint: "el deporte – der Sport" },
+  { id: 733, cat: "Freizeit & Tech", de: "Fußball spielen.", pre: "Jugar al ", post: ".", ans: "fútbol", hint: "el fútbol – der Fußball" },
+  { id: 734, cat: "Freizeit & Tech", de: "Tennis spielen.", pre: "Jugar al ", post: ".", ans: "tenis", hint: "el tenis – das Tennis" },
+  { id: 735, cat: "Freizeit & Tech", de: "Im Pool schwimmen.", pre: "Nadar en la ", post: ".", ans: "piscina", hint: "la piscina – das Schwimmbad/Pool" },
+  { id: 736, cat: "Freizeit & Tech", de: "Musik hören.", pre: "Escuchar ", post: ".", ans: "música", hint: "la música – die Musik" },
+  { id: 737, cat: "Freizeit & Tech", de: "Ein schönes Lied.", pre: "Una ", post: " bonita.", ans: "canción", hint: "la canción – das Lied" },
+  { id: 738, cat: "Freizeit & Tech", de: "Ein spannender Film.", pre: "Una ", post: " interesante.", ans: "película", hint: "la película – der Film" },
+  { id: 739, cat: "Freizeit & Tech", de: "Eine gute Serie.", pre: "Una buena ", post: ".", ans: "serie", hint: "la serie – die Serie" },
+  { id: 740, cat: "Freizeit & Tech", de: "Die Zeitung lesen.", pre: "Leer el ", post: ".", ans: "periódico", hint: "el periódico – die Zeitung" },
+  { id: 741, cat: "Freizeit & Tech", de: "Radio hören.", pre: "Escuchar la ", post: ".", ans: "radio", hint: "la radio – das Radio" },
+  { id: 742, cat: "Freizeit & Tech", de: "Ein Foto machen.", pre: "Hacer una ", post: ".", ans: "foto", hint: "la foto – das Foto" },
+  { id: 743, cat: "Freizeit & Tech", de: "Eine neue Kamera.", pre: "Una ", post: " nueva.", ans: "cámara", hint: "la cámara – die Kamera" },
+  { id: 744, cat: "Freizeit & Tech", de: "Das Handy lädt.", pre: "El ", post: " se carga.", ans: "móvil", hint: "el móvil / el teléfono – das Handy" },
+  { id: 745, cat: "Freizeit & Tech", de: "Ein schneller Computer.", pre: "Un ", post: " rápido.", ans: "ordenador", hint: "el ordenador / la computadora – der Computer" },
+  { id: 746, cat: "Freizeit & Tech", de: "Internetzugang.", pre: "Conexión a ", post: ".", ans: "internet", hint: "el internet – das Internet" },
+  { id: 747, cat: "Freizeit & Tech", de: "Eine E-Mail senden.", pre: "Mandar un ", post: ".", ans: "correo", hint: "el correo electrónico – die E-Mail" },
+  { id: 748, cat: "Freizeit & Tech", de: "Passwort eingeben.", pre: "La ", post: " secreta.", ans: "contraseña", hint: "la contraseña – das Passwort" },
+  { id: 749, cat: "Freizeit & Tech", de: "Eine Webseite öffnen.", pre: "Una ", post: " web.", ans: "página", hint: "la página web – die Webseite" },
+  { id: 750, cat: "Freizeit & Tech", de: "Soziale Netzwerke.", pre: "Las ", post: " sociales.", ans: "redes", hint: "las redes sociales – soziale Medien" },
+  { id: 751, cat: "Freizeit & Tech", de: "Gute Musik auf dem Konzert.", pre: "Un ", post: " de música.", ans: "concierto", hint: "el concierto – das Konzert" },
+  { id: 752, cat: "Freizeit & Tech", de: "Ein tolles Fest.", pre: "Una ", post: " divertida.", ans: "fiesta", hint: "la fiesta – das Fest/Party" },
+  { id: 753, cat: "Freizeit & Tech", de: "Ein schönes Geschenk.", pre: "Un ", post: " bonito.", ans: "regalo", hint: "el regalo – das Geschenk" },
+  { id: 754, cat: "Freizeit & Tech", de: "Viel Spaß!", pre: "¡Mucha ", post: "!", ans: "diversión", hint: "la diversión – der Spaß" },
+  { id: 755, cat: "Freizeit & Tech", de: "Ein unterhaltsames Spiel.", pre: "Un ", post: " divertido.", ans: "juego", hint: "el juego – das Spiel" },
+  { id: 756, cat: "Freizeit & Tech", de: "Ein spazierender Hund.", pre: "Un ", post: " en el parque.", ans: "perro", hint: "el perro – der Hund" },
+  { id: 757, cat: "Freizeit & Tech", de: "Eine schlafende Katze.", pre: "Un ", post: " tranquilo.", ans: "gato", hint: "el gato – die Katze" },
+  { id: 758, cat: "Freizeit & Tech", de: "Ein singender Vogel.", pre: "Un ", post: " bonito.", ans: "pájaro", hint: "el pájaro – der Vogel" },
+  { id: 759, cat: "Freizeit & Tech", de: "Ein schwimmender Fisch.", pre: "Un ", post: " en el agua.", ans: "pez", hint: "el pez – der Fisch (lebend)" },
+  { id: 760, cat: "Freizeit & Tech", de: "Ein schönes Tier.", pre: "Un ", post: " bonito.", ans: "animal", hint: "el animal – das Tier" },
+  { id: 761, cat: "Freizeit & Tech", de: "Grüne Natur.", pre: "La ", post: " verde.", ans: "naturaleza", hint: "la naturaleza – die Natur" },
+  { id: 762, cat: "Freizeit & Tech", de: "Ein hoher Baum.", pre: "Un ", post: " alto.", ans: "árbol", hint: "el árbol – der Baum" },
+  { id: 763, cat: "Freizeit & Tech", de: "Eine rote Blume.", pre: "Una ", post: " roja.", ans: "flor", hint: "la flor – die Blume" },
+  { id: 764, cat: "Freizeit & Tech", de: "Ein langer Fluss.", pre: "Un ", post: " largo.", ans: "río", hint: "el río – der Fluss" },
+  { id: 765, cat: "Freizeit & Tech", de: "Ein ruhiger See.", pre: "Un ", post: " tranquilo.", ans: "lago", hint: "el lago – der See" },
+  { id: 766, cat: "Freizeit & Tech", de: "Ein blauer Himmel.", pre: "Un ", post: " azul.", ans: "cielo", hint: "el cielo – der Himmel" },
+  { id: 767, cat: "Freizeit & Tech", de: "Eine weiße Wolke.", pre: "Una ", post: " blanca.", ans: "nube", hint: "la nube – die Wolke" },
+  { id: 768, cat: "Freizeit & Tech", de: "Starker Regen.", pre: "Mucha ", post: ".", ans: "lluvia", hint: "la lluvia – der Regen" },
+  { id: 769, cat: "Freizeit & Tech", de: "Weißer Schnee.", pre: "Mucha ", post: " blanca.", ans: "nieve", hint: "la nieve – der Schnee" },
+  { id: 770, cat: "Freizeit & Tech", de: "Starker Wind.", pre: "Mucho ", post: ".", ans: "viento", hint: "el viento – der Wind" },
+
+  // ==========================================
+  // 13. PHRASEN, FRAGEN & AUSDRÜCKE (771-1000)
+  // ==========================================
+  { id: 771, cat: "Phrasen & Ausdrücke", de: "Hallo!", pre: "¡", post: "!", ans: "Hola", hint: "¡Hola! – Hallo!" },
+  { id: 772, cat: "Phrasen & Ausdrücke", de: "Guten Tag.", pre: "¡Buenos ", post: "!", ans: "días", hint: "¡Buenos días! – Guten Morgen/Tag" },
+  { id: 773, cat: "Phrasen & Ausdrücke", de: "Guten Nachmittag.", pre: "¡Buenas ", post: "!", ans: "tardes", hint: "¡Buenas tardes! – Guten Tag/Nachmittag" },
+  { id: 774, cat: "Phrasen & Ausdrücke", de: "Gute Nacht.", pre: "¡Buenas ", post: "!", ans: "noches", hint: "¡Buenas noches! – Gute Nacht" },
+  { id: 775, cat: "Phrasen & Ausdrücke", de: "Tschüss!", pre: "¡", post: "!", ans: "Adiós", hint: "¡Adiós! – Tschüss/Auf Wiedersehen" },
+  { id: 776, cat: "Phrasen & Ausdrücke", de: "Bis später!", pre: "¡Hasta ", post: "!", ans: "luego", hint: "¡Hasta luego! – Bis später" },
+  { id: 777, cat: "Phrasen & Ausdrücke", de: "Bis morgen!", pre: "¡Hasta ", post: "!", ans: "mañana", hint: "¡Hasta mañana! – Bis morgen" },
+  { id: 778, cat: "Phrasen & Ausdrücke", de: "Wie geht's?", pre: "¿Qué ", post: "?", ans: "tal", hint: "¿Qué tal? / ¿Cómo estás? – Wie geht's?" },
+  { id: 779, cat: "Phrasen & Ausdrücke", de: "Sehr gut, danke.", pre: "Muy bien, ", post: ".", ans: "gracias", hint: "gracias – danke" },
+  { id: 780, cat: "Phrasen & Ausdrücke", de: "Bitte sehr.", pre: "De ", post: ".", ans: "nada", hint: "de nada – bitte sehr" },
+  { id: 781, cat: "Phrasen & Ausdrücke", de: "Bitte (Höflichkeit).", pre: "Por ", post: ".", ans: "favor", hint: "por favor – bitte" },
+  { id: 782, cat: "Phrasen & Ausdrücke", de: "Entschuldigung!", pre: "¡", post: "!", ans: "Perdón", hint: "¡Perdón! / Disculpe – Entschuldigung" },
+  { id: 783, cat: "Phrasen & Ausdrücke", de: "Es tut mir leid.", pre: "Lo ", post: ".", ans: "siento", hint: "Lo siento – Es tut mir leid" },
+  { id: 784, cat: "Phrasen & Ausdrücke", de: "Ja, gerne.", pre: "", post: ", con gusto.", ans: "Sí", hint: "Sí – Ja" },
+  { id: 785, cat: "Phrasen & Ausdrücke", de: "Nein, danke.", pre: "", post: ", gracias.", ans: "No", hint: "No – Nein" },
+  { id: 786, cat: "Phrasen & Ausdrücke", de: "Ich weiß nicht.", pre: "No lo ", post: ".", ans: "sé", hint: "No sé – Ich weiß nicht" },
+  { id: 787, cat: "Phrasen & Ausdrücke", de: "Ich verstehe.", pre: "Lo ", post: ".", ans: "entiendo", hint: "Entiendo – Ich verstehe" },
+  { id: 788, cat: "Phrasen & Ausdrücke", de: "Ich verstehe nicht.", pre: "No ", post: ".", ans: "entiendo", hint: "No entiendo – Ich verstehe nicht" },
+  { id: 789, cat: "Phrasen & Ausdrücke", de: "Sprechen Sie Deutsch?", pre: "¿Habla ", post: "?", ans: "alemán", hint: "alemán – Deutsch" },
+  { id: 790, cat: "Phrasen & Ausdrücke", de: "Sprechen Sie Englisch?", pre: "¿Habla ", post: "?", ans: "inglés", hint: "inglés – Englisch" },
+  { id: 791, cat: "Phrasen & Ausdrücke", de: "Ich spreche ein wenig Spanisch.", pre: "Hablo un poco de ", post: ".", ans: "español", hint: "español – Spanisch" },
+  { id: 792, cat: "Phrasen & Ausdrücke", de: "Langsamer, bitte.", pre: "Más ", post: ", por favor.", ans: "despacio", hint: "despacio / lento – langsam" },
+  { id: 793, cat: "Phrasen & Ausdrücke", de: "Wiederholen Sie, bitte.", pre: "Repita, por ", post: ".", ans: "favor", hint: "Repita – Wiederholen Sie" },
+  { id: 794, cat: "Phrasen & Ausdrücke", de: "Wie heißt du?", pre: "¿Cómo te ", post: "?", ans: "llamas", hint: "¿Cómo te llamas? – Wie heißt du?" },
+  { id: 795, cat: "Phrasen & Ausdrücke", de: "Ich heiße...", pre: "Me ", post: "...", ans: "llamo", hint: "Me llamo... – Ich heiße..." },
+  { id: 796, cat: "Phrasen & Ausdrücke", de: "Freut mich!", pre: "¡Mucho ", post: "!", ans: "gusto", hint: "¡Mucho gusto! / Encantado/a – Freut mich!" },
+  { id: 797, cat: "Phrasen & Ausdrücke", de: "Woher kommst du?", pre: "¿De dónde ", post: "?", ans: "eres", hint: "¿De dónde eres? – Woher kommst du?" },
+  { id: 798, cat: "Phrasen & Ausdrücke", de: "Ich komme aus Deutschland.", pre: "Soy de ", post: ".", ans: "Alemania", hint: "Alemania – Deutschland" },
+  { id: 799, cat: "Phrasen & Ausdrücke", de: "Ich wohne in...", pre: "", post: " en...", ans: "Vivo", hint: "Vivo en... – Ich wohne in..." },
+  { id: 800, cat: "Phrasen & Ausdrücke", de: "Wie alt bist du?", pre: "¿Cuántos años ", post: "?", ans: "tienes", hint: "¿Cuántos años tienes? – Wie alt bist du?" },
+  { id: 801, cat: "Phrasen & Ausdrücke", de: "Wo ist die Toilette?", pre: "¿Dónde está el ", post: "?", ans: "baño", hint: "el baño / servicio – die Toilette" },
+  { id: 802, cat: "Phrasen & Ausdrücke", de: "Wie viel kostet das?", pre: "¿Cuánto ", post: "?", ans: "cuesta", hint: "¿Cuánto cuesta? – Wie viel kostet das?" },
+  { id: 803, cat: "Phrasen & Ausdrücke", de: "Hilfe!", pre: "¡", post: "!", ans: "Ayuda", hint: "¡Ayuda! / ¡Socorro! – Hilfe!" },
+  { id: 804, cat: "Phrasen & Ausdrücke", de: "Guten Appetit!", pre: "¡Buen ", post: "!", ans: "provecho", hint: "¡Buen provecho! – Guten Appetit!" },
+  { id: 805, cat: "Phrasen & Ausdrücke", de: "Prost!", pre: "¡", post: "!", ans: "Salud", hint: "¡Salud! – Prost!" },
+  { id: 806, cat: "Phrasen & Ausdrücke", de: "Willkommen!", pre: "¡", post: "!", ans: "Bienvenido", hint: "¡Bienvenido/a! – Willkommen!" },
+  { id: 807, cat: "Phrasen & Ausdrücke", de: "Glückwunsch!", pre: "¡", post: "!", ans: "Felicidades", hint: "¡Felicidades! – Glückwunsch!" },
+  { id: 808, cat: "Phrasen & Ausdrücke", de: "Frohe Weihnachten!", pre: "¡Feliz ", post: "!", ans: "Navidad", hint: "Navidad – Weihnachten" },
+  { id: 809, cat: "Phrasen & Ausdrücke", de: "Gutes neues Jahr!", pre: "¡Feliz año ", post: "!", ans: "nuevo", hint: "año nuevo – neues Jahr" },
+  { id: 810, cat: "Phrasen & Ausdrücke", de: "Alles Gute zum Geburtstag!", pre: "¡Feliz ", post: "!", ans: "cumpleaños", hint: "el cumpleaños – der Geburtstag" },
+  { id: 811, cat: "Phrasen & Ausdrücke", de: "Gute Reise!", pre: "¡Buen ", post: "!", ans: "viaje", hint: "el viaje – die Reise" },
+  { id: 812, cat: "Phrasen & Ausdrücke", de: "Viel Erfolg!", pre: "¡Mucho ", post: "!", ans: "éxito", hint: "el éxito – der Erfolg" },
+  { id: 813, cat: "Phrasen & Ausdrücke", de: "Keine Ahnung.", pre: "Ni ", post: ".", ans: "idea", hint: "Ni idea – Keine Ahnung" },
+  { id: 814, cat: "Phrasen & Ausdrücke", de: "Macht nichts.", pre: "No pasa ", post: ".", ans: "nada", hint: "No pasa nada – Macht nichts" },
+  { id: 815, cat: "Phrasen & Ausdrücke", de: "Natürlich!", pre: "¡Por ", post: "!", ans: "supuesto", hint: "¡Por supuesto! / Claro – Natürlich!" },
+  { id: 816, cat: "Phrasen & Ausdrücke", de: "Einverstanden.", pre: "De ", post: ".", ans: "acuerdo", hint: "De acuerdo – Einverstanden" },
+  { id: 817, cat: "Phrasen & Ausdrücke", de: "Vielleicht.", pre: "Tal ", post: ".", ans: "vez", hint: "tal vez / quizás – vielleicht" },
+  { id: 818, cat: "Phrasen & Ausdrücke", de: "Sicherlich.", pre: "Seguramente ", post: ".", ans: "sí", hint: "seguramente – sicherlich" },
+  { id: 819, cat: "Phrasen & Ausdrücke", de: "Genau!", pre: "¡", post: "!", ans: "Exacto", hint: "¡Exacto! – Genau!" },
+  { id: 820, cat: "Phrasen & Ausdrücke", de: "Wirklich?", pre: "¿", post: "?", ans: "En serio", hint: "¿En serio? / ¿De verdad? – Wirklich?" },
+  { id: 821, cat: "Phrasen & Ausdrücke", de: "Gott sei Dank!", pre: "¡Gracias a ", post: "!", ans: "Dios", hint: "Dios – Gott" },
+  { id: 822, cat: "Phrasen & Ausdrücke", de: "Wie schade!", pre: "¡Qué ", post: "!", ans: "pena", hint: "¡Qué pena! / ¡Qué lástima! – Wie schade!" },
+  { id: 823, cat: "Phrasen & Ausdrücke", de: "Wie schön!", pre: "¡Qué ", post: "!", ans: "bonito", hint: "¡Qué bonito! – Wie schön!" },
+  { id: 824, cat: "Phrasen & Ausdrücke", de: "Welches Glück!", pre: "¡Qué ", post: "!", ans: "suerte", hint: "la suerte – das Glück" },
+  { id: 825, cat: "Phrasen & Ausdrücke", de: "Achtung!", pre: "¡", post: "!", ans: "Atención", hint: "¡Atención! / ¡Cuidado! – Achtung!" },
+  { id: 826, cat: "Phrasen & Ausdrücke", de: "Vorsicht!", pre: "¡", post: "!", ans: "Cuidado", hint: "el cuidado – die Vorsicht" },
+  { id: 827, cat: "Phrasen & Ausdrücke", de: "Halt!", pre: "¡", post: "!", ans: "Alto", hint: "¡Alto! / ¡Pare! – Halt!" },
+  { id: 828, cat: "Phrasen & Ausdrücke", de: "Notfall.", pre: "Una ", post: ".", ans: "emergencia", hint: "la emergencia – der Notfall" },
+  { id: 829, cat: "Phrasen & Ausdrücke", de: "Rufen Sie die Polizei!", pre: "¡Llame a la ", post: "!", ans: "policía", hint: "la policía – die Polizei" },
+  { id: 830, cat: "Phrasen & Ausdrücke", de: "Ich habe mich verlaufen.", pre: "Estoy ", post: ".", ans: "perdido", hint: "perdido/a – verloren/verlaufen" },
+  { id: 831, cat: "Phrasen & Ausdrücke", de: "Mir ist schlecht.", pre: "Me siento ", post: ".", ans: "mal", hint: "mal – schlecht" },
+  { id: 832, cat: "Phrasen & Ausdrücke", de: "Ich habe Hunger.", pre: "Tengo ", post: ".", ans: "hambre", hint: "el hambre – der Hunger" },
+  { id: 833, cat: "Phrasen & Ausdrücke", de: "Ich habe Durst.", pre: "Tengo ", post: ".", ans: "sed", hint: "la sed – der Durst" },
+  { id: 834, cat: "Phrasen & Ausdrücke", de: "Mir ist kalt.", pre: "Tengo ", post: ".", ans: "frío", hint: "el frío – die Kälte" },
+  { id: 835, cat: "Phrasen & Ausdrücke", de: "Mir ist heiß.", pre: "Tengo ", post: ".", ans: "calor", hint: "el calor – die Hitze" },
+  { id: 836, cat: "Phrasen & Ausdrücke", de: "Ich habe Angst.", pre: "Tengo ", post: ".", ans: "miedo", hint: "el miedo – die Angst" },
+  { id: 837, cat: "Phrasen & Ausdrücke", de: "Ich habe es eilig.", pre: "Tengo ", post: ".", ans: "prisa", hint: "la prisa – die Eile" },
+  { id: 838, cat: "Phrasen & Ausdrücke", de: "Ich habe Recht.", pre: "Tengo ", post: ".", ans: "razón", hint: "la razón – das Recht/Grund" },
+  { id: 839, cat: "Phrasen & Ausdrücke", de: "Ich bin müde.", pre: "Tengo ", post: ".", ans: "sueño", hint: "el sueño – die Müdigkeit/Traum" },
+  { id: 840, cat: "Phrasen & Ausdrücke", de: "Ich habe keine Lust.", pre: "No tengo ", post: ".", ans: "ganas", hint: "las ganas – die Lust" },
+  { id: 841, cat: "Phrasen & Ausdrücke", de: "Sehr geehrter Herr.", pre: "Estimado ", post: ".", ans: "señor", hint: "el señor – der Herr" },
+  { id: 842, cat: "Phrasen & Ausdrücke", de: "Sehr geehrte Frau.", pre: "Estimada ", post: ".", ans: "señora", hint: "la señora – die Frau/Dame" },
+  { id: 843, cat: "Phrasen & Ausdrücke", de: "Sehr geehrtes Fräulein.", pre: "Estimada ", post: ".", ans: "señorita", hint: "la señorita – das Fräulein" },
+  { id: 844, cat: "Phrasen & Ausdrücke", de: "Können Sie mir sagen...", pre: "¿Puede ", post: "...", ans: "decirme", hint: "decirme – mir sagen" },
+  { id: 845, cat: "Phrasen & Ausdrücke", de: "Ich würde gerne bestellen.", pre: "Quisiera ", post: ".", ans: "pedir", hint: "pedir – bestellen" },
+  { id: 846, cat: "Phrasen & Ausdrücke", de: "Wo kann ich kaufen...?", pre: "¿Dónde puedo ", post: "...?", ans: "comprar", hint: "comprar – kaufen" },
+  { id: 847, cat: "Phrasen & Ausdrücke", de: "Gibt es Wi-Fi?", pre: "¿Hay ", post: "?", ans: "wifi", hint: "el wifi – das WLAN" },
+  { id: 848, cat: "Phrasen & Ausdrücke", de: "Wie lautet das Passwort?", pre: "¿Cuál es la ", post: "?", ans: "contraseña", hint: "la contraseña – das Passwort" },
+  { id: 849, cat: "Phrasen & Ausdrücke", de: "Kann man mit Karte zahlen?", pre: "¿Se puede pagar con ", post: "?", ans: "tarjeta", hint: "la tarjeta – die Karte" },
+  { id: 850, cat: "Phrasen & Ausdrücke", de: "Nur in bar.", pre: "Solo en ", post: ".", ans: "efectivo", hint: "el efectivo – das Bargeld" },
+
+  // Ergänzende A1-Phrasen & Satzbausteine (851-1000)
+  { id: 851, cat: "Phrasen & Ausdrücke", de: "Ich stimme zu.", pre: "Estoy de ", post: ".", ans: "acuerdo", hint: "de acuerdo – einverstanden" },
+  { id: 852, cat: "Phrasen & Ausdrücke", de: "Ich stimme nicht zu.", pre: "No estoy de ", post: ".", ans: "acuerdo", hint: "de acuerdo – einverstanden" },
+  { id: 853, cat: "Phrasen & Ausdrücke", de: "Meiner Meinung nach.", pre: "En mi ", post: ".", ans: "opinión", hint: "la opinión – die Meinung" },
+  { id: 854, cat: "Phrasen & Ausdrücke", de: "Ich denke, dass ja.", pre: "Creo que ", post: ".", ans: "sí", hint: "creo que sí – ich denke schon" },
+  { id: 855, cat: "Phrasen & Ausdrücke", de: "Ich denke, dass nein.", pre: "Creo que ", post: ".", ans: "no", hint: "creo que no – ich denke nicht" },
+  { id: 856, cat: "Phrasen & Ausdrücke", de: "Es macht mir nichts aus.", pre: "No me ", post: ".", ans: "importa", hint: "importar – ausmachen/wichtig sein" },
+  { id: 857, cat: "Phrasen & Ausdrücke", de: "Das ist mir egal.", pre: "Me da ", post: ".", ans: "igual", hint: "da igual – egal sein" },
+  { id: 858, cat: "Phrasen & Ausdrücke", de: "Ich habe kein Geld.", pre: "No tengo ", post: ".", ans: "dinero", hint: "el dinero – das Geld" },
+  { id: 859, cat: "Phrasen & Ausdrücke", de: "Ich habe viel zu tun.", pre: "Tengo mucho que ", post: ".", ans: "hacer", hint: "hacer – tun/machen" },
+  { id: 860, cat: "Phrasen & Ausdrücke", de: "Es ist spät.", pre: "Es ", post: ".", ans: "tarde", hint: "tarde – spät" },
+  { id: 861, cat: "Phrasen & Ausdrücke", de: "Es ist früh.", pre: "Es ", post: ".", ans: "temprano", hint: "temprano – früh" },
+  { id: 862, cat: "Phrasen & Ausdrücke", de: "Es ist kalt.", pre: "Hace ", post: ".", ans: "frío", hint: "hace frío – es ist kalt" },
+  { id: 863, cat: "Phrasen & Ausdrücke", de: "Es ist heiß.", pre: "Hace ", post: ".", ans: "calor", hint: "hace calor – es ist heiß" },
+  { id: 864, cat: "Phrasen & Ausdrücke", de: "Es ist sonnig.", pre: "Hace ", post: ".", ans: "sol", hint: "hace sol – es ist sonnig" },
+  { id: 865, cat: "Phrasen & Ausdrücke", de: "Es ist windig.", pre: "Hace ", post: ".", ans: "viento", hint: "hace viento – es ist windig" },
+  { id: 866, cat: "Phrasen & Ausdrücke", de: "Es regnet.", pre: "", post: " mucho.", ans: "Llueve", hint: "llover – regnen" },
+  { id: 867, cat: "Phrasen & Ausdrücke", de: "Es schneit.", pre: "", post: " en la montaña.", ans: "Nieva", hint: "nevar – schneien" },
+  { id: 868, cat: "Phrasen & Ausdrücke", de: "Gutes Wetter.", pre: "Hace ", post: " tiempo.", ans: "buen", hint: "buen tiempo – gutes Wetter" },
+  { id: 869, cat: "Phrasen & Ausdrücke", de: "Schlechtes Wetter.", pre: "Hace ", post: " tiempo.", ans: "mal", hint: "mal tiempo – schlechtes Wetter" },
+  { id: 870, cat: "Phrasen & Ausdrücke", de: "Wie spät ist es?", pre: "¿Qué ", post: " es?", ans: "hora", hint: "la hora – die Uhrzeit" },
+  { id: 871, cat: "Phrasen & Ausdrücke", de: "Es ist ein Uhr.", pre: "Es la ", post: ".", ans: "una", hint: "la una – ein Uhr" },
+  { id: 872, cat: "Phrasen & Ausdrücke", de: "Es ist zwei Uhr.", pre: "Son las ", post: ".", ans: "dos", hint: "las dos – zwei Uhr" },
+  { id: 873, cat: "Phrasen & Ausdrücke", de: "Um wie viel Uhr?", pre: "¿A qué ", post: "?", ans: "hora", hint: "a qué hora – um wie viel Uhr" },
+  { id: 874, cat: "Phrasen & Ausdrücke", de: "Um drei Uhr.", pre: "A las ", post: ".", ans: "tres", hint: "a las tres – um drei Uhr" },
+  { id: 875, cat: "Phrasen & Ausdrücke", de: "Um viertel nach vier.", pre: "A las cuatro y ", post: ".", ans: "cuarto", hint: "y cuarto – viertel nach" },
+  { id: 876, cat: "Phrasen & Ausdrücke", de: "Um halb fünf.", pre: "A las cuatro y ", post: ".", ans: "media", hint: "y media – halb" },
+  { id: 877, cat: "Phrasen & Ausdrücke", de: "Um viertel vor sechs.", pre: "A las seis menos ", post: ".", ans: "cuarto", hint: "menos cuarto – viertel vor" },
+  { id: 878, cat: "Phrasen & Ausdrücke", de: "Vormittags.", pre: "Por la ", post: ".", ans: "mañana", hint: "por la mañana – morgens/vormittags" },
+  { id: 879, cat: "Phrasen & Ausdrücke", de: "Nachmittags.", pre: "Por la ", post: ".", ans: "tarde", hint: "por la tarde – nachmittags" },
+  { id: 880, cat: "Phrasen & Ausdrücke", de: "Nachts.", pre: "Por la ", post: ".", ans: "noche", hint: "por la noche – nachts" },
+  { id: 881, cat: "Phrasen & Ausdrücke", de: "Jeden Tag.", pre: "Todos los ", post: ".", ans: "días", hint: "todos los días – jeden Tag" },
+  { id: 882, cat: "Phrasen & Ausdrücke", de: "Jede Woche.", pre: "Todas las ", post: ".", ans: "semanas", hint: "todas las semanas – jede Woche" },
+  { id: 883, cat: "Phrasen & Ausdrücke", de: "Nächste Woche.", pre: "La semana ", post: ".", ans: "que viene", hint: "la semana que viene – nächste Woche" },
+  { id: 884, cat: "Phrasen & Ausdrücke", de: "Letzte Woche.", pre: "La semana ", post: ".", ans: "pasada", hint: "la semana pasada – letzte Woche" },
+  { id: 885, cat: "Phrasen & Ausdrücke", de: "Pünktlich ankommen.", pre: "Llegar a ", post: ".", ans: "tiempo", hint: "a tiempo – pünktlich" },
+  { id: 886, cat: "Phrasen & Ausdrücke", de: "Zu spät kommen.", pre: "Llegar ", post: ".", ans: "tarde", hint: "llegar tarde – zu spät kommen" },
+  { id: 887, cat: "Phrasen & Ausdrücke", de: "Zu früh kommen.", pre: "Llegar ", post: ".", ans: "pronto", hint: "llegar pronto / temprano – zu früh kommen" },
+  { id: 888, cat: "Phrasen & Ausdrücke", de: "Hallo an alle.", pre: "Hola a ", post: ".", ans: "todos", hint: "todos – alle" },
+  { id: 889, cat: "Phrasen & Ausdrücke", de: "Bis gleich!", pre: "¡Hasta ", post: "!", ans: "ahora", hint: "¡Hasta ahora! – Bis gleich!" },
+  { id: 890, cat: "Phrasen & Ausdrücke", de: "Guten Flug!", pre: "¡Buen ", post: "!", ans: "vuelo", hint: "el vuelo – der Flug" },
+  { id: 891, cat: "Phrasen & Ausdrücke", de: "Guten Aufenthalt!", pre: "¡Buena ", post: "!", ans: "estancia", hint: "la estancia – der Aufenthalt" },
+  { id: 892, cat: "Phrasen & Ausdrücke", de: "Schönes Wochenende!", pre: "¡Buen ", post: " de semana!", ans: "fin", hint: "el fin de semana – das Wochenende" },
+  { id: 893, cat: "Phrasen & Ausdrücke", de: "Pass auf dich auf!", pre: "¡", post: "!", ans: "Cuídate", hint: "Cuídate – Pass auf dich auf" },
+  { id: 894, cat: "Phrasen & Ausdrücke", de: "Schönen Tag noch!", pre: "¡Que tengas un buen ", post: "!", ans: "día", hint: "buen día – schönen Tag" },
+  { id: 895, cat: "Phrasen & Ausdrücke", de: "Auf Wiedersehen!", pre: "¡Hasta la ", post: "!", ans: "vista", hint: "¡Hasta la vista! – Auf Wiedersehen!" },
+  { id: 896, cat: "Phrasen & Ausdrücke", de: "Es war mir ein Vergnügen.", pre: "Un ", post: ".", ans: "placer", hint: "el placer – das Vergnügen" },
+  { id: 897, cat: "Phrasen & Ausdrücke", de: "Ebenso!", pre: "¡", post: "!", ans: "Igualmente", hint: "¡Igualmente! – Ebenso/Gleichfalls!" },
+  { id: 898, cat: "Phrasen & Ausdrücke", de: "Kein Problem.", pre: "Sin ", post: ".", ans: "problema", hint: "sin problema – kein Problem" },
+  { id: 899, cat: "Phrasen & Ausdrücke", de: "Alles klar.", pre: "Todo ", post: ".", ans: "claro", hint: "todo claro – alles klar" },
+  { id: 900, cat: "Phrasen & Ausdrücke", de: "Super!", pre: "¡", post: "!", ans: "Genial", hint: "¡Genial! / ¡Súper! – Super/Toll!" },
+  { id: 901, cat: "Phrasen & Ausdrücke", de: "Perfekt!", pre: "¡", post: "!", ans: "Perfecto", hint: "¡Perfecto! – Perfekt!" },
+  { id: 902, cat: "Phrasen & Ausdrücke", de: "Wunderbar!", pre: "¡", post: "!", ans: "Maravilloso", hint: "¡Maravilloso! – Wunderbar!" },
+  { id: 903, cat: "Phrasen & Ausdrücke", de: "Klasse!", pre: "¡Qué ", post: "!", ans: "bien", hint: "¡Qué bien! – Klasse/Toll!" },
+  { id: 904, cat: "Phrasen & Ausdrücke", de: "Wahnsinn!", pre: "¡Qué ", post: "!", ans: "locura", hint: "la locura – der Wahnsinn" },
+  { id: 905, cat: "Phrasen & Ausdrücke", de: "Schrecklich!", pre: "¡Qué ", post: "!", ans: "horror", hint: "el horror – der Schreck" },
+  { id: 906, cat: "Phrasen & Ausdrücke", de: "Unglaublich!", pre: "¡", post: "!", ans: "Increíble", hint: "¡Increíble! – Unglaublich!" },
+  { id: 907, cat: "Phrasen & Ausdrücke", de: "Egal!", pre: "¡No ", post: "!", ans: "importa", hint: "No importa – Egal" },
+  { id: 908, cat: "Phrasen & Ausdrücke", de: "Komm schon!", pre: "¡", post: "!", ans: "Vamos", hint: "¡Vamos! – Komm schon/Los geht's" },
+  { id: 909, cat: "Phrasen & Ausdrücke", de: "Los geht's!", pre: "¡", post: "!", ans: "Adelante", hint: "¡Adelante! – Los geht's/Vorwärts" },
+  { id: 910, cat: "Phrasen & Ausdrücke", de: "Einen Moment bitte.", pre: "Un ", post: ", por favor.", ans: "momento", hint: "un momento – einen Moment" },
+  { id: 911, cat: "Phrasen & Ausdrücke", de: "Einen Augenblick.", pre: "Un ", post: ".", ans: "instante", hint: "el instante – der Augenblick" },
+  { id: 912, cat: "Phrasen & Ausdrücke", de: "Tritt ein!", pre: "¡", post: "!", ans: "Pasa", hint: "¡Pasa! / ¡Entre! – Tritt ein!" },
+  { id: 913, cat: "Phrasen & Ausdrücke", de: "Nimm Platz!", pre: "¡Toma ", post: "!", ans: "asiento", hint: "tomar asiento – Platz nehmen" },
+  { id: 914, cat: "Phrasen & Ausdrücke", de: "Fühl dich wie zu Hause.", pre: "Estás en tu ", post: ".", ans: "casa", hint: "en tu casa – wie zu Hause" },
+  { id: 915, cat: "Phrasen & Ausdrücke", de: "Was möchtest du trinken?", pre: "¿Qué quieres ", post: "?", ans: "tomar", hint: "tomar – trinken/nehmen" },
+  { id: 916, cat: "Phrasen & Ausdrücke", de: "Ich nehme ein Wasser.", pre: "Voy a tomar un ", post: ".", ans: "agua", hint: "el agua – das Wasser" },
+  { id: 917, cat: "Phrasen & Ausdrücke", de: "Können Sie die Speisekarte bringen?", pre: "¿Nos trae la ", post: "?", ans: "carta", hint: "la carta – die Speisekarte" },
+  { id: 918, cat: "Phrasen & Ausdrücke", de: "Was empfehlen Sie?", pre: "¿Qué ", post: "?", ans: "recomienda", hint: "recomendar – empfehlen" },
+  { id: 919, cat: "Phrasen & Ausdrücke", de: "Es war sehr lecker.", pre: "Estaba muy ", post: ".", ans: "rico", hint: "rico/a – lecker" },
+  { id: 920, cat: "Phrasen & Ausdrücke", de: "Zusammen oder getrennt?", pre: "¿Juntos o por ", post: "?", ans: "separado", hint: "por separado – getrennt" },
+  { id: 921, cat: "Phrasen & Ausdrücke", de: "Das macht 10 Euro.", pre: "Son diez ", post: ".", ans: "euros", hint: "los euros – Euro" },
+  { id: 922, cat: "Phrasen & Ausdrücke", de: "Hier ist das Wechselgeld.", pre: "Aquí está el ", post: ".", ans: "cambio", hint: "el cambio – das Wechselgeld" },
+  { id: 923, cat: "Phrasen & Ausdrücke", de: "Behalten Sie den Rest.", pre: "Quédese con el ", post: ".", ans: "cambio", hint: "el cambio – das Wechselgeld" },
+  { id: 924, cat: "Phrasen & Ausdrücke", de: "Wo kann ich parken?", pre: "¿Dónde puedo ", post: "?", ans: "aparcar", hint: "aparcar / estacionar – parken" },
+  { id: 925, cat: "Phrasen & Ausdrücke", de: "Ist das frei?", pre: "¿Está ", post: "?", ans: "libre", hint: "libre – frei" },
+  { id: 926, cat: "Phrasen & Ausdrücke", de: "Ist das besetzt?", pre: "¿Está ", post: "?", ans: "ocupado", hint: "ocupado – besetzt" },
+  { id: 927, cat: "Phrasen & Ausdrücke", de: "Wie komme ich dorthin?", pre: "¿Cómo ", post: " allí?", ans: "llego", hint: "cómo llego a – wie komme ich zu" },
+  { id: 928, cat: "Phrasen & Ausdrücke", de: "Gehen Sie geradeaus.", pre: "Siga todo ", post: ".", ans: "recto", hint: "todo recto – geradeaus" },
+  { id: 929, cat: "Phrasen & Ausdrücke", de: "Biegen Sie links ab.", pre: "Gire a la ", post: ".", ans: "izquierda", hint: "la izquierda – links" },
+  { id: 930, cat: "Phrasen & Ausdrücke", de: "Biegen Sie rechts ab.", pre: "Gire a la ", post: ".", ans: "derecha", hint: "la derecha – rechts" },
+  { id: 931, cat: "Phrasen & Ausdrücke", de: "An der Ampel.", pre: "En el ", post: ".", ans: "semáforo", hint: "el semáforo – die Ampel" },
+  { id: 932, cat: "Phrasen & Ausdrücke", de: "Am Kreisverkehr.", pre: "En la ", post: ".", ans: "rotonda", hint: "la rotonda – der Kreisverkehr" },
+  { id: 933, cat: "Phrasen & Ausdrücke", de: "Es ist ganz nah.", pre: "Está muy ", post: ".", ans: "cerca", hint: "cerca – nah" },
+  { id: 934, cat: "Phrasen & Ausdrücke", de: "Es ist weit weg.", pre: "Está muy ", post: ".", ans: "lejos", hint: "lejos – weit" },
+  { id: 935, cat: "Phrasen & Ausdrücke", de: "Ich habe den Bus verpasst.", pre: "Perdí el ", post: ".", ans: "autobús", hint: "el autobús – der Bus" },
+  { id: 936, cat: "Phrasen & Ausdrücke", de: "Wann fährt der nächste Zug?", pre: "¿Cuándo sale el próximo ", post: "?", ans: "tren", hint: "el tren – der Zug" },
+  { id: 937, cat: "Phrasen & Ausdrücke", de: "Eine einfache Fahrkarte, bitte.", pre: "Un billete ", post: ", por favor.", ans: "sencillo", hint: "sencillo – einfach (Hinfahrt)" },
+  { id: 938, cat: "Phrasen & Ausdrücke", de: "Hin- und Rückfahrkarte.", pre: "Un billete de ida y ", post: ".", ans: "vuelta", hint: "ida y vuelta – Hin- und Rückfahrt" },
+  { id: 939, cat: "Phrasen & Ausdrücke", de: "An welchem Gleis?", pre: "¿En qué ", post: "?", ans: "vía", hint: "la vía / el andén – das Gleis" },
+  { id: 940, cat: "Phrasen & Ausdrücke", de: "Der Zug hat Verspätung.", pre: "El tren tiene ", post: ".", ans: "retraso", hint: "el retraso – die Verspätung" },
+  { id: 941, cat: "Phrasen & Ausdrücke", de: "Gute Reise!", pre: "¡Buen ", post: "!", ans: "viaje", hint: "el viaje – die Reise" },
+  { id: 942, cat: "Phrasen & Ausdrücke", de: "Ich möchte ein Zimmer reservieren.", pre: "Quiero reservar una ", post: ".", ans: "habitación", hint: "la habitación – das Zimmer" },
+  { id: 943, cat: "Phrasen & Ausdrücke", de: "Für wie viele Nächte?", pre: "¿Para cuántas ", post: "?", ans: "noches", hint: "la noche – die Nacht" },
+  { id: 944, cat: "Phrasen & Ausdrücke", de: "Für zwei Personen.", pre: "Para dos ", post: ".", ans: "personas", hint: "las personas – die Personen" },
+  { id: 945, cat: "Phrasen & Ausdrücke", de: "Ein Doppelzimmer.", pre: "Una habitación ", post: ".", ans: "doble", hint: "doble – Doppel-" },
+  { id: 946, cat: "Phrasen & Ausdrücke", de: "Ein Einzelzimmer.", pre: "Una habitación ", post: ".", ans: "individual", hint: "individual – Einzel-" },
+  { id: 947, cat: "Phrasen & Ausdrücke", de: "Ist das Frühstück inklusive?", pre: "¿Está el ", post: " incluido?", ans: "desayuno", hint: "el desayuno – das Frühstück" },
+  { id: 948, cat: "Phrasen & Ausdrücke", de: "Wo ist der Aufzug?", pre: "¿Dónde está el ", post: "?", ans: "ascensor", hint: "el ascensor – der Aufzug" },
+  { id: 949, cat: "Phrasen & Ausdrücke", de: "Die Schlüsselkarte bitte.", pre: "La ", post: " llave, por favor.", ans: "tarjeta", hint: "la tarjeta – die Karte" },
+  { id: 950, cat: "Phrasen & Ausdrücke", de: "Wann ist das Check-out?", pre: "¿A qué hora es la ", post: "?", ans: "salida", hint: "la salida – die Abreise/Check-out" },
+  { id: 951, cat: "Phrasen & Ausdrücke", de: "Ich muss zur Bank.", pre: "Tengo que ir al ", post: ".", ans: "banco", hint: "el banco – die Bank" },
+  { id: 952, cat: "Phrasen & Ausdrücke", de: "Geld abheben.", pre: "Sacar ", post: ".", ans: "dinero", hint: "sacar dinero – Geld abheben" },
+  { id: 953, cat: "Phrasen & Ausdrücke", de: "Wo ist ein Geldautomat?", pre: "¿Dónde hay un ", post: "?", ans: "cajero", hint: "el cajero automático – der Geldautomat" },
+  { id: 954, cat: "Phrasen & Ausdrücke", de: "Einen Moment Geduld.", pre: "Un poco de ", post: ".", ans: "paciencia", hint: "la paciencia – die Geduld" },
+  { id: 955, cat: "Phrasen & Ausdrücke", de: "Das ist sehr wichtig.", pre: "Es muy ", post: ".", ans: "importante", hint: "importante – wichtig" },
+  { id: 956, cat: "Phrasen & Ausdrücke", de: "Es ist nicht notwendig.", pre: "No es ", post: ".", ans: "necesario", hint: "necesario – nötig/notwendig" },
+  { id: 957, cat: "Phrasen & Ausdrücke", de: "Ich stimme vollkommen zu.", pre: "Totalmente de ", post: ".", ans: "acuerdo", hint: "de acuerdo – einverstanden" },
+  { id: 958, cat: "Phrasen & Ausdrücke", de: "Das ist wahr.", pre: "Es ", post: ".", ans: "verdad", hint: "la verdad – die Wahrheit" },
+  { id: 959, cat: "Phrasen & Ausdrücke", de: "Das ist nicht wahr.", pre: "No es ", post: ".", ans: "verdad", hint: "la verdad – die Wahrheit" },
+  { id: 960, cat: "Phrasen & Ausdrücke", de: "Das ist eine Lüge!", pre: "¡Es una ", post: "!", ans: "mentira", hint: "la mentira – die Lüge" },
+  { id: 961, cat: "Phrasen & Ausdrücke", de: "Bist du sicher?", pre: "¿Estás ", post: "?", ans: "seguro", hint: "seguro/a – sicher" },
+  { id: 962, cat: "Phrasen & Ausdrücke", de: "Ich bin mir ganz sicher.", pre: "Estoy muy ", post: ".", ans: "seguro", hint: "seguro/a – sicher" },
+  { id: 963, cat: "Phrasen & Ausdrücke", de: "Ich habe Zweifel.", pre: "Tengo ", post: ".", ans: "dudas", hint: "la duda – der Zweifel" },
+  { id: 964, cat: "Phrasen & Ausdrücke", de: "Keine Sorge!", pre: "¡No te ", post: "!", ans: "preocupes", hint: "preocuparse – sich Sorgen machen" },
+  { id: 965, cat: "Phrasen & Ausdrücke", de: "Reg dich nicht auf.", pre: "Tranquilo, no pasa ", post: ".", ans: "nada", hint: "tranquilo – ruhig/entspannt" },
+  { id: 966, cat: "Phrasen & Ausdrücke", de: "Ruhig bleiben.", pre: "Mantén la ", post: ".", ans: "calma", hint: "la calma – die Ruhe" },
+  { id: 967, cat: "Phrasen & Ausdrücke", de: "Ich bin glücklich.", pre: "Estoy muy ", post: ".", ans: "contento", hint: "contento/a / feliz – glücklich/zufrieden" },
+  { id: 968, cat: "Phrasen & Ausdrücke", de: "Ich bin traurig.", pre: "Estoy ", post: ".", ans: "triste", hint: "triste – traurig" },
+  { id: 969, cat: "Phrasen & Ausdrücke", de: "Ich bin wütend.", pre: "Estoy ", post: ".", ans: "enfadado", hint: "enfadado/a – wütend/verärgert" },
+  { id: 970, cat: "Phrasen & Ausdrücke", de: "Ich bin überrascht.", pre: "Estoy ", post: ".", ans: "sorprendido", hint: "sorprendido/a – überrascht" },
+  { id: 971, cat: "Phrasen & Ausdrücke", de: "Ich bin gelangweilt.", pre: "Estoy ", post: ".", ans: "aburrido", hint: "aburrido/a – gelangweilt" },
+  { id: 972, cat: "Phrasen & Ausdrücke", de: "Das ist langweilig.", pre: "Es ", post: ".", ans: "aburrido", hint: "aburrido/a – langweilig" },
+  { id: 973, cat: "Phrasen & Ausdrücke", de: "Das ist lustig.", pre: "Es ", post: ".", ans: "divertido", hint: "divertido/a – lustig/unterhaltsam" },
+  { id: 974, cat: "Phrasen & Ausdrücke", de: "Ein wunderbarer Tag.", pre: "Un día ", post: ".", ans: "maravilloso", hint: "maravilloso/a – wunderbar" },
+  { id: 975, cat: "Phrasen & Ausdrücke", de: "Ein schlimmer Fehler.", pre: "Un ", post: " grave.", ans: "error", hint: "el error – der Fehler" },
+  { id: 976, cat: "Phrasen & Ausdrücke", de: "Aus Fehlern lernt man.", pre: "Se aprende de los ", post: ".", ans: "errores", hint: "el error – der Fehler" },
+  { id: 977, cat: "Phrasen & Ausdrücke", de: "Viel Glück!", pre: "¡Mucha ", post: "!", ans: "suerte", hint: "la suerte – das Glück" },
+  { id: 978, cat: "Phrasen & Ausdrücke", de: "Leb wohl!", pre: "¡Hasta ", post: "!", ans: "siempre", hint: "hasta siempre – für immer / leb wohl" },
+  { id: 979, cat: "Phrasen & Ausdrücke", de: "Ich bin bereit zum Lernen.", pre: "Estoy listo para ", post: ".", ans: "aprender", hint: "aprender – lernen" },
+  { id: 980, cat: "Phrasen & Ausdrücke", de: "Übung macht den Meister.", pre: "La práctica hace al ", post: ".", ans: "maestro", hint: "el maestro – der Meister/Lehrer" },
+  { id: 981, cat: "Phrasen & Ausdrücke", de: "Schritt für Schritt.", pre: "Paso a ", post: ".", ans: "paso", hint: "el paso – der Schritt" },
+  { id: 982, cat: "Phrasen & Ausdrücke", de: "Wort für Wort.", pre: "Palabra por ", post: ".", ans: "palabra", hint: "la palabra – das Wort" },
+  { id: 983, cat: "Phrasen & Ausdrücke", de: "Nichts ist unmöglich.", pre: "Nada es ", post: ".", ans: "imposible", hint: "imposible – unmöglich" },
+  { id: 984, cat: "Phrasen & Ausdrücke", de: "Alles ist möglich.", pre: "Todo es ", post: ".", ans: "posible", hint: "posible – möglich" },
+  { id: 985, cat: "Phrasen & Ausdrücke", de: "Guten Abend allerseits.", pre: "Buenas ", post: " a todos.", ans: "noches", hint: "buenas noches – guten Abend" },
+  { id: 986, cat: "Phrasen & Ausdrücke", de: "Ich wünsche dir einen schönen Tag.", pre: "Que tengas un ", post: " día.", ans: "buen", hint: "buen día – schönen Tag" },
+  { id: 987, cat: "Phrasen & Ausdrücke", de: "Ich wünsche dir das Beste.", pre: "Te deseo lo ", post: ".", ans: "mejor", hint: "lo mejor – das Beste" },
+  { id: 988, cat: "Phrasen & Ausdrücke", de: "Herzlichen Glückwunsch!", pre: "¡Muchas ", post: "!", ans: "felicidades", hint: "felicidades – Glückwunsch" },
+  { id: 989, cat: "Phrasen & Ausdrücke", de: "Prost auf das Leben!", pre: "¡Salud por la ", post: "!", ans: "vida", hint: "la vida – das Leben" },
+  { id: 990, cat: "Phrasen & Ausdrücke", de: "Das Leben ist schön.", pre: "La vida es ", post: ".", ans: "bella", hint: "bello/a – schön" },
+  { id: 991, cat: "Phrasen & Ausdrücke", de: "Gute Nacht und schlaf gut.", pre: "Buenas noches y ", post: " bien.", ans: "duerme", hint: "dormir – schlafen" },
+  { id: 992, cat: "Phrasen & Ausdrücke", de: "Süße Träume!", pre: "¡", post: " sueños!", ans: "Dulces", hint: "dulce – süß" },
+  { id: 993, cat: "Phrasen & Ausdrücke", de: "Bis morgen früh.", pre: "Hasta ", post: " por la mañana.", ans: "mañana", hint: "mañana – morgen" },
+  { id: 994, cat: "Phrasen & Ausdrücke", de: "Wir sehen uns bald.", pre: "Nos vemos ", post: ".", ans: "pronto", hint: "pronto – bald" },
+  { id: 995, cat: "Phrasen & Ausdrücke", de: "Wir sehen uns später.", pre: "Nos vemos más ", post: ".", ans: "tarde", hint: "más tarde – später" },
+  { id: 996, cat: "Phrasen & Ausdrücke", de: "Rufe mich an.", pre: "", post: " por teléfono.", ans: "Llámame", hint: "llamar – anrufen" },
+  { id: 997, cat: "Phrasen & Ausdrücke", de: "Schreib mir eine Nachricht.", pre: "Escríbeme un ", post: ".", ans: "mensaje", hint: "el mensaje – die Nachricht" },
+  { id: 998, cat: "Phrasen & Ausdrücke", de: "Ich erwarte dich.", pre: "Te ", post: ".", ans: "espero", hint: "esperar – warten/erwarten" },
+  { id: 999, cat: "Phrasen & Ausdrücke", de: "Gute Reise nach Hause.", pre: "Buen viaje a ", post: ".", ans: "casa", hint: "la casa – das Haus/Heim" },
+  { id: 1000, cat: "Phrasen & Ausdrücke", de: "Geschafft! Das Ende.", pre: "¡Fin del ", post: "!", ans: "curso", hint: "el fin – das Ende" }
+];
+
+// Variablen für den Ablauf
+let currentQueue = [];       // Die Vokabeln, die in der aktuellen Runde abgefragt werden
+let failedQueue = [];        // Vokabeln, die falsch waren und wiederholt werden müssen
+let currentIndex = 0;
+let correctCount = 0;
+let isAnswered = false;
+let isRetryRound = false;    // Ob wir gerade in der Extra-Fehler-Runde sind
+
+// DOM Elemente
+const menuScreen = document.getElementById('menuScreen');
+const quizScreen = document.getElementById('quizScreen');
+const chapterList = document.getElementById('chapterList');
+const germanPrompt = document.getElementById('germanPrompt');
+const userInput = document.getElementById('userInput');
+const submitBtn = document.getElementById('submitBtn');
+const feedback = document.getElementById('feedback');
+const progress = document.getElementById('progress');
+const score = document.getElementById('score');
+const modeIndicator = document.getElementById('modeIndicator');
+const backToMenuBtn = document.getElementById('backToMenuBtn');
+const hintBox = document.getElementById('hintBox');
+const hintBtn = document.getElementById('hintBtn');
+
+// Große Kategorien in mehrere Kapitel aufteilen.
+// Hier kannst du weitere Kategorien eintragen, z. B. "Verben & Aktionen": 3
+const CHAPTER_SPLITS = {
+    "Phrasen & Ausdrücke": 5
+};
+
+function buildChapters() {
+    const chapters = [];
+    const categories = [...new Set(vocabDb.map(item => item.cat))];
+
+    categories.forEach(cat => {
+        const items = vocabDb.filter(item => item.cat === cat);
+        const parts = CHAPTER_SPLITS[cat] || 1;
+
+        if (parts === 1) {
+            chapters.push({ label: cat, items: items });
+            return;
+        }
+
+        const size = Math.ceil(items.length / parts);
+        for (let p = 0; p < parts; p++) {
+            const slice = items.slice(p * size, (p + 1) * size);
+            if (slice.length > 0) {
+                chapters.push({ label: `${cat} – Teil ${p + 1}`, items: slice });
+            }
+        }
+    });
+
+    return chapters;
+}
+
+// 1. Kapitel-Menü beim Start aufbauen
+function initMenu() {
+    chapterList.innerHTML = '';
+
+    buildChapters().forEach(chapter => {
+        const btn = document.createElement('button');
+        btn.textContent = `${chapter.label} (${chapter.items.length} Vokabeln)`;
+        btn.onclick = () => startChapter(chapter);
+        chapterList.appendChild(btn);
+    });
+}
+
+// 2. Kapitel starten
+function startChapter(chapter) {
+    // Kopie der Vokabeln aus diesem Kapitel erstellen
+    currentQueue = [...chapter.items];
+    failedQueue = [];
+    currentIndex = 0;
+    correctCount = 0;
+    isRetryRound = false;
+
+    menuScreen.style.display = 'none';
+    quizScreen.style.display = 'block';
+    backToMenuBtn.style.display = 'none';
+
+    // WICHTIG: Eingabefeld und Button wieder sichtbar machen,
+    // falls ein vorheriges Kapitel abgeschlossen wurde.
+    userInput.style.display = 'block';
+    submitBtn.style.display = 'block';
+
+    modeIndicator.textContent = `Kapitel: ${chapter.label}`;
+
+    loadQuestion();
+}
+
+function returnToMenu() {
+    quizScreen.style.display = 'none';
+    menuScreen.style.display = 'block';
+    initMenu();
+}
+
+function loadQuestion() {
+    if (currentIndex >= currentQueue.length) {
+        // Runden-Ende erreicht! Prüfen, ob es Fehler gab
+        if (failedQueue.length > 0) {
+            // Es gibt Fehler -> Starte die Wiederholungsrunde
+            currentQueue = [...failedQueue];
+            failedQueue = [];
+            currentIndex = 0;
+            isRetryRound = true;
+            modeIndicator.textContent = `Wiederholungsrunde der Fehler!`;
+            alert("Runde beendet! Jetzt werden alle falsch beantworteten Vokabeln so lange wiederholt, bis sie sitzen.");
+        } else {
+            // Komplett fertig mit diesem Kapitel!
+            germanPrompt.innerHTML = "<strong>🎉 Super! Du hast alle Vokabeln dieses Kapitels (inklusive Wiederholungen) fehlerfrei gemeistert!</strong>";
+            userInput.style.display = 'none';
+            submitBtn.style.display = 'none';
+            hintBtn.style.display = 'none';
+            hintBox.style.display = 'none';
+            feedback.style.display = 'none';
+            backToMenuBtn.style.display = 'block';
+            modeIndicator.textContent = "Kapitel abgeschlossen!";
+            return;
+        }
+    }
+
+    const q = currentQueue[currentIndex];
+    germanPrompt.innerHTML = `<div>${q.de}</div><div style="font-size: 0.95rem; color: #3498db; margin-top: 6px;">${q.pre}<span style="border-bottom: 2px solid #3498db; padding: 0 10px; display: inline-block;">...</span>${q.post}</div>`;
+
+    // Tipp wird erst auf Wunsch oder nach der Antwort gezeigt
+    hintBox.textContent = '';
+    hintBox.style.display = 'none';
+    hintBtn.style.display = 'block';
+
+    userInput.value = '';
+    userInput.focus();
+    feedback.style.display = 'none';
+    feedback.className = 'feedback';
+    submitBtn.textContent = 'Überprüfen';
+    isAnswered = false;
+
+    updateStats();
+}
+
+function showHint() {
+    if (currentIndex >= currentQueue.length) return;
+    hintBox.textContent = `Tipp: ${currentQueue[currentIndex].hint}`;
+    hintBox.style.display = 'block';
+    hintBtn.style.display = 'none';
+    userInput.focus();
+}
+
+function updateStats() {
+    const pos = Math.min(currentIndex + 1, currentQueue.length);
+    progress.textContent = `Fortschritt: ${pos} / ${currentQueue.length}`;
+    score.textContent = `Richtig: ${correctCount}`;
+}
+
+// Vergleich ohne Akzente, Apostrophe und Satzzeichen:
+// "esta", "está" und "est a" gelten alle als dieselbe Antwort.
+function normalize(str) {
+    return str
+        .toLowerCase()
+        .normalize('NFD')                 // Buchstaben und Akzente trennen
+        .replace(/[\u0300-\u036f]/g, '')  // Akzente entfernen (á -> a)
+        .replace(/['’`´¡!¿?.,;:"-]/g, '') // Apostrophe und Satzzeichen entfernen
+        .replace(/\s+/g, ' ')             // Mehrfache Leerzeichen zusammenfassen
+        .trim();
+}
+
+function checkAnswer() {
+    if (currentIndex >= currentQueue.length) return;
+
+    if (isAnswered) {
+        currentIndex++;
+        loadQuestion();
+        return;
+    }
+
+    const currentItem = currentQueue[currentIndex];
+    const currentAns = currentItem.ans.trim();
+    const userAns = userInput.value.trim();
+
+    feedback.style.display = 'block';
+
+    const exact = userAns.toLowerCase() === currentAns.toLowerCase();
+    const lenient = normalize(userAns) === normalize(currentAns);
+
+    if (exact) {
+        correctCount++;
+        feedback.textContent = 'Richtig!';
+        feedback.className = 'feedback correct';
+    } else if (lenient) {
+        // Nur Akzente, Apostrophe oder Satzzeichen weichen ab -> gilt als richtig
+        correctCount++;
+        feedback.innerHTML = `Richtig! <span style="font-weight: normal;">Korrekte Schreibweise: <strong>${currentAns}</strong></span>`;
+        feedback.className = 'feedback correct';
+    } else {
+        feedback.textContent = `Falsch! Richtig ist: "${currentAns}"`;
+        feedback.className = 'feedback incorrect';
+
+        // Wenn die Vokabel falsch war und noch nicht in der Fehlerliste ist, fügen wir sie hinzu
+        if (!failedQueue.includes(currentItem)) {
+            failedQueue.push(currentItem);
+        }
+    }
+
+    // Nach der Antwort wird der Tipp zur Erklärung eingeblendet
+    hintBox.textContent = `Tipp: ${currentItem.hint}`;
+    hintBox.style.display = 'block';
+    hintBtn.style.display = 'none';
+
+    isAnswered = true;
+    submitBtn.textContent = 'Nächste Frage';
+    updateStats();
+}
+
+userInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkAnswer();
+    }
+});
+
+// Menü initialisieren beim Laden der Seite
+initMenu();
+    </script>
+</body>
+</html>
