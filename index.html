@@ -1222,26 +1222,89 @@ const vocabDb = [
 
         ];
 
+// Variablen für den Ablauf
+let currentQueue = [];       // Die Vokabeln, die in der aktuellen Runde abgefragt werden
+let failedQueue = [];        // Vokabeln, die falsch waren und wiederholt werden müssen
+let currentIndex = 0;
 let correctCount = 0;
 let isAnswered = false;
+let isRetryRound = false;    // Ob wir gerade in der Extra-Fehler-Runde sind
 
+// DOM Elemente
+const menuScreen = document.getElementById('menuScreen');
+const quizScreen = document.getElementById('quizScreen');
+const chapterList = document.getElementById('chapterList');
 const germanPrompt = document.getElementById('germanPrompt');
 const userInput = document.getElementById('userInput');
 const submitBtn = document.getElementById('submitBtn');
 const feedback = document.getElementById('feedback');
 const progress = document.getElementById('progress');
 const score = document.getElementById('score');
+const modeIndicator = document.getElementById('modeIndicator');
+const backToMenuBtn = document.getElementById('backToMenuBtn');
+
+// 1. Kapitel-Menü beim Start aufbauen
+function initMenu() {
+    chapterList.innerHTML = '';
+    // Alle eindeutigen Kategorien finden
+    const categories = [...new Set(vocabDb.map(item => item.cat))];
+
+    categories.forEach(cat => {
+        const count = vocabDb.filter(item => item.cat === cat).length;
+        const btn = document.createElement('button');
+        btn.textContent = `${cat} (${count} Vokabeln)`;
+        btn.onclick = () => startChapter(cat);
+        chapterList.appendChild(btn);
+    });
+}
+
+// 2. Kapitel starten
+function startChapter(category) {
+    // Kopie der Vokabeln aus diesem Kapitel erstellen
+    currentQueue = vocabDb.filter(item => item.cat === category);
+    failedQueue = [];
+    currentIndex = 0;
+    correctCount = 0;
+    isRetryRound = false;
+
+    menuScreen.style.display = 'none';
+    quizScreen.style.display = 'block';
+    backToMenuBtn.style.display = 'none';
+    modeIndicator.textContent = `Kapitel: ${category}`;
+
+    loadQuestion();
+}
+
+function returnToMenu() {
+    quizScreen.style.display = 'none';
+    menuScreen.style.display = 'block';
+    initMenu();
+}
 
 function loadQuestion() {
-    if (currentIndex >= vocabDb.length) {
-        germanPrompt.innerHTML = "<strong>Gratulation! Du hast alle Übungen abgeschlossen!</strong>";
-        userInput.style.display = 'none';
-        submitBtn.style.display = 'none';
-        feedback.style.display = 'none';
-        return;
+    if (currentIndex >= currentQueue.length) {
+        // Runden-Ende erreicht! Prüfen, ob es Fehler gab
+        if (failedQueue.length > 0) {
+            // Es gibt Fehler -> Starte die Wiederholungsrunde
+            currentQueue = [...failedQueue];
+            failedQueue = [];
+            currentIndex = 0;
+            isRetryRound = true;
+            modeIndicator.textContent = `Wiederholungsrunde der Fehler!`;
+            alert("Runde beendet! Jetzt werden alle falsch beantworteten Vokabeln so lange wiederholt, bis sie sitzen.");
+        } else {
+            // Komplett fertig mit diesem Kapitel!
+            germanPrompt.innerHTML = "<strong>🎉 Super! Du hast alle Vokabeln dieses Kapitels (inklusive Wiederholungen) fehlerfrei gemeistert!</strong>";
+            userInput.style.display = 'none';
+            submitBtn.style.display = 'none';
+            feedback.style.display = 'none';
+            backToMenuBtn.style.display = 'block';
+            modeIndicator.textContent = "Kapitel abgeschlossen!";
+            return;
+        }
     }
 
-    const q = vocabDb[currentIndex];
+    const q = currentQueue[currentIndex];
     germanPrompt.innerHTML = `<div>${q.de}</div><div style="font-size: 0.95rem; color: #3498db; margin-top: 6px;">${q.pre}<span style="border-bottom: 2px solid #3498db; padding: 0 10px; display: inline-block;">...</span>${q.post}</div><div style="font-size: 0.8rem; color: #888; margin-top: 4px; font-weight: normal;"><i>Tipp: ${q.hint}</i></div>`;
     
     userInput.value = '';
@@ -1255,12 +1318,12 @@ function loadQuestion() {
 }
 
 function updateStats() {
-    progress.textContent = `Fortschritt: ${currentIndex + 1} / ${vocabDb.length}`;
+    progress.textContent = `Fortschritt: ${currentIndex + 1} / ${currentQueue.length}`;
     score.textContent = `Richtig: ${correctCount}`;
 }
 
 function checkAnswer() {
-    if (currentIndex >= vocabDb.length) return;
+    if (currentIndex >= currentQueue.length) return;
 
     if (isAnswered) {
         currentIndex++;
@@ -1268,7 +1331,8 @@ function checkAnswer() {
         return;
     }
 
-    const currentAns = vocabDb[currentIndex].ans.trim();
+    const currentItem = currentQueue[currentIndex];
+    const currentAns = currentItem.ans.trim();
     const userAns = userInput.value.trim();
 
     feedback.style.display = 'block';
@@ -1280,6 +1344,11 @@ function checkAnswer() {
     } else {
         feedback.textContent = `Falsch! Richtig ist: "${currentAns}"`;
         feedback.className = 'feedback incorrect';
+        
+        // Wenn die Vokabel falsch war und noch nicht in der Fehlerliste ist, fügen wir sie hinzu
+        if (!failedQueue.includes(currentItem)) {
+            failedQueue.push(currentItem);
+        }
     }
 
     isAnswered = true;
@@ -1293,7 +1362,8 @@ userInput.addEventListener('keypress', function(e) {
     }
 });
 
-loadQuestion();
+// Menü initialisieren beim Laden der Seite
+initMenu();
     </script>
 </body>
 </html>
